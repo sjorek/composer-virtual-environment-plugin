@@ -1,21 +1,21 @@
 <?php
-namespace Sjorek\Composer\VirtualEnvironmentPlugin\Command;
+namespace Sjorek\Composer\VirtualEnvironmentPlugin;
 
 use Composer\Command\BaseCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Silencer;
 use Composer\Util\Platform;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class VirtualEnvironmentCommand extends BaseCommand
+class Command extends BaseCommand
 {
     protected function configure()
     {
