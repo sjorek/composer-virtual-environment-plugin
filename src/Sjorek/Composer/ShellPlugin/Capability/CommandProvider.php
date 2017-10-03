@@ -2,7 +2,7 @@
 namespace Sjorek\Composer\ShellPlugin\Capability;
 
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
-use Sjorek\Composer\ShellPlugin\Command\ActivateEnvironmentCommand;
+use Sjorek\Composer\ShellPlugin\Command\VirtualEnvironmentCommand;
 
 /**
  *
@@ -19,7 +19,7 @@ class CommandProvider implements CommandProviderCapability
      */
     public function getCommands()
     {
-        return array(new ActivateEnvironmentCommand());
+        return array(new VirtualEnvironmentCommand());
     }
 }
 

@@ -9,11 +9,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ActivateEnvironmentCommand extends BaseCommand
+class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
-        $this->setName('activate-environment');
+        $this->setName('virtual-environment');
     }
     
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -21,4 +21,3 @@ class ActivateEnvironmentCommand extends BaseCommand
         $output->writeln('Executing');
     }
 }
-

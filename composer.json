@@ -4,7 +4,7 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Sjorek\\Composer\\" : "src"
+			"Sjorek\\Composer\\" : "src/Sjorek/Composer"
 		}
 	},
 	"name" : "sjorek/composer-shell-plugin",
