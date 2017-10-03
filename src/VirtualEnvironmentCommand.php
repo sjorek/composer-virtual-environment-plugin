@@ -101,7 +101,7 @@ EOT
         foreach($templates as $template) {
             $source = $resPath . '/' .$template;
             $target = $binPath . '/' .$template;
-            if (file_exists($target) && !$input->getArgument('force')) {
+            if (file_exists($target) && !$input->getOption('force')) {
                 $io->writeError('    <warning>Skipped installation of bin '.$target.': file already exists</warning>');
                 continue;
             }
@@ -139,7 +139,7 @@ EOT
         foreach($symlinks as $name => $source) {
             $target = $binPath . '/' .$name;
             if (file_exists($target) || is_link($target)) {
-                if ($input->getArgument('force')) {
+                if ($input->getOption('force')) {
                     if (!$filesystem->unlink($target)) {
                         $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': force-option given, while file already exists and its removal failed</warning>');
                         continue;
