@@ -7,10 +7,10 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Sjorek\\Composer" : "src/Sjorek/Composer"
+			"Sjorek\\Composer\\" : "src"
 		},
 		"psr-0" : {
-			"Sjorek\\Composer" : "src/Sjorek/Composer"
+			"Sjorek\\Composer\\" : "src"
 		}
 	},
 	"name" : "sjorek/composer-virtual-environment-plugin",
