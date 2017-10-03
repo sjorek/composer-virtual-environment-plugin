@@ -3,9 +3,9 @@
 
 function deactivate  -d "Exit virtual environment and return to normal shell environment"
     # reset old environment variables
-    if test -n "$_OLD_VIRTUAL_ENVIRONMENT_PATH"
-        set -gx PATH $_OLD_VIRTUAL_ENVIRONMENT_PATH
-        set -e _OLD_VIRTUAL_ENVIRONMENT_PATH
+    if test -n "$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH"
+        set -gx PATH $_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH
+        set -e _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH
     end
 
     if test -n "$_OLD_FISH_PROMPT_OVERRIDE"
@@ -15,7 +15,7 @@ function deactivate  -d "Exit virtual environment and return to normal shell env
         functions -e _old_fish_prompt
     end
 
-    set -e VIRTUAL_ENVIRONMENT
+    set -e COMPOSER_VIRTUAL_ENVIRONMENT
     if test "$argv[1]" != "nondestructive"
         # Self destruct!
         functions -e deactivate
@@ -25,12 +25,12 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENVIRONMENT "@BASE_DIR@"
+set -gx COMPOSER_VIRTUAL_ENVIRONMENT "@BASE_DIR@"
 
-set -gx _OLD_VIRTUAL_ENVIRONMENT_PATH $PATH
+set -gx _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH $PATH
 set -gx PATH "@BIN_DIR@" $PATH
 
-if test -z "$VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
+if test -z "$COMPOSER_VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
     # fish uses a function instead of an env var to generate the prompt.
 
     # save the current fish_prompt function as the function _old_fish_prompt
@@ -46,13 +46,13 @@ if test -z "$VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
             printf "%s%s" "(@NAME@) " (set_color normal)
         else
             # ...Otherwise, prepend env
-            set -l _checkbase (basename "$VIRTUAL_ENVIRONMENT")
+            set -l _checkbase (basename "$COMPOSER_VIRTUAL_ENVIRONMENT")
             if test $_checkbase = "__"
                 # special case for Aspen magic directories
                 # see http://www.zetadev.com/software/aspen/
-                printf "%s[%s]%s " (set_color -b blue white) (basename (dirname "$VIRTUAL_ENVIRONMENT")) (set_color normal)
+                printf "%s[%s]%s " (set_color -b blue white) (basename (dirname "$COMPOSER_VIRTUAL_ENVIRONMENT")) (set_color normal)
             else
-                printf "%s(%s)%s" (set_color -b blue white) (basename "$VIRTUAL_ENVIRONMENT") (set_color normal)
+                printf "%s(%s)%s" (set_color -b blue white) (basename "$COMPOSER_VIRTUAL_ENVIRONMENT") (set_color normal)
             end
         end
 
@@ -61,5 +61,5 @@ if test -z "$VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
         _old_fish_prompt
     end
 
-    set -gx _OLD_FISH_PROMPT_OVERRIDE "$VIRTUAL_ENVIRONMENT"
+    set -gx _OLD_FISH_PROMPT_OVERRIDE "$COMPOSER_VIRTUAL_ENVIRONMENT"
 end

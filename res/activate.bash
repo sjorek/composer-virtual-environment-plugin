@@ -10,19 +10,19 @@ deactivate () {
     fi
 
     # reset old environment variables
-    if [ -n "$_OLD_VIRTUAL_ENVIRONMENT_PATH" ] ; then
-        PATH="$_OLD_VIRTUAL_ENVIRONMENT_PATH"
+    if [ -n "$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH" ] ; then
+        PATH="$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH"
         export PATH
-        unset _OLD_VIRTUAL_ENVIRONMENT_PATH
+        unset _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH
     fi
 
-    if [ -n "$_OLD_VIRTUAL_ENVIRONMENT_PS1" ] ; then
-        PS1="$_OLD_VIRTUAL_ENVIRONMENT_PS1"
+    if [ -n "$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PS1" ] ; then
+        PS1="$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PS1"
         export PS1
-        unset _OLD_VIRTUAL_ENVIRONMENTL_PS1
+        unset _OLD_COMPOSER_VIRTUAL_ENVIRONMENTL_PS1
     fi
 
-    unset VIRTUAL_ENVIRONMENT
+    unset COMPOSER_VIRTUAL_ENVIRONMENT
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
         unset -f deactivate
@@ -32,24 +32,24 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENVIRONMENT="@BASE_DIR@"
-export VIRTUAL_ENVIRONMENT
+COMPOSER_VIRTUAL_ENVIRONMENT="@BASE_DIR@"
+export COMPOSER_VIRTUAL_ENVIRONMENT
 
-_OLD_VIRTUAL_ENVIRONMENT_PATH="$PATH"
+_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH="$PATH"
 PATH="@BIN_DIR@:$PATH"
 export PATH
 
-if [ -z "$VIRTUAL_ENVIRONMENT_DISABLE_PROMPT" ] ; then
-    _OLD_VIRTUAL_ENVIRONMENT_PS1="$PS1"
+if [ -z "$COMPOSER_VIRTUAL_ENVIRONMENT_DISABLE_PROMPT" ] ; then
+    _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PS1="$PS1"
     if [ "x(@NAME@) " != x ] ; then
     PS1="(@NAME@) $PS1"
     else
-    if [ "`basename \"$VIRTUAL_ENVIRONMENT\"`" = "__" ] ; then
+    if [ "`basename \"$COMPOSER_VIRTUAL_ENVIRONMENT\"`" = "__" ] ; then
         # special case for Aspen magic directories
         # see http://www.zetadev.com/software/aspen/
-        PS1="[`basename \`dirname \"$VIRTUAL_ENVIRONMENT\"\``] $PS1"
+        PS1="[`basename \`dirname \"$COMPOSER_VIRTUAL_ENVIRONMENT\"\``] $PS1"
     else
-        PS1="(`basename \"$VIRTUAL_ENVIRONMENT\"`)$PS1"
+        PS1="(`basename \"$COMPOSER_VIRTUAL_ENVIRONMENT\"`)$PS1"
     fi
     fi
     export PS1
