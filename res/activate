@@ -2,10 +2,9 @@
 # you cannot run it directly
 
 if [ -n "$BASH_VERSION" ] ; then
-    source @BIN_DIR@/activate.bash
-else
-if [ -n "$ZSH_VERSION" ] ; then
-    source @BIN_DIR@/activate.zsh
+    source "@BIN_DIR@/activate.bash"
+elif [ -n "$ZSH_VERSION" ] ; then
+    source "@BIN_DIR@/activate.zsh"
 else
     echo "Could not determine shell version."
     echo "Virtual environment not activated."
