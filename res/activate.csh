@@ -32,7 +32,4 @@ if (! "$?VIRTUAL_ENVIRONMENT_DISABLE_PROMPT") then
     unset env_name
 endif
 
-#alias composer @COMPOSER_BIN@
-#alias php @PHP_BIN@
-
 rehash
