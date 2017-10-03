@@ -72,6 +72,11 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $composer = $this->getComposer();
+        $config = $composer->getConfig();
+        $recipe = Factory::getComposerFile();
+        $io = $this->getIO();
+
         $filesystem = new Filesystem();
         // Do not remove double realpath() calls.
         // Fixes failing Windows realpath() implementation.
@@ -80,11 +85,6 @@ EOT
         $binPath = $filesystem->normalizePath(realpath(realpath($config->get('bin-dir'))));
         $resPath = $filesystem->normalizePath(realpath(realpath(__DIR__ . '/../../../../res')));
 
-        $io = $this->getIO();
-        $composer = $this->getComposer();
-        $config = $composer->getConfig();
-
-        $recipe = Factory::getComposerFile();
         $json = new JsonFile($basePath . $recipe, null, $io);
         $manifest = $json->read();
 
