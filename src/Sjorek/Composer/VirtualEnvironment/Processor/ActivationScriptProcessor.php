@@ -28,7 +28,7 @@ class ActivationScriptProcessor
     {
         if (file_exists($this->target) && !$force) {
             $output->writeln('    <warning>Skipped installation of bin '.$this->target.': file already exists</warning>');
-            continue;
+            return false;
         }
 
         $content = file_get_contents($this->source, false);
@@ -41,6 +41,7 @@ class ActivationScriptProcessor
         file_put_contents($this->target, $content);
         Silencer::call('chmod', $this->target, 0777 & ~umask());
         $output->writeln('Installed virtual environment activation script: ' . $this->target);
+        return true;
     }
 
     public function rollback($output)
@@ -48,12 +49,14 @@ class ActivationScriptProcessor
         if (file_exists($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment activation script: ' . $this->target);
+                return true;
             } else {
                 $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
             }
         } else {
             $output->writeln('Skipped removing virtual environment activation script, as it does not exist: ' . $this->target);
         }
+        return false;
     }
 }
 

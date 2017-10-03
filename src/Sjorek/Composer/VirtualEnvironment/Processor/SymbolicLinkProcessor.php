@@ -56,12 +56,14 @@ class SymbolicLinkProcessor
         if (is_link($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment symbolic link: ' . $this->target);
+                return true;
             } else {
                 $output->writeln('Could not remove virtual environment symbolic link: ' . $this->target);
             }
         } else {
             $output->writeln('Skipped removing virtual environment symbolic link, as it does not exist: ' . $this->target);
         }
+        return false;
     }
 }
 
