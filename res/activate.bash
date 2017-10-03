@@ -32,7 +32,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENVIRONMENT="@VIRTUAL_ENVIRONMENT@"
+VIRTUAL_ENVIRONMENT="@BASE_DIR@"
 export VIRTUAL_ENVIRONMENT
 
 _OLD_VIRTUAL_ENVIRONMENT_PATH="$PATH"
