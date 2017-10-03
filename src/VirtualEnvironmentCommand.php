@@ -81,9 +81,8 @@ EOT
         $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
         $binPath = $filesystem->normalizePath($config->get('bin-dir'));
         $resPath = $filesystem->normalizePath(__DIR__ . '/../../../../res');
-        $jsonPath = $filesystem->normalizePath($basePath . '/' . basename($recipe));
 
-        $json = new JsonFile($jsonPath, null, $io);
+        $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
 
         if ($input->getOption('name')) {
