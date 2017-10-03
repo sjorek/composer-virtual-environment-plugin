@@ -1,8 +1,8 @@
 <?php
-namespace Sjorek\Composer\ShellPlugin\Capability;
+namespace Sjorek\Composer\VirtualEnvironmentPlugin\Capability;
 
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
-use Sjorek\Composer\ShellPlugin\Command\VirtualEnvironmentCommand;
+use Sjorek\Composer\VirtualEnvironmentPlugin\Command\VirtualEnvironmentCommand;
 
 /**
  *

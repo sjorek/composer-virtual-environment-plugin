@@ -9,7 +9,7 @@ use Composer\IO\IOInterface;
  * 
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellPlugin implements PluginInterface
+class VirtualEnvironmentPlugin implements PluginInterface
 {
 
     /**
@@ -24,7 +24,7 @@ class ShellPlugin implements PluginInterface
     public function getCapabilities()
     {
         return array(
-            'Composer\\Plugin\\Capability\\CommandProvider' => 'Sjorek\\Composer\\ShellPlugin\\Capability\\CommandProvider',
+            'Composer\\Plugin\\Capability\\CommandProvider' => 'Sjorek\\Composer\\VirtualEnvironmentPlugin\\Capability\\CommandProvider',
         );
     }
 }

@@ -7,7 +7,7 @@
 			"Sjorek\\Composer\\" : "src/Sjorek/Composer"
 		}
 	},
-	"name" : "sjorek/composer-shell-plugin",
+	"name" : "sjorek/composer-virtual-environment-plugin",
 	"type" : "composer-plugin",
 	"description" : "Provides a command to activate/deactivate the current bin directory in shell, optionally placing a symlink to the current php-binary.",
 	"license" : "BSD-3-Clause",
