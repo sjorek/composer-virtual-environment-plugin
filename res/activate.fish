@@ -28,7 +28,7 @@ deactivate nondestructive
 set -gx VIRTUAL_ENVIRONMENT "@BASE_DIR@"
 
 set -gx _OLD_VIRTUAL_ENVIRONMENT_PATH $PATH
-set -gx PATH "$VIRTUAL_ENVIRONMENT/bin" $PATH
+set -gx PATH "@BIN_DIR@" $PATH
 
 if test -z "$VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
     # fish uses a function instead of an env var to generate the prompt.
