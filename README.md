@@ -1,4 +1,4 @@
-# composer-virtual-environment-plugin
+# A “virtual-environment” command-plugin for composer
 
 Provides a composer-plugin that adds a command to activate/deactivate the current bin-directory
 in shell, optionally creating symlinks to the composer- and php-binary in the bin-directory.
