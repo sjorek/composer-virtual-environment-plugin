@@ -89,8 +89,8 @@ EOT
         $json = new JsonFile($jsonPath, null, $io);
         $manifest = $json->read();
 
-        if ($input->getArgument('name')) {
-            $name = $input->getArgument('name');
+        if ($input->getOption('name')) {
+            $name = $input->getOption('name');
         } else {
             $name = $manifest['name'];
         }
