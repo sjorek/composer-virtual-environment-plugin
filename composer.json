@@ -15,17 +15,17 @@
 		"composer-plugin-api" : "^1.1"
 	},
 	"extra" : {
-		"class" : "Sjorek\\Composer\\ShellPlugin"
+		"class" : "Sjorek\\Composer\\VirtualEnvironmentPlugin"
 	},
-	"homepage" : "http://github.com/sjorek/composer-shell-plugin",
+	"homepage" : "http://github.com/sjorek/composer-virtual-environment-plugin",
 	"authors" : [{
 			"name" : "Stephan Jorek",
 			"email" : "stephan.jorek@gmail.com"
 		}
 	],
 	"repositories" : [{
-			"type" : "git",
-			"url" : "https://github.com/sjorek/composer-shell-plugin",
+			"typronmente" : "git",
+			"url" : "https://github.com/sjorek/composer-virtual-environment-plugin",
 			"name" : "Github"
 		}
 	],
