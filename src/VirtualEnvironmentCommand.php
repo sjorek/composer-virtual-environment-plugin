@@ -78,10 +78,10 @@ EOT
         $io = $this->getIO();
 
         $filesystem = new Filesystem();
-        $basePath = $filesystem->normalizePath(dirname($recipe));
+        $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
         $binPath = $filesystem->normalizePath($config->get('bin-dir'));
         $resPath = $filesystem->normalizePath(__DIR__ . '/../../../../res');
-        $jsonPath = $filesystem->normalizePath($basePath . '/' . $recipe);
+        $jsonPath = $filesystem->normalizePath($basePath . '/' . basename($recipe));
 
         $json = new JsonFile($jsonPath, null, $io);
         $manifest = $json->read();
