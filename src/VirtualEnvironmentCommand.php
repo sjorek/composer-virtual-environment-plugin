@@ -108,7 +108,7 @@ EOT
             $source = $resPath . '/' .$template;
             $target = $binPath . '/' .$template;
             if (file_exists($target) && !$input->getOption('force')) {
-                $io->writeError('    <warning>Skipped installation of bin '.$target.': file already exists</warning>');
+                $output->writeln('    <warning>Skipped installation of bin '.$target.': file already exists</warning>');
                 continue;
             }
             $data = file_get_contents($source, false);
@@ -139,29 +139,33 @@ EOT
             $symlinks['composer'] = realpath($input->getOption('composer')) ?: $input->getOption('composer');
         }
         if (!empty($symlinks) && Platform::isWindows()) {
-            $io->writeError('    <warning>Skipped creation of symbolic links on windows</warning>');
+            $output->writeln('    <warning>Skipped creation of symbolic links on windows</warning>');
             return ;
         }
         foreach($symlinks as $name => $source) {
             $target = $binPath . '/' .$name;
+            if ($source === $target) {
+                $output->writeln('    <warning>Skipped creation of symbolic link: source and target are the same '.$target.' -> ' . $source . '</warning>');
+                continue;
+            }
             if (file_exists($target) || is_link($target)) {
                 if ($input->getOption('force')) {
                     if (!$filesystem->unlink($target)) {
-                        $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': force-option given, while file already exists and its removal failed</warning>');
+                        $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': force-option given, while file already exists and its removal failed</warning>');
                         continue;
                     }
                 } else {
-                    $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': file already exists</warning>');
+                    $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': file already exists</warning>');
                     continue;
                 }
             }
             if (!(file_exists($source) || is_link($target))) {
-                $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': ' . $source . ' does not exist</warning>');
+                $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': ' . $source . ' does not exist</warning>');
                 continue;
             }
             $filesystem->ensureDirectoryExists($config->get('bin-dir'));
             if (!$filesystem->relativeSymlink($source, $target)) {
-                $io->writeError('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
+                $output->writeln('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
                 continue;
             }
             $output->writeln('Installed virtual environment symlink: ' . $target .' -> ' . $source );
