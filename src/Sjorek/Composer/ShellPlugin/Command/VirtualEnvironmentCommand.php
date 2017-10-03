@@ -9,6 +9,7 @@ use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Silencer;
+use Composer\Util\Platform;
 
 /**
  *
@@ -22,11 +23,16 @@ class VirtualEnvironmentCommand extends BaseCommand
         $json = new JsonFile($file, null, $io);
         $manifest = $json->read();
 
+        $composer = realpath($_SERVER['argv'][0]) ?: null;
+        $php = Silencer::call('which', 'php') ?: null;
+
         $this
             ->setName('virtual-environment')
             ->setDescription('Setup a virtual environment.')
             ->setDefinition(array(
-                new InputOption('name', "n", InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $manifest['name']),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $manifest['name']),
+                new InputOption('php', null, InputOption::VALUE_OPTIONAL, 'Add symlink to php', $php),
+                new InputOption('composer', null, InputOption::VALUE_OPTIONAL, 'Add symlink to composer', $composer),
                 new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false)
             ))
             ->setHelp(<<<EOT
@@ -119,6 +125,41 @@ EOT
             Silencer::call('chmod', $target, 0777 & ~umask());
 
             $output->writeln('Installed virtual environment script: ' . $target);
+        }
+
+        $symlinks = array();
+        if ($input->getArgument('php')) {
+            $symlinks['php'] = realpath($input->getArgument('php')) ?: $input->getArgument('php');
+        }
+        if ($input->getArgument('composer')) {
+            $symlinks['composer'] = realpath($input->getArgument('composer')) ?: $input->getArgument('composer');
+        }
+        if (!empty($symlinks) && Platform::isWindows()) {
+            $io->writeError('    <warning>Skipped creation of symbolic links on windows</warning>');
+            return ;
+        }
+        foreach($symlinks as $name => $source) {
+            $target = $binPath . '/' .$name;
+            if (file_exists($target) || is_link($target)) {
+                if ($input->getArgument('force')) {
+                    if (!$filesystem->unlink($target)) {
+                        $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': force-option given, while file already exists and its removal failed</warning>');
+                        continue;
+                    }
+                } else {
+                    $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': file already exists</warning>');
+                    continue;
+                }
+            }
+            if (!(file_exists($source) || is_link($target))) {
+                $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': ' . $source . ' does not exist</warning>');
+                continue;
+            }
+            if (!$filesystem->relativeSymlink($source, $target)) {
+                $io->writeError('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
+                continue;
+            }
+            $output->writeln('Installed virtual environment symlink: ' . $target .' -> ' . $source );
         }
     }
 }
