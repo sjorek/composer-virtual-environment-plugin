@@ -7,7 +7,7 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Sjorek\\Composer\\" : "src/Sjorek/Composer"
+			"Sjorek\\Composer" : "src/Sjorek/Composer"
 		}
 	},
 	"name" : "sjorek/composer-virtual-environment-plugin",
@@ -24,12 +24,6 @@
 	"authors" : [{
 			"name" : "Stephan Jorek",
 			"email" : "stephan.jorek@gmail.com"
-		}
-	],
-	"repositories" : [{
-			"typronmente" : "git",
-			"url" : "https://github.com/sjorek/composer-virtual-environment-plugin",
-			"name" : "Github"
 		}
 	],
 	"minimum-stability" : "dev"
