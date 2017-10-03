@@ -14,13 +14,20 @@
 	"require" : {
 		"composer-plugin-api" : "^1.1"
 	},
-	"extra": {
-		"class": "Sjorek\\Composer\\ShellPlugin"
+	"extra" : {
+		"class" : "Sjorek\\Composer\\ShellPlugin"
 	},
 	"homepage" : "http://github.com/sjorek/composer-shell-plugin",
 	"authors" : [{
 			"name" : "Stephan Jorek",
 			"email" : "stephan.jorek@gmail.com"
 		}
-	]
+	],
+	"repositories" : [{
+			"type" : "git",
+			"url" : "https://github.com/sjorek/composer-shell-plugin",
+			"name" : "Github"
+		}
+	],
+	"minimum-stability" : "dev"
 }
