@@ -1,0 +1,26 @@
+{
+	"keywords" : [
+		"environment shell php hhvm"
+	],
+	"autoload" : {
+		"psr-4" : {
+			"Sjorek\\Composer\\" : "src"
+		}
+	},
+	"name" : "sjorek/composer-shell-plugin",
+	"type" : "composer-plugin",
+	"description" : "Provides a command to activate/deactivate the current bin directory in shell, optionally placing a symlink to the current php-binary.",
+	"license" : "BSD-3-Clause",
+	"require" : {
+		"composer-plugin-api" : "^1.1"
+	},
+	"extra": {
+		"class": "Sjorek\\Composer\\ShellPlugin"
+	},
+	"homepage" : "http://github.com/sjorek/composer-shell-plugin",
+	"authors" : [{
+			"name" : "Stephan Jorek",
+			"email" : "stephan.jorek@gmail.com"
+		}
+	]
+}
