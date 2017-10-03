@@ -1,0 +1,12 @@
+# This file must be used with "source bin/activate" *from bash or zsh*
+# you cannot run it directly
+
+if [ -n "$BASH_VERSION" ] ; then
+    source @VIRTUAL_ENVIRONMENT@/@BIN_DIR@/activate.bash
+else
+if [ -n "$ZSH_VERSION" ] ; then
+    source @VIRTUAL_ENVIRONMENT@/@BIN_DIR@/activate.zsh
+else
+    echo "Could not determine shell version."
+    echo "Virtual environment not activated."
+fi
