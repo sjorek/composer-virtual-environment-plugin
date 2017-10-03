@@ -19,8 +19,9 @@ class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
-        $file = Factory::getComposerFile();
-        $json = new JsonFile($file, null, $io);
+        $io = $this->getIO();
+        $recipe = Factory::getComposerFile();
+        $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
 
         $composer = realpath($_SERVER['argv'][0]) ?: null;
