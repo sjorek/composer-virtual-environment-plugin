@@ -17,6 +17,7 @@ use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Processor;
+use Sjorek\Composer\VirtualEnvironment\Util\CommandConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,24 +29,27 @@ class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
+        $cmdConfig = new CommandConfiguration();
+
         $io = $this->getIO();
         $recipe = Factory::getComposerFile();
         $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
+        $name = $cmdConfig->get('name', $manifest['name']);
 
         if (getenv('COMPOSER_VIRTUAL_ENVIRONMENT')) {
-            $php = null;
-            $composer = null;
+            $php = $cmdConfig->get('php');
+            $composer = $cmdConfig->get('composer');;
         } else {
-            $php = exec('which php') ?: null;
-            $composer = realpath($_SERVER['argv'][0]) ?: null;
+            $php = $cmdConfig->get('php', exec('which php') ?: null);
+            $composer = $cmdConfig->get('composer', realpath($_SERVER['argv'][0]) ?: null);
         }
 
         $this
             ->setName('virtual-environment')
             ->setDescription('Setup a virtual environment.')
             ->setDefinition(array(
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $manifest['name']),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $name),
                 new InputOption('php', null, InputOption::VALUE_OPTIONAL, 'Add symlink to php', $php),
                 new InputOption('composer', null, InputOption::VALUE_OPTIONAL, 'Add symlink to composer', $composer),
                 new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false),
@@ -88,6 +92,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $cmdConfig = new CommandConfiguration();
         $composer = $this->getComposer();
         $config = $composer->getConfig();
         $recipe = Factory::getComposerFile();
@@ -113,19 +118,24 @@ EOT
             '@BIN_DIR@' => $binPath,
         );
 
-        $templates = array(
+        $activators = array(
             'activate',
             'activate.bash',
             'activate.csh',
             'activate.fish',
             'activate.zsh',
         );
-
-        foreach ($templates as $template) {
-            $source = $resPath . '/' .$template;
-            $target = $binPath . '/' .$template;
+        foreach ($activators as $key => $filename) {
+            $source = $resPath . '/' .$filename;
+            $target = $binPath . '/' .$filename;
             $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
-            $processor->deploy($output, $input->getOption('force'));
+            if ($processor->deploy($output, $input->getOption('force'))) {
+                continue;
+            }
+            unset($activators[$key]);
+        }
+        if (!empty($activators)) {
+            $cmdConfig->set('activators', implode(',', $activators));
         }
 
         $symlinks = array();
@@ -142,7 +152,12 @@ EOT
         foreach ($symlinks as $name => $source) {
             $target = $binPath . '/' .$name;
             $processor = new Processor\SymbolicLinkProcessor($source, $target);
-            $processor->deploy($output, $input->getOption('force'));
+            if ($processor->deploy($output, $input->getOption('force'))) {
+                $cmdConfig->set($name, $source);
+            }
+        }
+        if ($cmdConfig->persist()) {
+            $output->writeln('Updated virtual environment configuration file: composer.venv');
         }
     }
 }
