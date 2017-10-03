@@ -39,7 +39,7 @@ class VirtualEnvironmentCommand extends BaseCommand
 
         if (getenv('COMPOSER_VIRTUAL_ENVIRONMENT')) {
             $php = $cmdConfig->get('php');
-            $composer = $cmdConfig->get('composer');;
+            $composer = $cmdConfig->get('composer');
         } else {
             $php = $cmdConfig->get('php', exec('which php') ?: null);
             $composer = $cmdConfig->get('composer', realpath($_SERVER['argv'][0]) ?: null);
@@ -147,6 +147,7 @@ EOT
         }
         if (!empty($symlinks) && Platform::isWindows()) {
             $output->writeln('    <warning>Skipped creation of symbolic links on windows</warning>');
+
             return ;
         }
         foreach ($symlinks as $name => $source) {

@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of Composer Virtual Environment Plugin.
+ *
+ * (c) Stephan Jorek <stephnan.jorek@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Sjorek\Composer\VirtualEnvironment\Processor;
 
 use Symfony\Component\Console\Output\OutputInterface;
@@ -6,7 +16,6 @@ use Composer\Util\Filesystem;
 use Composer\Util\Silencer;
 
 /**
- *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class ActivationScriptProcessor
@@ -28,6 +37,7 @@ class ActivationScriptProcessor
     {
         if (file_exists($this->target) && !$force) {
             $output->writeln('    <warning>Skipped installation of bin '.$this->target.': file already exists</warning>');
+
             return false;
         }
 
@@ -41,6 +51,7 @@ class ActivationScriptProcessor
         file_put_contents($this->target, $content);
         Silencer::call('chmod', $this->target, 0777 & ~umask());
         $output->writeln('Installed virtual environment activation script: ' . $this->target);
+
         return true;
     }
 
@@ -49,6 +60,7 @@ class ActivationScriptProcessor
         if (file_exists($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment activation script: ' . $this->target);
+
                 return true;
             } else {
                 $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
@@ -56,7 +68,7 @@ class ActivationScriptProcessor
         } else {
             $output->writeln('Skipped removing virtual environment activation script, as it does not exist: ' . $this->target);
         }
+
         return false;
     }
 }
-

@@ -1,15 +1,23 @@
 <?php
+
+/*
+ * This file is part of Composer Virtual Environment Plugin.
+ *
+ * (c) Stephan Jorek <stephnan.jorek@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Sjorek\Composer\VirtualEnvironment\Util;
 
 use Composer\Factory;
 
 /**
- *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class CommandConfiguration
 {
-
     protected $filename;
     protected $data;
     protected $dirty;
@@ -68,6 +76,7 @@ class CommandConfiguration
         }
         $this->data = $data;
         $this->dirty = false;
+
         return true;
     }
 
@@ -84,7 +93,7 @@ class CommandConfiguration
             }
             $this->dirty = false;
         }
+
         return true;
     }
 }
-
