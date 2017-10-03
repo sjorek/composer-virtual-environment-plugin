@@ -72,6 +72,14 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $filesystem = new Filesystem();
+        // Do not remove double realpath() calls.
+        // Fixes failing Windows realpath() implementation.
+        // See https://bugs.php.net/bug.php?id=72738
+        $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
+        $binPath = $filesystem->normalizePath(realpath(realpath($config->get('bin-dir'))));
+        $resPath = $filesystem->normalizePath(realpath(realpath(__DIR__ . '/../../../../res')));
+
         $io = $this->getIO();
         $composer = $this->getComposer();
         $config = $composer->getConfig();
@@ -85,15 +93,6 @@ EOT
         } else {
             $name = $manifest['name'];
         }
-
-        $filesystem = new Filesystem();
-        $filesystem->ensureDirectoryExists($config->get('bin-dir'));
-        // Do not remove double realpath() calls.
-        // Fixes failing Windows realpath() implementation.
-        // See https://bugs.php.net/bug.php?id=72738
-        $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
-        $binPath = $filesystem->normalizePath(realpath(realpath($config->get('bin-dir'))));
-        $resPath = $filesystem->normalizePath(realpath(realpath(__DIR__ . '/../../../../res')));
 
         $templates = array(
             'activate',
@@ -122,6 +121,7 @@ EOT
                 ),
                 $data
             );
+            $filesystem->ensureDirectoryExists($config->get('bin-dir'));
             file_put_contents($target, $data);
             Silencer::call('chmod', $target, 0777 & ~umask());
 
@@ -156,6 +156,7 @@ EOT
                 $io->writeError('    <warning>Skipped creation of symbolic link '.$target.': ' . $source . ' does not exist</warning>');
                 continue;
             }
+            $filesystem->ensureDirectoryExists($config->get('bin-dir'));
             if (!$filesystem->relativeSymlink($source, $target)) {
                 $io->writeError('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
                 continue;
