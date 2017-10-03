@@ -24,8 +24,13 @@ class VirtualEnvironmentCommand extends BaseCommand
         $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
 
-        $composer = realpath($_SERVER['argv'][0]) ?: null;
-        $php = exec('which php') ?: null;
+        if (getenv('VIRTUAL_ENVIRONMENT')) {
+            $php = null;
+            $composer = null;
+        } else {
+            $php = exec('which php') ?: null;
+            $composer = realpath($_SERVER['argv'][0]) ?: null;
+        }
 
         $this
             ->setName('virtual-environment')
