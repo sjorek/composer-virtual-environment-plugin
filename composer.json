@@ -7,10 +7,10 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Sjorek\\Composer\\" : "src"
+			"Sjorek\\Composer\\VirtualEnvironment\\" : "src/Sjorek/Composer/VirtualEnvironment"
 		},
 		"psr-0" : {
-			"Sjorek\\Composer\\" : "src"
+			"Sjorek\\Composer\\VirtualEnvironment\\" : "src/Sjorek/Composer/VirtualEnvironment"
 		}
 	},
 	"name" : "sjorek/composer-virtual-environment-plugin",
@@ -21,7 +21,7 @@
 		"composer-plugin-api" : "^1.1"
 	},
 	"extra" : {
-		"class" : "Sjorek\\Composer\\VirtualEnvironmentPlugin"
+		"class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
 	},
 	"homepage" : "http://github.com/sjorek/composer-virtual-environment-plugin",
 	"authors" : [{
