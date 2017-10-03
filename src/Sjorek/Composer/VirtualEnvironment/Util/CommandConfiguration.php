@@ -63,6 +63,10 @@ class CommandConfiguration
 
     public function load()
     {
+        if (!file_exists($this->filename)) {
+            return false;
+        }
+
         $json = file_get_contents($this->filename, false);
         if ($json === false) {
             return false;
