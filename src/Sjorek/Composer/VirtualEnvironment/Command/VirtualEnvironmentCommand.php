@@ -33,7 +33,7 @@ class VirtualEnvironmentCommand extends BaseCommand
         $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
 
-        if (getenv('VIRTUAL_ENVIRONMENT')) {
+        if (getenv('COMPOSER_VIRTUAL_ENVIRONMENT')) {
             $php = null;
             $composer = null;
         } else {
