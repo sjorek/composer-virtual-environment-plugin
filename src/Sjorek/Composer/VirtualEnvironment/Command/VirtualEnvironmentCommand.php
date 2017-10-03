@@ -96,7 +96,7 @@ EOT
         $filesystem = new Filesystem();
         $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
         $binPath = $filesystem->normalizePath($config->get('bin-dir'));
-        $resPath = $filesystem->normalizePath(__DIR__ . '/../res');
+        $resPath = $filesystem->normalizePath(__DIR__ . '/../../../../res');
 
         $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
