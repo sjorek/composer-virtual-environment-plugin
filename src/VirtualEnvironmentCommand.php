@@ -37,9 +37,10 @@ class VirtualEnvironmentCommand extends BaseCommand
                 new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false)
             ))
             ->setHelp(<<<EOT
-The <info>virtual-environment</info> command creates files
-to activate/deactivate the current bin directory in shell,
-optionally placing a symlink to the current php-binary.
+The <info>virtual-environment</info> command creates files to activate
+and deactivate the current bin directory in shell,
+optionally placing a symlinks to php- and composer-binaries
+in the bin directory.
 
 <info>php composer.phar virtual-environment</info>
 

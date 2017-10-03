@@ -20,13 +20,14 @@ optionally placing a symlink to the composer- and php-binary.
           --profile                  Display timing and memory usage information
           --no-plugins               Whether to disable plugins.
       -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
-      -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose
-                                     output and 3 for debug
+      -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output,
+                                     2 for more verbose output and 3 for debug
     
     Help:
-      The virtual-environment command creates files
-      to activate/deactivate the current bin directory in shell,
-      optionally placing a symlink to the current php-binary.
+      The virtual-environment command creates files to activate
+      and deactivate the current bin directory in shell,
+      optionally creating symlinks to php- and composer binaries
+      in the bin directory.
       
       php composer.phar virtual-environment
       
