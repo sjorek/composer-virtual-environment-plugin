@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of Composer Virtual Environment Plugin.
+ *
+ * (c) Stephan Jorek <stephnan.jorek@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Sjorek\Composer;
 
 use Composer\Command\BaseCommand;
@@ -12,7 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class VirtualEnvironmentCommand extends BaseCommand
@@ -39,9 +48,10 @@ class VirtualEnvironmentCommand extends BaseCommand
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $manifest['name']),
                 new InputOption('php', null, InputOption::VALUE_OPTIONAL, 'Add symlink to php', $php),
                 new InputOption('composer', null, InputOption::VALUE_OPTIONAL, 'Add symlink to composer', $composer),
-                new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false)
+                new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false),
             ))
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>virtual-environment</info> command creates files to activate
 and deactivate the current bin directory in shell,
 optionally placing a symlinks to php- and composer-binaries
@@ -102,9 +112,9 @@ EOT
             'activate.bash',
             'activate.csh',
             'activate.fish',
-            'activate.zsh'
+            'activate.zsh',
         );
-        foreach($templates as $template) {
+        foreach ($templates as $template) {
             $source = $resPath . '/' .$template;
             $target = $binPath . '/' .$template;
             if (file_exists($target) && !$input->getOption('force')) {
@@ -116,11 +126,12 @@ EOT
                 array(
                     '@NAME@',
                     '@BASE_DIR@',
-                    '@BIN_DIR@'
-                ), array(
+                    '@BIN_DIR@',
+                ),
+                array(
                     $name,
                     $basePath,
-                    $binPath
+                    $binPath,
                 ),
                 $data
             );
@@ -140,9 +151,10 @@ EOT
         }
         if (!empty($symlinks) && Platform::isWindows()) {
             $output->writeln('    <warning>Skipped creation of symbolic links on windows</warning>');
+
             return ;
         }
-        foreach($symlinks as $name => $source) {
+        foreach ($symlinks as $name => $source) {
             $target = $binPath . '/' .$name;
             if ($source === $target) {
                 $output->writeln('    <warning>Skipped creation of symbolic link: source and target are the same '.$target.' -> ' . $source . '</warning>');
@@ -168,7 +180,7 @@ EOT
                 $output->writeln('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
                 continue;
             }
-            $output->writeln('Installed virtual environment symlink: ' . $target .' -> ' . $source );
+            $output->writeln('Installed virtual environment symlink: ' . $target .' -> ' . $source);
         }
     }
 }

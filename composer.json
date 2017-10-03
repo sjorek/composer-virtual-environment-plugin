@@ -29,5 +29,8 @@
 			"email" : "stephan.jorek@gmail.com"
 		}
 	],
-	"minimum-stability" : "dev"
+	"minimum-stability" : "dev",
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.8@dev"
+	}
 }
