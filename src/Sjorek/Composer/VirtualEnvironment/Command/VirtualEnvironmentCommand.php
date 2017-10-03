@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\Composer;
+namespace Sjorek\Composer\VirtualEnvironment\Command;
 
 use Composer\Command\BaseCommand;
 use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
-use Composer\Util\Silencer;
 use Composer\Util\Platform;
+use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -107,6 +107,12 @@ EOT
             $name = $manifest['name'];
         }
 
+        $data = array(
+            '@NAME@' => $name,
+            '@BASE_DIR@' => $basePath,
+            '@BIN_DIR@' => $binPath,
+        );
+
         $templates = array(
             'activate',
             'activate.bash',
@@ -114,32 +120,12 @@ EOT
             'activate.fish',
             'activate.zsh',
         );
+
         foreach ($templates as $template) {
             $source = $resPath . '/' .$template;
             $target = $binPath . '/' .$template;
-            if (file_exists($target) && !$input->getOption('force')) {
-                $output->writeln('    <warning>Skipped installation of bin '.$target.': file already exists</warning>');
-                continue;
-            }
-            $data = file_get_contents($source, false);
-            $data = str_replace(
-                array(
-                    '@NAME@',
-                    '@BASE_DIR@',
-                    '@BIN_DIR@',
-                ),
-                array(
-                    $name,
-                    $basePath,
-                    $binPath,
-                ),
-                $data
-            );
-            $filesystem->ensureDirectoryExists($config->get('bin-dir'));
-            file_put_contents($target, $data);
-            Silencer::call('chmod', $target, 0777 & ~umask());
-
-            $output->writeln('Installed virtual environment script: ' . $target);
+            $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
+            $processor->deploy($output, $input->getOption('force'));
         }
 
         $symlinks = array();
@@ -151,36 +137,12 @@ EOT
         }
         if (!empty($symlinks) && Platform::isWindows()) {
             $output->writeln('    <warning>Skipped creation of symbolic links on windows</warning>');
-
             return ;
         }
         foreach ($symlinks as $name => $source) {
             $target = $binPath . '/' .$name;
-            if ($source === $target) {
-                $output->writeln('    <warning>Skipped creation of symbolic link: source and target are the same '.$target.' -> ' . $source . '</warning>');
-                continue;
-            }
-            if (file_exists($target) || is_link($target)) {
-                if ($input->getOption('force')) {
-                    if (!$filesystem->unlink($target)) {
-                        $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': force-option given, while file already exists and its removal failed</warning>');
-                        continue;
-                    }
-                } else {
-                    $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': file already exists</warning>');
-                    continue;
-                }
-            }
-            if (!(file_exists($source) || is_link($target))) {
-                $output->writeln('    <warning>Skipped creation of symbolic link '.$target.': ' . $source . ' does not exist</warning>');
-                continue;
-            }
-            $filesystem->ensureDirectoryExists($config->get('bin-dir'));
-            if (!$filesystem->relativeSymlink($source, $target)) {
-                $output->writeln('    <warning>Creation of symbolic link '.$target.' -> ' . $source . ' failed</warning>');
-                continue;
-            }
-            $output->writeln('Installed virtual environment symlink: ' . $target .' -> ' . $source);
+            $processor = new Processor\SymbolicLinkProcessor($source, $target);
+            $processor->deploy($output, $input->getOption('force'));
         }
     }
 }

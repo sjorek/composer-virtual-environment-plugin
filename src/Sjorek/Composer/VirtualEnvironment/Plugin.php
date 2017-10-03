@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\Composer;
+namespace Sjorek\Composer\VirtualEnvironment;
 
 use Composer\Plugin\PluginInterface;
 use Composer\Composer;
@@ -23,7 +23,7 @@ use Composer\Plugin\Capability\CommandProvider;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class VirtualEnvironmentPlugin implements PluginInterface, Capable, CommandProvider
+class Plugin implements PluginInterface, Capable, CommandProvider
 {
     /**
      * {@inheritDoc}
@@ -50,6 +50,6 @@ class VirtualEnvironmentPlugin implements PluginInterface, Capable, CommandProvi
      */
     public function getCommands()
     {
-        return array(new VirtualEnvironmentCommand());
+        return array(new Command\VirtualEnvironmentCommand());
     }
 }
