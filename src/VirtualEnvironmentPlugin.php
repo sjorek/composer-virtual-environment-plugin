@@ -43,7 +43,7 @@ class VirtualEnvironmentPlugin implements PluginInterface, Capable, CommandProvi
      */
     public function getCommands()
     {
-        return array(new VirtualEnvironmentPlugin\Command());
+        return array(new VirtualEnvironmentCommand());
     }
 }
 

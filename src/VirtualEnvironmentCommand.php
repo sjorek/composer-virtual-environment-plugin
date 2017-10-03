@@ -1,5 +1,5 @@
 <?php
-namespace Sjorek\Composer\VirtualEnvironmentPlugin;
+namespace Sjorek\Composer;
 
 use Composer\Command\BaseCommand;
 use Composer\Factory;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class Command extends BaseCommand
+class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
