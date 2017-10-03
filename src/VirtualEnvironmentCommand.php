@@ -126,11 +126,11 @@ EOT
         }
 
         $symlinks = array();
-        if ($input->getArgument('php')) {
-            $symlinks['php'] = realpath($input->getArgument('php')) ?: $input->getArgument('php');
+        if ($input->getOption('php')) {
+            $symlinks['php'] = realpath($input->getOption('php')) ?: $input->getOption('php');
         }
-        if ($input->getArgument('composer')) {
-            $symlinks['composer'] = realpath($input->getArgument('composer')) ?: $input->getArgument('composer');
+        if ($input->getOption('composer')) {
+            $symlinks['composer'] = realpath($input->getOption('composer')) ?: $input->getOption('composer');
         }
         if (!empty($symlinks) && Platform::isWindows()) {
             $io->writeError('    <warning>Skipped creation of symbolic links on windows</warning>');
