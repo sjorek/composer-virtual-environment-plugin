@@ -1,4 +1,6 @@
 <?php
+namespace Sjorek\Composer;
+
 use Composer\Plugin\PluginInterface;
 use Composer\Composer;
 use Composer\IO\IOInterface;
