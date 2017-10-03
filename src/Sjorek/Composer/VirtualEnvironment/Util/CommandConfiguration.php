@@ -87,7 +87,7 @@ class CommandConfiguration
     public function persist($force = false)
     {
         if ($this->dirty || $force) {
-            $json = json_encode($this->data, JSON_PRETTY_PRINT /*| JSON_FORCE_OBJECT */);
+            $json = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES /*| JSON_FORCE_OBJECT */);
             if ($json === false) {
                 return false;
             }
