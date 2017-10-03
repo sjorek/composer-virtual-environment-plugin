@@ -48,23 +48,23 @@ corresponding to your shell:
 
 bash/zsh:
 
-    <info>$ source bin/activate</info>
+    <info>$ source vendor/bin/activate</info>
 
 csh:
 
-    <info>$ source bin/activate.csh</info>
+    <info>$ source vendor/bin/activate.csh</info>
 
 fish:
 
-    <info>$ . bin/activate.fish</info>
+    <info>$ . vendor/bin/activate.fish</info>
 
 bash (alternative):
 
-    <info>$ source bin/activate.bash</info>
+    <info>$ source vendor/bin/activate.bash</info>
 
 zsh (alternative):
 
-    <info>$ source bin/activate.zsh</info>
+    <info>$ source vendor/bin/activate.zsh</info>
 
 EOT
             );
