@@ -96,8 +96,8 @@ class CommandConfiguration
                 return false;
             }
             $this->dirty = false;
+            return true;
         }
-
-        return true;
+        return false;
     }
 }
