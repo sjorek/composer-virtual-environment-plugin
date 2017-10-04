@@ -33,31 +33,31 @@ class SymbolicLinkProcessor
     public function deploy(OutputInterface $output, $force = false)
     {
         if ($this->source === $this->target) {
-            $output->writeln('    <warning>Skipped creation of symbolic link: source and target are the same '.$this->target.' -> ' . $this->source . '</warning>');
+            $output->writeln('    <error>Skipped creation of symbolic link:</error> source and target are the same '.$this->target.' -> ' . $this->source);
 
             return false;
         }
         if (file_exists($this->target) || is_link($this->target)) {
             if ($force) {
                 if (!$this->filesystem->unlink($this->target)) {
-                    $output->writeln('    <warning>Skipped creation of symbolic link '.$this->target.': force-option given, while file already exists and its removal failed</warning>');
+                    $output->writeln('    <error>Skipped creation of symbolic link:</error> force-option given, while file "'.$this->target.'" already exists and its removal failed');
 
                     return false;
                 }
             } else {
-                $output->writeln('    <warning>Skipped creation of symbolic link '.$this->target.': file already exists</warning>');
+                $output->writeln('    <error>Skipped creation of symbolic link:</error> file "'.$this->target.'" already exists');
 
                 return false;
             }
         }
-        if (!(file_exists($this->source) || is_link($this->target))) {
-            $output->writeln('    <warning>Skipped creation of symbolic link '.$this->target.': ' . $this->source . ' does not exist</warning>');
+        if (!(file_exists($this->source) || is_link($this->source))) {
+            $output->writeln('    <error>Skipped creation of symbolic link:</error> For "'.$this->target.'" the target "' . $this->source . '" does not exist');
 
             return false;
         }
         $this->filesystem->ensureDirectoryExists(dirname($this->target));
         if (!$this->filesystem->relativeSymlink($this->source, $this->target)) {
-            $output->writeln('    <warning>Creation of symbolic link '.$this->target.' -> ' . $this->source . ' failed</warning>');
+            $output->writeln('    <error>Creation of symbolic link failed:</error> "'.$this->target.'" -> "' . $this->source . '"');
 
             return false;
         }

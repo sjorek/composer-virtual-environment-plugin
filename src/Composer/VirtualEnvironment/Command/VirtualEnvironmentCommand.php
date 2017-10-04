@@ -17,7 +17,7 @@ use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Processor;
-use Sjorek\Composer\VirtualEnvironment\Util\JsonConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Util\RecipeConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,30 +29,44 @@ class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
-        $jsonConfiguration = new JsonConfiguration();
-
         $io = $this->getIO();
-        $recipe = Factory::getComposerFile();
-        $json = new JsonFile($recipe, null, $io);
-        $manifest = $json->read();
-        $name = $jsonConfiguration->get('name', $manifest['name']);
+        $composerFile = Factory::getComposerFile();
+        $composerJson = new JsonFile($composerFile, null, $io);
+        $manifest = $composerJson->read();
 
-        if (getenv('COMPOSER_VIRTUAL_ENVIRONMENT')) {
-            $php = $jsonConfiguration->get('php');
-            $composer = $jsonConfiguration->get('composer');
-        } else {
-            $php = $jsonConfiguration->get('php', exec('which php') ?: null);
-            $composer = $jsonConfiguration->get('composer', realpath($_SERVER['argv'][0]) ?: null);
+        $recipe = new RecipeConfiguration();
+
+        $name = $recipe->get('name', $manifest['name']);
+        $activators = $recipe->get(
+            'shell',
+            explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS)
+        );
+
+        $oldPath = getenv('PATH');
+        if ($oldPath) {
+            putenv('PATH=' . implode( PATH_SEPARATOR, array_slice( explode( PATH_SEPARATOR, $oldPath ), 1 )));
         }
+        $php = $recipe->get('php', exec('which php') ?: null);
+        if ($oldPath) {
+            putenv('PATH=' . $oldPath);
+        }
+        $composer = $recipe->get('composer', realpath($_SERVER['argv'][0]) ?: null);
+
+        $useRecipe = file_exists($recipe->filename);
 
         $this
             ->setName('virtual-environment')
             ->setDescription('Setup a virtual environment.')
             ->setDefinition(array(
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment', $name),
-                new InputOption('php', null, InputOption::VALUE_OPTIONAL, 'Add symlink to php', $php),
-                new InputOption('composer', null, InputOption::VALUE_OPTIONAL, 'Add symlink to composer', $composer),
-                new InputOption('force', "f", InputOption::VALUE_OPTIONAL, 'Force overwriting existing environment scripts', false),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment. Takes precedence over recipe and global composer configuration.', $name),
+                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy. Takes precedence over recipe and global composer configuration.', $activators),
+                new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php. Takes precedence over recipe and global composer configuration.', $php),
+                new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer. Takes precedence over recipe and global composer configuration.', $composer),
+                $useRecipe
+                    ? new InputOption('use-recipe', null, InputOption::VALUE_OPTIONAL, 'Use and update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe. Takes precedence over global composer configuration.', $useRecipe)
+                    : new InputOption('use-recipe', null, InputOption::VALUE_NONE, 'Use and update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe. Takes precedence over global composer configuration.'),
+                new InputOption('use-composer', null, InputOption::VALUE_NONE, 'Use and update the global composer configuration.'),
+                new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment scripts'),
             ))
             ->setHelp(
                 <<<EOT
@@ -61,6 +75,8 @@ and deactivate the current bin directory in shell,
 optionally placing a symlinks to php- and composer-binaries
 in the bin directory.
 
+Usage:
+
 <info>php composer.phar virtual-environment</info>
 
 After this you can source the activation-script
@@ -68,23 +84,23 @@ corresponding to your shell:
 
 bash/zsh:
 
-    <info>$ source vendor/bin/activate</info>
+    <info>source vendor/bin/activate</info>
 
 csh:
 
-    <info>$ source vendor/bin/activate.csh</info>
+    <info>source vendor/bin/activate.csh</info>
 
 fish:
 
-    <info>$ . vendor/bin/activate.fish</info>
+    <info>. vendor/bin/activate.fish</info>
 
 bash (alternative):
 
-    <info>$ source vendor/bin/activate.bash</info>
+    <info>source vendor/bin/activate.bash</info>
 
 zsh (alternative):
 
-    <info>$ source vendor/bin/activate.zsh</info>
+    <info>source vendor/bin/activate.zsh</info>
 
 EOT
             );
@@ -92,73 +108,96 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $jsonConfiguration = new JsonConfiguration();
         $composer = $this->getComposer();
         $config = $composer->getConfig();
-        $recipe = Factory::getComposerFile();
+
         $io = $this->getIO();
+        $composerFile = Factory::getComposerFile();
+        $composerJson = new JsonFile($composerFile, null, $io);
+        $manifest = $composerJson->read();
+
+        $recipe = new RecipeConfiguration();
 
         $filesystem = new Filesystem();
-        $basePath = $filesystem->normalizePath(realpath(realpath(dirname($recipe))));
+        $basePath = $filesystem->normalizePath(realpath(realpath(dirname($composerFile))));
         $binPath = $filesystem->normalizePath($config->get('bin-dir'));
         $resPath = $filesystem->normalizePath(__DIR__ . '/../../../../res');
 
-        $json = new JsonFile($recipe, null, $io);
-        $manifest = $json->read();
-
+        $name = $manifest['name'];
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
-        } else {
-            $name = $manifest['name'];
+        } elseif ($input->getOption('use-recipe')) {
+            $name = $recipe->get('name', $name);
         }
-
+        if ($input->getOption('use-recipe')) {
+            $recipe->set('name', $name);
+        }
         $data = array(
             '@NAME@' => $name,
             '@BASE_DIR@' => $basePath,
             '@BIN_DIR@' => $binPath,
         );
 
-        $activators = array(
-            'activate',
-            'activate.bash',
-            'activate.csh',
-            'activate.fish',
-            'activate.zsh',
-        );
-        foreach ($activators as $key => $filename) {
-            $source = $resPath . '/' .$filename;
-            $target = $binPath . '/' .$filename;
+        $candidates = explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
+        if ($input->getOption('shell')) {
+            $candidates = $input->getOption('shell');
+        } elseif ($input->getOption('use-recipe')) {
+            $candidates = $recipe->get('shell', $candidates);
+        }
+        $activators = Processor\ActivationScriptProcessor::importConfiguration($candidates);
+
+        foreach ($activators as $filename) {
+            $source = $resPath . DIRECTORY_SEPARATOR .$filename;
+            $target = $binPath . DIRECTORY_SEPARATOR .$filename;
             $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
             if ($processor->deploy($output, $input->getOption('force'))) {
                 continue;
             }
-            unset($activators[$key]);
         }
-        if (!empty($activators)) {
-            $jsonConfiguration->set('activators', implode(',', $activators));
+        if ($input->getOption('use-recipe')) {
+            $activators = Processor\ActivationScriptProcessor::exportConfiguration($activators);
+            $recipe->set('shell', $activators);
         }
 
-        $symlinks = array();
+        $symlinks = array(
+            'activate' => null,
+            'composer' => null,
+            'php' => null,
+        );
+
+        // If only has been given, we'll symlink to this activator 
+        if (count($activators) === 1) {
+            $symlinks['activate'] = $binPath . DIRECTORY_SEPARATOR . 'activate.' . $activators[0];
+        }
         if ($input->getOption('php')) {
             $symlinks['php'] = realpath($input->getOption('php')) ?: $input->getOption('php');
+        } elseif ($input->getOption('use-recipe')) {
+            $symlinks['php'] = $recipe->get('php', $symlinks['php']);
         }
         if ($input->getOption('composer')) {
             $symlinks['composer'] = realpath($input->getOption('composer')) ?: $input->getOption('composer');
+        } elseif ($input->getOption('use-recipe')) {
+            $symlinks['composer'] = $recipe->get('composer', $symlinks['composer']);
         }
-        if (!empty($symlinks) && Platform::isWindows()) {
-            $output->writeln('    <warning>Skipped creation of symbolic links on windows</warning>');
+        $symlinks = array_filter($symlinks);
 
-            return ;
-        }
-        foreach ($symlinks as $name => $source) {
-            $target = $binPath . '/' .$name;
-            $processor = new Processor\SymbolicLinkProcessor($source, $target);
-            if ($processor->deploy($output, $input->getOption('force'))) {
-                $jsonConfiguration->set($name, $source);
+        if (empty($symlinks)) {
+            $output->writeln('Skipping creation of symbolic links, none available.');
+        } elseif (Platform::isWindows()) {
+            $output->writeln('    <warning>Symbolic links are not supported on windows</warning>');
+        } else {
+            foreach ($symlinks as $name => $source) {
+                $target = $binPath . DIRECTORY_SEPARATOR . $name;
+                $processor = new Processor\SymbolicLinkProcessor($source, $target);
+                if ($processor->deploy($output, $input->getOption('force'))) {
+                    if ($input->getOption('use-recipe') && $name !== 'activate') {
+                        $recipe->set($name, $source);
+                    }
+                }
             }
         }
-        if ($jsonConfiguration->persist()) {
-            $output->writeln('Updated virtual environment configuration file: composer.venv');
+        if ($input->getOption('use-recipe') && $recipe->persist()) {
+            $output->writeln('Updated virtual environment configuration recipe: ' . $recipe->filename);
         }
     }
 }
