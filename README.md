@@ -11,46 +11,42 @@ and php-binary in the bin-directory.
       virtual-environment [options]
     
     Options:
-          --name=NAME                Name of the virtual environment.
-                                     Takes precedence over recipe and
-                                     global composer configuration.
-                                     [default: "package/name"]
-          --shell=SHELL              Set the list of shell activators to
-                                     deploy.
-                                     Takes precedence over recipe and
-                                     global composer configuration.
-                                     [default: ["bash","csh","fish",
-                                     "zsh"]] (multiple values allowed)
-          --php=PHP                  Add symlink to php.
-                                     Takes precedence over recipe and
-                                     global composer configuration.
-          --composer=COMPOSER        Add symlink to composer.
-                                     Takes precedence over recipe and
-                                     global composer configuration.
-          --use-recipe               Use and update the virtual
-                                     environment configuration recipe in
-                                     "./composer.venv".
-                                     Takes precedence over global
-                                     composer configuration.
-          --use-composer             Use and update the global composer
-                                     configuration
-                                     "~/.composer/config.json".
-      -f, --force                    Force overwriting existing
-                                     environment scripts
-      -h, --help                     Display this help message
-      -q, --quiet                    Do not output any message
-      -V, --version                  Display this application version
-          --ansi                     Force ANSI output
-          --no-ansi                  Disable ANSI output
-      -n, --no-interaction           Do not ask any interactive question
-          --profile                  Display timing and memory usage
-                                     information
-          --no-plugins               Whether to disable plugins.
-      -d, --working-dir=WORKING-DIR  If specified, use the given
-                                     directory as working directory.
-      -v|vv|vvv, --verbose           Increase the verbosity of messages:
-                                     1 for normal output, 2 for more
-                                     verbose output and 3 for debug
+          --name=NAME                      Name of the virtual environment.
+                                           [default: "vendor/package-name"]
+          --shell=SHELL                    Set the list of shell activators
+                                           to deploy.
+                                           [default: ["bash","csh","fish","zsh"]]
+                                           (multiple values allowed)
+          --php=PHP                        Add symlink to php.
+          --composer=COMPOSER              Add symlink to composer.
+                                           [default: "composer.phar"]
+          --recipe-update[=RECIPE-UPDATE]  Update the virtual environment
+                                           configuration recipe in
+                                           "./composer.venv" recipe.
+                                           [default: false]
+          --recipe-ignore                  Ignore the virtual environment
+                                           configuration recipe in
+                                           "./composer.venv" recipe.
+          --global-update[=GLOBAL-UPDATE]  Update the global composer
+                                           configuration.
+                                           [default: false]
+          --global-ignore                  Ignore the global composer
+                                           configuration.
+      -f, --force                          Force overwriting existing
+                                           environment scripts
+      -h, --help                           Display this help message
+      -q, --quiet                          Do not output any message
+      -V, --version                        Display this application version
+          --ansi                           Force ANSI output
+          --no-ansi                        Disable ANSI output
+      -n, --no-interaction                 Do not ask any interactive question
+          --profile                        Display timing and memory usage information
+          --no-plugins                     Whether to disable plugins.
+      -d, --working-dir=WORKING-DIR        If specified, use the given directory as
+                                           working directory.
+      -v|vv|vvv, --verbose                 Increase the verbosity of messages:
+                                           1 for normal output, 2 for more verbose
+                                           output and 3 for debug
     
     Help:
       The virtual-environment command creates files to activate
@@ -60,28 +56,22 @@ and php-binary in the bin-directory.
       
       Usage:
       
-      php composer.phar virtual-environment
+          php composer.phar virtual-environment
       
       After this you can source the activation-script
-      corresponding to your shell:
+      corresponding to your shell.
       
-      bash/zsh:
-      
+      if only one shell-activator or bash and zsh have been deployed:
           source vendor/bin/activate
       
       csh:
-      
           source vendor/bin/activate.csh
       
       fish:
-      
           . vendor/bin/activate.fish
       
       bash (alternative):
-      
           source vendor/bin/activate.bash
       
       zsh (alternative):
-      
           source vendor/bin/activate.zsh
-      

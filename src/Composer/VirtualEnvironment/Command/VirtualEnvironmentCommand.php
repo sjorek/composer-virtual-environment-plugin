@@ -41,31 +41,24 @@ class VirtualEnvironmentCommand extends BaseCommand
             'shell',
             explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS)
         );
-
-        $oldPath = getenv('PATH');
-        if ($oldPath) {
-            putenv('PATH=' . implode( PATH_SEPARATOR, array_slice( explode( PATH_SEPARATOR, $oldPath ), 1 )));
-        }
-        $php = $recipe->get('php', exec('which php') ?: null);
-        if ($oldPath) {
-            putenv('PATH=' . $oldPath);
-        }
+        $php = $recipe->get('php');
         $composer = $recipe->get('composer', realpath($_SERVER['argv'][0]) ?: null);
 
-        $useRecipe = file_exists($recipe->filename);
+        $recipeConfig = file_exists($recipe->filename);
+        $glocalConfig = false;
 
         $this
             ->setName('virtual-environment')
             ->setDescription('Setup a virtual environment.')
             ->setDefinition(array(
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment. Takes precedence over recipe and global composer configuration.', $name),
-                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy. Takes precedence over recipe and global composer configuration.', $activators),
-                new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php. Takes precedence over recipe and global composer configuration.', $php),
-                new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer. Takes precedence over recipe and global composer configuration.', $composer),
-                $useRecipe
-                    ? new InputOption('use-recipe', null, InputOption::VALUE_OPTIONAL, 'Use and update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe. Takes precedence over global composer configuration.', $useRecipe)
-                    : new InputOption('use-recipe', null, InputOption::VALUE_NONE, 'Use and update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe. Takes precedence over global composer configuration.'),
-                new InputOption('use-composer', null, InputOption::VALUE_NONE, 'Use and update the global composer configuration.'),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
+                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', $activators),
+                new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php.'),
+                new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer.', $composer),
+                new InputOption('recipe-update', null, InputOption::VALUE_OPTIONAL, 'Update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe.', $recipeConfig),
+                new InputOption('recipe-ignore', null, InputOption::VALUE_NONE, 'Ignore the virtual environment configuration recipe in "' . $recipe->filename . '" recipe.'),
+                new InputOption('global-update', null, InputOption::VALUE_OPTIONAL, 'Update the global composer configuration.', $glocalConfig),
+                new InputOption('global-ignore', null, InputOption::VALUE_NONE, 'Ignore the global composer configuration.'),
                 new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment scripts'),
             ))
             ->setHelp(
@@ -77,29 +70,24 @@ in the bin directory.
 
 Usage:
 
-<info>php composer.phar virtual-environment</info>
+    <info>php composer.phar virtual-environment</info>
 
 After this you can source the activation-script
-corresponding to your shell:
+corresponding to your shell.
 
-bash/zsh:
-
+if only one shell-activator or bash and zsh have been deployed:
     <info>source vendor/bin/activate</info>
 
 csh:
-
     <info>source vendor/bin/activate.csh</info>
 
 fish:
-
     <info>. vendor/bin/activate.fish</info>
 
 bash (alternative):
-
     <info>source vendor/bin/activate.bash</info>
 
 zsh (alternative):
-
     <info>source vendor/bin/activate.zsh</info>
 
 EOT
@@ -126,10 +114,10 @@ EOT
         $name = $manifest['name'];
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
-        } elseif ($input->getOption('use-recipe')) {
+        } elseif (!$input->getOption('recipe-ignore')) {
             $name = $recipe->get('name', $name);
         }
-        if ($input->getOption('use-recipe')) {
+        if ($input->getOption('recipe-update')) {
             $recipe->set('name', $name);
         }
         $data = array(
@@ -141,21 +129,19 @@ EOT
         $candidates = explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
         if ($input->getOption('shell')) {
             $candidates = $input->getOption('shell');
-        } elseif ($input->getOption('use-recipe')) {
+        } elseif (!$input->getOption('recipe-ignore')) {
             $candidates = $recipe->get('shell', $candidates);
         }
         $activators = Processor\ActivationScriptProcessor::importConfiguration($candidates);
-
-        foreach ($activators as $filename) {
+        foreach ($activators as $key => $filename) {
             $source = $resPath . DIRECTORY_SEPARATOR .$filename;
             $target = $binPath . DIRECTORY_SEPARATOR .$filename;
             $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
-            if ($processor->deploy($output, $input->getOption('force'))) {
-                continue;
-            }
+            $processor->deploy($output, $input->getOption('force'));
         }
-        if ($input->getOption('use-recipe')) {
-            $activators = Processor\ActivationScriptProcessor::exportConfiguration($activators);
+        $activators = Processor\ActivationScriptProcessor::exportConfiguration($activators);
+
+        if ($input->getOption('recipe-update')) {
             $recipe->set('shell', $activators);
         }
 
@@ -171,12 +157,12 @@ EOT
         }
         if ($input->getOption('php')) {
             $symlinks['php'] = realpath($input->getOption('php')) ?: $input->getOption('php');
-        } elseif ($input->getOption('use-recipe')) {
+        } elseif (!$input->getOption('recipe-ignore')) {
             $symlinks['php'] = $recipe->get('php', $symlinks['php']);
         }
         if ($input->getOption('composer')) {
             $symlinks['composer'] = realpath($input->getOption('composer')) ?: $input->getOption('composer');
-        } elseif ($input->getOption('use-recipe')) {
+        } elseif (!$input->getOption('recipe-ignore')) {
             $symlinks['composer'] = $recipe->get('composer', $symlinks['composer']);
         }
         $symlinks = array_filter($symlinks);
@@ -189,14 +175,13 @@ EOT
             foreach ($symlinks as $name => $source) {
                 $target = $binPath . DIRECTORY_SEPARATOR . $name;
                 $processor = new Processor\SymbolicLinkProcessor($source, $target);
-                if ($processor->deploy($output, $input->getOption('force'))) {
-                    if ($input->getOption('use-recipe') && $name !== 'activate') {
-                        $recipe->set($name, $source);
-                    }
+                $processor->deploy($output, $input->getOption('force'));
+                if ($input->getOption('recipe-update') && $name !== 'activate') {
+                    $recipe->set($name, $source);
                 }
             }
         }
-        if ($input->getOption('use-recipe') && $recipe->persist()) {
+        if ($input->getOption('recipe-update') && $recipe->persist()) {
             $output->writeln('Updated virtual environment configuration recipe: ' . $recipe->filename);
         }
     }
