@@ -16,7 +16,7 @@ use Composer\Factory;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class CommandConfiguration
+class JsonConfiguration
 {
     protected $filename;
     protected $data;

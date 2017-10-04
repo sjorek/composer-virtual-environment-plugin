@@ -17,7 +17,7 @@ use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Processor;
-use Sjorek\Composer\VirtualEnvironment\Util\CommandConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Util\JsonConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,20 +29,20 @@ class VirtualEnvironmentCommand extends BaseCommand
 {
     protected function configure()
     {
-        $cmdConfig = new CommandConfiguration();
+        $jsonConfiguration = new JsonConfiguration();
 
         $io = $this->getIO();
         $recipe = Factory::getComposerFile();
         $json = new JsonFile($recipe, null, $io);
         $manifest = $json->read();
-        $name = $cmdConfig->get('name', $manifest['name']);
+        $name = $jsonConfiguration->get('name', $manifest['name']);
 
         if (getenv('COMPOSER_VIRTUAL_ENVIRONMENT')) {
-            $php = $cmdConfig->get('php');
-            $composer = $cmdConfig->get('composer');
+            $php = $jsonConfiguration->get('php');
+            $composer = $jsonConfiguration->get('composer');
         } else {
-            $php = $cmdConfig->get('php', exec('which php') ?: null);
-            $composer = $cmdConfig->get('composer', realpath($_SERVER['argv'][0]) ?: null);
+            $php = $jsonConfiguration->get('php', exec('which php') ?: null);
+            $composer = $jsonConfiguration->get('composer', realpath($_SERVER['argv'][0]) ?: null);
         }
 
         $this
@@ -92,7 +92,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $cmdConfig = new CommandConfiguration();
+        $jsonConfiguration = new JsonConfiguration();
         $composer = $this->getComposer();
         $config = $composer->getConfig();
         $recipe = Factory::getComposerFile();
@@ -135,7 +135,7 @@ EOT
             unset($activators[$key]);
         }
         if (!empty($activators)) {
-            $cmdConfig->set('activators', implode(',', $activators));
+            $jsonConfiguration->set('activators', implode(',', $activators));
         }
 
         $symlinks = array();
@@ -154,10 +154,10 @@ EOT
             $target = $binPath . '/' .$name;
             $processor = new Processor\SymbolicLinkProcessor($source, $target);
             if ($processor->deploy($output, $input->getOption('force'))) {
-                $cmdConfig->set($name, $source);
+                $jsonConfiguration->set($name, $source);
             }
         }
-        if ($cmdConfig->persist()) {
+        if ($jsonConfiguration->persist()) {
             $output->writeln('Updated virtual environment configuration file: composer.venv');
         }
     }
