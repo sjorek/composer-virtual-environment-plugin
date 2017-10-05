@@ -6,11 +6,32 @@ and php-binary in the bin-directory.
 
 ## Installation
 
-    $ php composer.phar require-dev sjorek/composer-virtual-environment-plugin
+```bash
+php composer.phar require-dev sjorek/composer-virtual-environment-plugin
+```
 
 ## Usage
 
-    $ php composer.phar help virtual-environment
+```bash
+# initial setup example...
+composer virtual-environment --php=/opt/local/bin/php70 --update-local
+
+# after this you can always ...
+source vendor/bin/activate # if you're using bash, for other shells see [Documentation].
+# which adds vendor/bin to you're PATH
+
+# now use any binary from vendor/bin, like ...
+php-cs-fixer
+
+# if you're done, issue ...
+deactivate
+# and vendor/bin will be removed from your PATH
+
+```
+
+## Documentation
+
+    php composer.phar help virtual-environment
     Usage:
       virtual-environment [options]
     
