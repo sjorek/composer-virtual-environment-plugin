@@ -97,9 +97,9 @@ class ActivationScriptProcessor
         if (file_exists($this->target) || is_link($this->target)) {
             if ($force) {
                 if ($this->filesystem->unlink($this->target)) {
-                    $output->writeln('Removed exsting virtual environment activation script: ' . $this->target);
+                    $output->writeln('Removed existing virtual environment activation script: ' . $this->target);
                 } else {
-                    $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
+                    $output->writeln('    <error>Could not remove virtual environment activation script:</error> ' . $this->target);
                     return false;
                 }
             } else {

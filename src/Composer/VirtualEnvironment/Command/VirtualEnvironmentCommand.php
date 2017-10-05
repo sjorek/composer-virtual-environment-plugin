@@ -17,7 +17,7 @@ use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Processor;
-use Sjorek\Composer\VirtualEnvironment\Util\RecipeConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,18 +34,9 @@ class VirtualEnvironmentCommand extends BaseCommand
         $composerJson = new JsonFile($composerFile, null, $io);
         $manifest = $composerJson->read();
 
-        $recipe = new RecipeConfiguration();
-
-        $name = $recipe->get('name', $manifest['name']);
-        $activators = $recipe->get(
-            'shell',
-            explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS)
-        );
-        $php = $recipe->get('php');
-        $composer = $recipe->get('composer', realpath($_SERVER['argv'][0]) ?: null);
-
-        $recipeConfig = file_exists($recipe->filename);
-        $glocalConfig = false;
+        $name = $manifest['name'];
+        $activators = explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
+        $composer = realpath($_SERVER['argv'][0]) ?: null;
 
         $this
             ->setName('virtual-environment')
@@ -55,10 +46,10 @@ class VirtualEnvironmentCommand extends BaseCommand
                 new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', $activators),
                 new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php.'),
                 new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer.', $composer),
-                new InputOption('recipe-update', null, InputOption::VALUE_OPTIONAL, 'Update the virtual environment configuration recipe in "' . $recipe->filename . '" recipe.', $recipeConfig),
-                new InputOption('recipe-ignore', null, InputOption::VALUE_NONE, 'Ignore the virtual environment configuration recipe in "' . $recipe->filename . '" recipe.'),
-                new InputOption('global-update', null, InputOption::VALUE_OPTIONAL, 'Update the global composer configuration.', $glocalConfig),
-                new InputOption('global-ignore', null, InputOption::VALUE_NONE, 'Ignore the global composer configuration.'),
+                new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local virtual environment configuration recipe in "./composer.venv".'),
+                new InputOption('update-global', null, InputOption::VALUE_NONE, 'Update the global virtual environment configuration recipe in "~/.composer/composer.venv".'),
+                new InputOption('ignore-local', null, InputOption::VALUE_NONE, 'Ignore the local virtual environment configuration recipe in "./composer.venv".'),
+                new InputOption('ignore-global', null, InputOption::VALUE_NONE, 'Ignore the global virtual environment configuration recipe in "~/.composer/composer.venv".'),
                 new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment scripts'),
             ))
             ->setHelp(
@@ -104,7 +95,11 @@ EOT
         $composerJson = new JsonFile($composerFile, null, $io);
         $manifest = $composerJson->read();
 
-        $recipe = new RecipeConfiguration();
+        $recipe = new Config\CompositeConfiguration(
+            $composer,
+            $input->getOption('update-local'), $input->getOption('ignore-local'),
+            $input->getOption('update-global'), $input->getOption('ignore-global')
+        );
 
         $filesystem = new Filesystem();
         $basePath = $filesystem->normalizePath(realpath(realpath(dirname($composerFile))));
@@ -114,12 +109,11 @@ EOT
         $name = $manifest['name'];
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
-        } elseif (!$input->getOption('recipe-ignore')) {
+        } else {
             $name = $recipe->get('name', $name);
         }
-        if ($input->getOption('recipe-update')) {
-            $recipe->set('name', $name);
-        }
+        $recipe->set('name', $name);
+
         $data = array(
             '@NAME@' => $name,
             '@BASE_DIR@' => $basePath,
@@ -129,7 +123,7 @@ EOT
         $candidates = explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
         if ($input->getOption('shell')) {
             $candidates = $input->getOption('shell');
-        } elseif (!$input->getOption('recipe-ignore')) {
+        } else {
             $candidates = $recipe->get('shell', $candidates);
         }
         $activators = Processor\ActivationScriptProcessor::importConfiguration($candidates);
@@ -140,10 +134,7 @@ EOT
             $processor->deploy($output, $input->getOption('force'));
         }
         $activators = Processor\ActivationScriptProcessor::exportConfiguration($activators);
-
-        if ($input->getOption('recipe-update')) {
-            $recipe->set('shell', $activators);
-        }
+        $recipe->set('shell', $activators);
 
         $symlinks = array(
             'activate' => null,
@@ -157,12 +148,12 @@ EOT
         }
         if ($input->getOption('php')) {
             $symlinks['php'] = realpath($input->getOption('php')) ?: $input->getOption('php');
-        } elseif (!$input->getOption('recipe-ignore')) {
+        } else {
             $symlinks['php'] = $recipe->get('php', $symlinks['php']);
         }
         if ($input->getOption('composer')) {
             $symlinks['composer'] = realpath($input->getOption('composer')) ?: $input->getOption('composer');
-        } elseif (!$input->getOption('recipe-ignore')) {
+        } else {
             $symlinks['composer'] = $recipe->get('composer', $symlinks['composer']);
         }
         $symlinks = array_filter($symlinks);
@@ -176,13 +167,24 @@ EOT
                 $target = $binPath . DIRECTORY_SEPARATOR . $name;
                 $processor = new Processor\SymbolicLinkProcessor($source, $target);
                 $processor->deploy($output, $input->getOption('force'));
-                if ($input->getOption('recipe-update') && $name !== 'activate') {
+                if ($input->getOption('update-local') && $name !== 'activate') {
                     $recipe->set($name, $source);
                 }
             }
         }
-        if ($input->getOption('recipe-update') && $recipe->persist()) {
-            $output->writeln('Updated virtual environment configuration recipe: ' . $recipe->filename);
+        if ($recipe->updateLocal) {
+            if ($recipe->local->persist($input->getOption('force'))) {
+                $output->writeln('Update of local configuration "' . $recipe->local->filename . '" succeeded.');
+            } else {
+                $output->writeln('    <warning>Updated of local configuration "' . $recipe->local->filename . '" failed.<warning>');
+            }
+        }
+        if ($recipe->updateGlobal) {
+            if ($recipe->global->persist($input->getOption('force'))) {
+                $output->writeln('Update of global configuration "' . $recipe->global->filename . '" succeeded.');
+            } else {
+                $output->writeln('    <warning>Updated of global configuration "' . $recipe->global->filename . '" failed.<warning>');
+            }
         }
     }
 }

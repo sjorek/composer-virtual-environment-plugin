@@ -39,9 +39,10 @@ class SymbolicLinkProcessor
         }
         if (file_exists($this->target) || is_link($this->target)) {
             if ($force) {
-                if (!$this->filesystem->unlink($this->target)) {
-                    $output->writeln('    <error>Skipped creation of symbolic link:</error> force-option given, while file "'.$this->target.'" already exists and its removal failed');
-
+                if ($this->filesystem->unlink($this->target)) {
+                    $output->writeln('Removed existing symbolic link: ' . $this->target);
+                } else {
+                    $output->writeln('    <error>Could not remove existing symbolic link:</error> ' . $this->target);
                     return false;
                 }
             } else {
