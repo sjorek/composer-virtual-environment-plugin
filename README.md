@@ -4,6 +4,10 @@ A composer-plugin adding a command to activate/deactivate the current
 bin-directory in shell, optionally creating symlinks to the composer-
 and php-binary in the bin-directory.
 
+## Installation
+
+    $ php composer.phar require-dev sjorek/composer-virtual-environment-plugin
+
 ## Usage
 
     $ php composer.phar help virtual-environment
