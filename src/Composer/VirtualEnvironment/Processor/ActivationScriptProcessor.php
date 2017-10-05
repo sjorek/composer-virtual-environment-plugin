@@ -94,9 +94,18 @@ class ActivationScriptProcessor
      */
     public function deploy(OutputInterface $output, $force = false)
     {
-        if (file_exists($this->target) && !$force) {
-            $output->writeln('    <error>Skipped installation of shell activator:</error> file "'.$this->target.'" already exists');
-            return false;
+        if (file_exists($this->target) || is_link($this->target)) {
+            if ($force) {
+                if ($this->filesystem->unlink($this->target)) {
+                    $output->writeln('Removed exsting virtual environment activation script: ' . $this->target);
+                } else {
+                    $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
+                    return false;
+                }
+            } else {
+                $output->writeln('    <error>Skipped installation of shell activator:</error> file "'.$this->target.'" already exists');
+                return false;
+            }
         }
 
         $content = file_get_contents($this->source, false);
@@ -126,7 +135,7 @@ class ActivationScriptProcessor
      */
     public function rollback(OutputInterface $output)
     {
-        if (file_exists($this->target)) {
+        if (file_exists($this->target) || is_link($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment activation script: ' . $this->target);
                 return true;

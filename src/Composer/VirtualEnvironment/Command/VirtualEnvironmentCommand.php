@@ -133,7 +133,7 @@ EOT
             $candidates = $recipe->get('shell', $candidates);
         }
         $activators = Processor\ActivationScriptProcessor::importConfiguration($candidates);
-        foreach ($activators as $key => $filename) {
+        foreach ($activators as $filename) {
             $source = $resPath . DIRECTORY_SEPARATOR .$filename;
             $target = $binPath . DIRECTORY_SEPARATOR .$filename;
             $processor = new Processor\ActivationScriptProcessor($source, $target, $data);

@@ -68,7 +68,7 @@ class SymbolicLinkProcessor
 
     public function rollback(OutputInterface $output)
     {
-        if (is_link($this->target)) {
+        if (file_exists($this->target) || is_link($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment symbolic link: ' . $this->target);
 
