@@ -14,14 +14,16 @@ php composer.phar require-dev sjorek/composer-virtual-environment-plugin
 
 ```bash
 # initial setup example...
-composer virtual-environment --php=/opt/local/bin/php70 --update-local
+/opt/local/bin/php70 /opt/local/lib/php70/composer.phar virtual-environment --php=/opt/local/bin/php70 --update-local
 
 # after this you can always ...
 source vendor/bin/activate # if you're using bash, for other shells see [Documentation].
 # which adds vendor/bin to you're PATH
 
 # now use any binary from vendor/bin, like ...
-php-cs-fixer
+php-cs-fixer fix
+# or even ...
+composer help # <-- notice that we don't need to specify path to php explictly
 
 # if you're done, issue ...
 deactivate
