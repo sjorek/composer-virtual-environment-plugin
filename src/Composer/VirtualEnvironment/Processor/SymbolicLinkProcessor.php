@@ -43,6 +43,7 @@ class SymbolicLinkProcessor
                     $output->writeln('Removed existing symbolic link: ' . $this->target);
                 } else {
                     $output->writeln('    <error>Could not remove existing symbolic link:</error> ' . $this->target);
+
                     return false;
                 }
             } else {

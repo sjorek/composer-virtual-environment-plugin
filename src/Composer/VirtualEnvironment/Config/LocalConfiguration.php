@@ -21,6 +21,7 @@ class LocalConfiguration extends AbstractConfiguration
     protected function getRecipeFilename()
     {
         $recipe = Factory::getComposerFile();
+
         return dirname($recipe) . DIRECTORY_SEPARATOR . basename($recipe, '.json') . '.venv';
     }
 }

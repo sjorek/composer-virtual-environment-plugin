@@ -97,8 +97,10 @@ EOT
 
         $recipe = new Config\CompositeConfiguration(
             $composer,
-            $input->getOption('update-local'), $input->getOption('ignore-local'),
-            $input->getOption('update-global'), $input->getOption('ignore-global')
+            $input->getOption('update-local'),
+            $input->getOption('ignore-local'),
+            $input->getOption('update-global'),
+            $input->getOption('ignore-global')
         );
 
         $filesystem = new Filesystem();
@@ -142,7 +144,7 @@ EOT
             'php' => null,
         );
 
-        // If only has been given, we'll symlink to this activator 
+        // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
             $symlinks['activate'] = $binPath . DIRECTORY_SEPARATOR . 'activate.' . $activators[0];
         }

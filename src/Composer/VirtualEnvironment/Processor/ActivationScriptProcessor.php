@@ -28,7 +28,7 @@ class ActivationScriptProcessor
     protected $filesystem;
 
     /**
-     * @param string $candidates
+     * @param  string $candidates
      * @return array
      */
     public static function importConfiguration(array $candidates)
@@ -49,7 +49,7 @@ class ActivationScriptProcessor
 
         // Create filenames
         $activators = array_map(
-            function($activator) {
+            function ($activator) {
                 return $activator === 'activate' ? $activator : ('activate.' . $activator);
             },
             $activators
@@ -59,7 +59,7 @@ class ActivationScriptProcessor
     }
 
     /**
-     * @param array $activators
+     * @param  array  $activators
      * @return string
      */
     public static function exportConfiguration(array $activators)
@@ -67,7 +67,7 @@ class ActivationScriptProcessor
         // Restore activator names from filenames - 'activate' will be removed by array_filter below
         // array_filter removes 'activate' fragment left over by the restore from above
         return array_filter(array_map(
-            function($activator) {
+            function ($activator) {
                 return $activator === 'activate' ? '' : pathinfo($activator, PATHINFO_EXTENSION);
             },
             $activators
@@ -77,7 +77,7 @@ class ActivationScriptProcessor
     /**
      * @param string $source
      * @param string $target
-     * @param array $data
+     * @param array  $data
      */
     public function __construct($source, $target, array $data)
     {
@@ -88,9 +88,9 @@ class ActivationScriptProcessor
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string $force
-     * @return boolean
+     * @param  OutputInterface $output
+     * @param  string          $force
+     * @return bool
      */
     public function deploy(OutputInterface $output, $force = false)
     {
@@ -100,10 +100,12 @@ class ActivationScriptProcessor
                     $output->writeln('Removed existing virtual environment activation script: ' . $this->target);
                 } else {
                     $output->writeln('    <error>Could not remove virtual environment activation script:</error> ' . $this->target);
+
                     return false;
                 }
             } else {
                 $output->writeln('    <error>Skipped installation of shell activator:</error> file "'.$this->target.'" already exists');
+
                 return false;
             }
         }
@@ -111,6 +113,7 @@ class ActivationScriptProcessor
         $content = file_get_contents($this->source, false);
         if ($content === false) {
             $output->writeln('    <error>Skipped installation of shell activator:</error> could not read the template file "'.$this->source.'"');
+
             return false;
         }
         $content = str_replace(
@@ -121,6 +124,7 @@ class ActivationScriptProcessor
         $this->filesystem->ensureDirectoryExists(dirname($this->target));
         if (file_put_contents($this->target, $content) === false) {
             $output->writeln('    <error>Skipped installation of shell activator:</error> could not write the shell activator file "'.$this->target.'"');
+
             return false;
         }
         Silencer::call('chmod', $this->target, 0777 & ~umask());
@@ -130,14 +134,15 @@ class ActivationScriptProcessor
     }
 
     /**
-     * @param OutputInterface $output
-     * @return boolean
+     * @param  OutputInterface $output
+     * @return bool
      */
     public function rollback(OutputInterface $output)
     {
         if (file_exists($this->target) || is_link($this->target)) {
             if ($this->filesystem->unlink($this->target)) {
                 $output->writeln('Removed virtual environment activation script: ' . $this->target);
+
                 return true;
             } else {
                 $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
@@ -145,6 +150,7 @@ class ActivationScriptProcessor
         } else {
             $output->writeln('Skipped removing virtual environment activation script, as it does not exist: ' . $this->target);
         }
+
         return false;
     }
 }

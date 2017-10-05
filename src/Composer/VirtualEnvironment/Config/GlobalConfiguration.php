@@ -24,6 +24,7 @@ class GlobalConfiguration extends AbstractConfiguration
     {
         $recipe = Factory::getComposerFile();
         $home = $this->composer->getConfig()->get('home');
+
         return  $home . DIRECTORY_SEPARATOR . basename($recipe, '.json') . '.venv';
     }
 }

@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of Composer Virtual Environment Plugin.
+ *
+ * (c) Stephan Jorek <stephnan.jorek@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Sjorek\Composer\VirtualEnvironment\Config;
 
 use Composer\Composer;
@@ -8,7 +18,6 @@ use Composer\Composer;
  */
 class CompositeConfiguration implements ConfigurationInterface
 {
-
     /**
      * @var GlobalConfiguration
      */
@@ -26,10 +35,13 @@ class CompositeConfiguration implements ConfigurationInterface
 
     /**
      */
-    public function __construct(Composer $composer,
-                                $updateLocal = false, $ignoreLocal = false,
-                                $updateGlobal = false, $ignoreGlobal = false)
-    {
+    public function __construct(
+        Composer $composer,
+        $updateLocal = false,
+        $ignoreLocal = false,
+        $updateGlobal = false,
+        $ignoreGlobal = false
+    ) {
         $this->local = new LocalConfiguration($composer);
         $this->updateLocal = $updateLocal;
         $this->ignoreLocal = $ignoreLocal;
@@ -48,6 +60,7 @@ class CompositeConfiguration implements ConfigurationInterface
         } elseif ($this->ignoreGlobal) {
             return $this->local->all();
         }
+
         return array_unique(array_merge($this->local->all(), $this->global->all()));
     }
 
@@ -60,6 +73,7 @@ class CompositeConfiguration implements ConfigurationInterface
         } elseif ($this->ignoreGlobal) {
             return $this->local->has($key);
         }
+
         return $this->local->has($key) || $this->global->has($key);
     }
 
@@ -72,6 +86,7 @@ class CompositeConfiguration implements ConfigurationInterface
         } elseif ($this->ignoreGlobal) {
             return $this->local->get($key, $default);
         }
+
         return $this->local->get($key, $this->global->get($key, $default));
     }
 
@@ -105,6 +120,7 @@ class CompositeConfiguration implements ConfigurationInterface
         if (!$this->ignoreGlobal) {
             $global = $this->global->load();
         }
+
         return $local && $global;
     }
 
@@ -118,7 +134,7 @@ class CompositeConfiguration implements ConfigurationInterface
         if ($this->updateGlobal) {
             $global = $this->global->persist($force);
         }
+
         return $local && $global;
     }
 }
-
