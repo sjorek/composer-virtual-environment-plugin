@@ -86,3 +86,12 @@ deactivate
       zsh (alternative):
           source vendor/bin/activate.zsh
 
+## Want more?
+
+There is a [bash-completion implementation](https://sjorek.github.io/composer-bash-completion/)
+complementing this composer-plugin. And if you're using [MacPorts](http://macports.org),
+especially if you're using my [MacPorts-PHP](https://sjorek.github.io/MacPorts-PHP/)
+repository, everything should work like a breeze.
+
+Cheers!
+
