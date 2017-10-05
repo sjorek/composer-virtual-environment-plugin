@@ -18,6 +18,7 @@
 	"description" : "A composer-plugin adding a command to activate/deactivate the current bin directory in shell, optionally placing a symlink to the composer- and php-binary.",
 	"license" : "BSD-3-Clause",
 	"require" : {
+		"php": "^7.0",
 		"composer-plugin-api" : "^1.1"
 	},
 	"extra" : {
