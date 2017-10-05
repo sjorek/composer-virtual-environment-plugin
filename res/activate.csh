@@ -1,7 +1,15 @@
+#!csh
 # This file must be used with "source bin/activate.csh" *from csh*.
 # You cannot run it directly.
 # Created by Davide Di Blasi <davidedb@gmail.com>.
 # Ported to Python 3.3 venv by Andrew Svetlov <andrew.svetlov@gmail.com>
+# Adapted for composer by Stephan Jorek <stephan.jorek@gmail.com>
+
+if ("$?COMPOSER_VIRTUAL_ENVIRONMENT") then
+    echo "Another virtual environment already active! Please"
+    echo "run 'deactivate' before activating this environment."
+    goto done 
+endif
 
 alias deactivate 'test $?_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH != 0 && setenv PATH "$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH" && unset _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH; rehash; test $?_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PROMPT != 0 && set prompt="$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PROMPT" && unset _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PROMPT; unsetenv COMPOSER_VIRTUAL_ENVIRONMENT; test "\!:*" != "nondestructive" && unalias deactivate'
 
@@ -33,3 +41,6 @@ if (! "$?COMPOSER_VIRTUAL_ENVIRONMENT_DISABLE_PROMPT") then
 endif
 
 rehash
+
+done:
+    # nothing to do here

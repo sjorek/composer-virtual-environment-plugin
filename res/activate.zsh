@@ -1,5 +1,12 @@
+#!zsh
 # This file must be used with "source bin/activate" *from zsh*
 # you cannot run it directly
+
+if [ ! -z "$COMPOSER_VIRTUAL_ENVIRONMENT" ] ; then
+    echo "Another virtual environment already active! Please"
+    echo "run 'deactivate' before activating this environment."
+    return 
+fi
 
 deactivate () {
     # This should detect zsh, which has a hash command that must
