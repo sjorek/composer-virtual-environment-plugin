@@ -1,5 +1,7 @@
 # “virtual-environment” command-plugin for composer
 
+[![Dependency Status](https://gemnasium.com/badges/github.com/sjorek/composer-virtual-environment-plugin.svg)](https://gemnasium.com/github.com/sjorek/composer-virtual-environment-plugin)
+
 A composer-plugin adding a command to activate/deactivate the current
 bin-directory in shell, optionally creating symlinks to the composer-
 and php-binary in the bin-directory.
