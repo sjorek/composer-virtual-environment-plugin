@@ -56,7 +56,7 @@ class VirtualEnvironmentCommand extends BaseCommand
                 <<<EOT
 The <info>virtual-environment</info> command creates files to activate
 and deactivate the current bin directory in shell,
-optionally placing a symlinks to php- and composer-binaries
+optionally placing symlinks to php- and composer-binaries
 in the bin directory.
 
 Usage:
