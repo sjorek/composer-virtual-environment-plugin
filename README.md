@@ -119,7 +119,7 @@ Generating autoload files
 $ # change directory to your first package:
 $ cd /path/to/vendor/first-example-package
 
-$ # initial setup of the virtual composer shell environment (run this only once per packe):
+$ # initial setup of the virtual composer shell environment (run this only once per package):
 $ /path/to/bin/php70 /path/to/composer.phar venv --php=/path/to/bin/php70 --shell=bash
 Installed virtual environment activation script: /path/to/vendor/first-example-package/vendor/bin/activate.bash
 Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/activate -> activate.bash
@@ -173,7 +173,7 @@ $ # ... and vendor/bin will be removed from your PATH
 $ # now change directory to your second package:
 $ cd /path/to/vendor/second-example-package
 
-$ # initial setup of the virtual composer shell environment (run this only once per packe):
+$ # initial setup of the virtual composer shell environment (run this only once per package):
 $ /path/to/bin/php72 /path/to/composer.phar venv --php=/path/to/bin/php72 --shell=bash
 Installed virtual environment activation script: /path/to/vendor/second-example-package/vendor/bin/activate.bash
 Installed virtual environment symlink: /path/to/vendor/second-example-package/vendor/bin/activate -> activate.bash
