@@ -35,58 +35,64 @@ deactivate
 
 ## Documentation
 
-    php composer.phar help virtual-environment
-    Usage:
-      virtual-environment [options]
-    
-    Options:
-          --name=NAME                Name of the virtual environment. [default: "vendor/package-name"]
-          --shell=SHELL              Set the list of shell activators to deploy. [default: ["bash","csh","fish","zsh"]] (multiple values allowed)
-          --php=PHP                  Add symlink to php.
-          --composer=COMPOSER        Add symlink to composer. [default: "composer.phar"]
-          --update-local             Update the local virtual environment configuration recipe in "./composer.venv".
-          --update-global            Update the global virtual environment configuration recipe in "~/.composer/composer.venv".
-          --ignore-local             Ignore the local virtual environment configuration recipe in "./composer.venv".
-          --ignore-global            Ignore the global virtual environment configuration recipe in "~/.composer/composer.venv".
-      -f, --force                    Force overwriting existing environment scripts
-      -h, --help                     Display this help message
-      -q, --quiet                    Do not output any message
-      -V, --version                  Display this application version
-          --ansi                     Force ANSI output
-          --no-ansi                  Disable ANSI output
-      -n, --no-interaction           Do not ask any interactive question
-          --profile                  Display timing and memory usage information
-          --no-plugins               Whether to disable plugins.
-      -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
-      -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-    
-    Help:
-      The virtual-environment command creates files to activate
-      and deactivate the current bin directory in shell,
-      optionally placing symlinks to php- and composer-binaries
-      in the bin directory.
-      
-      Usage:
-      
-          php composer.phar virtual-environment
-      
-      After this you can source the activation-script
-      corresponding to your shell.
-      
-      if only one shell-activator or bash and zsh have been deployed:
-          source vendor/bin/activate
-      
-      csh:
-          source vendor/bin/activate.csh
-      
-      fish:
-          . vendor/bin/activate.fish
-      
-      bash (alternative):
-          source vendor/bin/activate.bash
-      
-      zsh (alternative):
-          source vendor/bin/activate.zsh
+```console
+$ php composer.phar help virtual-environment
+[33mUsage:[39m
+  virtual-environment [options]
+  virtualenvironment
+  venv
+
+[33mOptions:[39m
+  [32m    --name=NAME[39m                Name of the virtual environment.[33m [default: "vendor/package-name"][39m
+  [32m    --shell=SHELL[39m              Set the list of shell activators to deploy.[33m (multiple values allowed)[39m
+  [32m    --php=PHP[39m                  Add symlink to php.
+  [32m    --composer=COMPOSER[39m        Add symlink to composer.[33m [default: "composer.phar"][39m
+  [32m    --update-local[39m             Update the local virtual environment configuration recipe in "./composer.venv".
+  [32m    --update-global[39m            Update the global virtual environment configuration recipe in "~/.composer/composer.venv".
+  [32m    --ignore-local[39m             Ignore the local virtual environment configuration recipe in "./composer.venv".
+  [32m    --ignore-global[39m            Ignore the global virtual environment configuration recipe in "~/.composer/composer.venv".
+  [32m    --remove[39m                   Remove any deployed shell activators or symbolic links.
+  [32m-f, --force[39m                    Force overwriting existing environment scripts
+  [32m-h, --help[39m                     Display this help message
+  [32m-q, --quiet[39m                    Do not output any message
+  [32m-V, --version[39m                  Display this application version
+  [32m    --ansi[39m                     Force ANSI output
+  [32m    --no-ansi[39m                  Disable ANSI output
+  [32m-n, --no-interaction[39m           Do not ask any interactive question
+  [32m    --profile[39m                  Display timing and memory usage information
+  [32m    --no-plugins[39m               Whether to disable plugins.
+  [32m-d, --working-dir=WORKING-DIR[39m  If specified, use the given directory as working directory.
+  [32m-v|vv|vvv, --verbose[39m           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+[33mHelp:[39m
+  The [32mvirtual-environment[39m command creates files to activate
+  and deactivate the current bin directory in shell,
+  optionally placing symlinks to php- and composer-binaries
+  in the bin directory.
+  
+  Usage:
+  
+      [32mphp composer.phar virtual-environment[39m
+  
+  After this you can source the activation-script
+  corresponding to your shell.
+  
+  if only one shell-activator or bash and zsh have been deployed:
+      [32msource vendor/bin/activate[39m
+  
+  csh:
+      [32msource vendor/bin/activate.csh[39m
+  
+  fish:
+      [32m. vendor/bin/activate.fish[39m
+  
+  bash (alternative):
+      [32msource vendor/bin/activate.bash[39m
+  
+  zsh (alternative):
+      [32msource vendor/bin/activate.zsh[39m
+  
+```
 
 ## Want more?
 
@@ -96,4 +102,3 @@ especially if you're using my [MacPorts-PHP](https://sjorek.github.io/MacPorts-P
 repository, everything should work like a breeze.
 
 Cheers!
-
