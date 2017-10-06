@@ -68,6 +68,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         }
         $this->dirty = $this->get($key) !== $value;
         $this->data[$key] = $value;
+        return $value;
     }
 
     public function remove($key)
@@ -116,10 +117,8 @@ abstract class AbstractConfiguration implements ConfigurationInterface
                 return false;
             }
             $this->dirty = false;
-
-            return true;
         }
 
-        return false;
+        return !$this->dirty;
     }
 }

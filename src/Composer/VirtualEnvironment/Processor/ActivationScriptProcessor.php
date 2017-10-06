@@ -31,14 +31,21 @@ class ActivationScriptProcessor
      * @param  string $candidates
      * @return array
      */
-    public static function importConfiguration(array $candidates)
+    public static function import(array $candidates)
     {
         $candidates = array_map('trim', array_map('strtolower', $candidates));
         $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
-
+        
         // Get a list of valid $activators
-        $activators = array_intersect($candidates, $activators);
+        return array_intersect($candidates, $activators);
+    }
 
+    /**
+     * @param  string $activators
+     * @return array
+     */
+    public static function export(array $activators)
+    {
         // Make the 'activate' shortcut available if needed
         if (in_array('bash', $activators, true) && in_array('zsh', $activators, true)) {
             $activators[] = 'activate';
@@ -56,22 +63,6 @@ class ActivationScriptProcessor
         );
 
         return $activators;
-    }
-
-    /**
-     * @param  array  $activators
-     * @return string
-     */
-    public static function exportConfiguration(array $activators)
-    {
-        // Restore activator names from filenames - 'activate' will be removed by array_filter below
-        // array_filter removes 'activate' fragment left over by the restore from above
-        return array_filter(array_map(
-            function ($activator) {
-                return $activator === 'activate' ? '' : pathinfo($activator, PATHINFO_EXTENSION);
-            },
-            $activators
-        ));
     }
 
     /**
@@ -139,14 +130,22 @@ class ActivationScriptProcessor
      */
     public function rollback(OutputInterface $output)
     {
-        if (file_exists($this->target) || is_link($this->target)) {
-            if ($this->filesystem->unlink($this->target)) {
-                $output->writeln('Removed virtual environment activation script: ' . $this->target);
-
-                return true;
+        if (file_exists($this->target)) {
+            // For existing symlinks
+            if (is_link($this->target)) {
+                $output->writeln('Refused to remove virtual environment activation script, as this is a symbolic link: ' . $this->target);
             } else {
-                $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
+                if ($this->filesystem->unlink($this->target)) {
+                    $output->writeln('Removed virtual environment activation script: ' . $this->target);
+
+                    return true;
+                } else {
+                    $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
+                }
             }
+        // For dangeling symlinks
+        } elseif (is_link($this->target)) {
+            $output->writeln('Refused to remove virtual environment activation script, as this is a symbolic link: ' . $this->target);
         } else {
             $output->writeln('Skipped removing virtual environment activation script, as it does not exist: ' . $this->target);
         }

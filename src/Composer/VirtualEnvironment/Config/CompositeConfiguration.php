@@ -98,6 +98,7 @@ class CompositeConfiguration implements ConfigurationInterface
         if ($this->updateGlobal) {
             $this->global->set($key, $value);
         }
+        return $value;
     }
 
     public function remove($key)
