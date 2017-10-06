@@ -157,7 +157,12 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
 
 # if you're done, run ...
 $ deactivate
-# and vendor/bin will be removed from your PATH
+
+Left virtual composer shell environment.
+
+Good Bye!
+
+# ... and vendor/bin will be removed from your PATH
 
 
 ###############################
@@ -201,7 +206,12 @@ Zend Engine v3.2.0-dev, Copyright (c) 1998-2017 Zend Technologies
 
 # if you're done, run ...
 (vendor/second-example-package) $ deactivate
-# and 'vendor/bin' will be removed from your PATH
+
+Left virtual composer shell environment.
+
+Good Bye!
+
+# ... and 'vendor/bin' will be removed from your PATH
 ```
 
 ## Want more?
