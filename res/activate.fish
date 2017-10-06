@@ -2,16 +2,22 @@
 # This file must be used with ". bin/activate.fish" *from fish* (http://fishshell.org)
 # you cannot run it directly
 
-if test -n "$COMPOSER_VIRTUAL_ENVIRONMENT"
-    echo "Another virtual environment already active! Please"
-    echo "run 'deactivate' before activating this environment."
+if test -n "$COMPOSER_VENV"
+    echo ""
+    echo "A virtual composer shell environment is already active!"
+    echo ""
+    echo "    Name: $COMPOSER_VENV"
+    echo "    Path: $COMPOSER_VENV_DIR"
+    echo ""
+    echo "Run 'deactivate' before activating this environment."
+    echo ""
 else
 
     function deactivate  -d "Exit virtual environment and return to normal shell environment"
         # reset old environment variables
-        if test -n "$_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH"
-            set -gx PATH $_OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH
-            set -e _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH
+        if test -n "$_OLD_COMPOSER_VENV_PATH"
+            set -gx PATH $_OLD_COMPOSER_VENV_PATH
+            set -e _OLD_COMPOSER_VENV_PATH
         end
     
         if test -n "$_OLD_FISH_PROMPT_OVERRIDE"
@@ -21,22 +27,30 @@ else
             functions -e _old_fish_prompt
         end
     
-        set -e COMPOSER_VIRTUAL_ENVIRONMENT
+        set -e COMPOSER_VENV
+        set -e COMPOSER_VENV_DIR
         if test "$argv[1]" != "nondestructive"
             # Self destruct!
             functions -e deactivate
+
+            echo ""
+            echo "Left virtual composer shell environment."
+            echo ""
+            echo "Good Bye!"
+            echo ""
         end
     end
 
     # unset irrelevant variables
     deactivate nondestructive
 
-    set -gx COMPOSER_VIRTUAL_ENVIRONMENT "@BASE_DIR@"
+    set -gx COMPOSER_VENV "@NAME@"
+    set -gx COMPOSER_VENV_DIR "@BASE_DIR@"
 
-    set -gx _OLD_COMPOSER_VIRTUAL_ENVIRONMENT_PATH $PATH
+    set -gx _OLD_COMPOSER_VENV_PATH $PATH
     set -gx PATH "@BIN_DIR@" $PATH
 
-    if test -z "$COMPOSER_VIRTUAL_ENVIRONMENT_DISABLE_PROMPT"
+    if test -z "$COMPOSER_VENV_DISABLE_PROMPT"
         # fish uses a function instead of an env var to generate the prompt.
 
         # save the current fish_prompt function as the function _old_fish_prompt
@@ -48,17 +62,17 @@ else
             set -l old_status $status
 
             # Prompt override?
-            if test -n "(@NAME@) "
+            if test -n "$COMPOSER_VENV"
                 printf "%s%s" "(@NAME@) " (set_color normal)
             else
                 # ...Otherwise, prepend env
-                set -l _checkbase (basename "$COMPOSER_VIRTUAL_ENVIRONMENT")
+                set -l _checkbase (basename "$COMPOSER_VENV_DIR")
                 if test $_checkbase = "__"
                     # special case for Aspen magic directories
                     # see http://www.zetadev.com/software/aspen/
-                    printf "%s[%s]%s " (set_color -b blue white) (basename (dirname "$COMPOSER_VIRTUAL_ENVIRONMENT")) (set_color normal)
+                    printf "%s[%s]%s " (set_color -b blue white) (basename (dirname "$COMPOSER_VENV_DIR")) (set_color normal)
                 else
-                    printf "%s(%s)%s" (set_color -b blue white) (basename "$COMPOSER_VIRTUAL_ENVIRONMENT") (set_color normal)
+                    printf "%s(%s)%s" (set_color -b blue white) (basename "$COMPOSER_VENV_DIR") (set_color normal)
                 end
             end
     
@@ -67,7 +81,15 @@ else
             _old_fish_prompt
         end
 
-        set -gx _OLD_FISH_PROMPT_OVERRIDE "$COMPOSER_VIRTUAL_ENVIRONMENT"
+        set -gx _OLD_FISH_PROMPT_OVERRIDE "$COMPOSER_VENV_DIR"
     end
 
+    echo ""
+    echo "virtual composer shell environment"
+    echo ""
+    echo "    Name: $COMPOSER_VENV"
+    echo "    Path: $COMPOSER_VENV_DIR"
+    echo ""
+    echo "Run 'deactivate' to exit the environment and return to normal shell."
+    echo ""
 end
