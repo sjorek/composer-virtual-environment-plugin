@@ -76,9 +76,9 @@ Help:
 ```
 
 
-## Usage
+## Usage Scenarios
 
-### Example Scenario: multiple PHP versions for many composer packages
+### Example: multiple PHP versions for many composer packages
 
 Assuming the following:
 
