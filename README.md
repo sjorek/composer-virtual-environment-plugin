@@ -9,6 +9,15 @@ and php-binary in the bin-directory.
 
 ## Installation
 
+### Method 1: globally, so it is available in all packages
+
+```bash
+php composer.phar global require sjorek/composer-virtual-environment-plugin
+```
+
+
+### Method 2: As a package requirement
+
 ```bash
 php composer.phar require-dev sjorek/composer-virtual-environment-plugin
 ```
