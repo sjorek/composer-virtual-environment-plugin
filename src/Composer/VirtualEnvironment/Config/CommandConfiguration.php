@@ -30,17 +30,17 @@ class CommandConfiguration extends AbstractConfiguration
     protected $output;
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param Composer $composer
-     * @param IOInterface $io
+     * @param Composer        $composer
+     * @param IOInterface     $io
      */
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
         Composer $composer,
-        IOInterface $io)
-    {
+        IOInterface $io
+    ) {
         $this->input = $input;
         $this->output = $output;
         $this->io = $io;
@@ -95,7 +95,7 @@ class CommandConfiguration extends AbstractConfiguration
             'composer' => null,
             'php' => null,
         );
-        
+
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
             $symlinks['activate'] = $binPath . DIRECTORY_SEPARATOR . 'activate.' . $activators[0];
@@ -124,7 +124,7 @@ class CommandConfiguration extends AbstractConfiguration
         $result = true;
         $recipe = $this->get('recipe');
         $output = $this->output;
-        
+
         if ($recipe->updateLocal) {
             if ($recipe->local->persist($force)) {
                 $output->writeln('Update of local configuration "' . $recipe->local->filename . '" succeeded.');
@@ -141,6 +141,7 @@ class CommandConfiguration extends AbstractConfiguration
                 $result = false;
             }
         }
+
         return $result;
     }
 

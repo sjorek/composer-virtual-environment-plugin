@@ -35,7 +35,7 @@ class ActivationScriptProcessor
     {
         $candidates = array_map('trim', array_map('strtolower', $candidates));
         $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
-        
+
         // Get a list of valid $activators
         return array_intersect($candidates, $activators);
     }
@@ -143,7 +143,7 @@ class ActivationScriptProcessor
                     $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
                 }
             }
-        // For dangeling symlinks
+            // For dangeling symlinks
         } elseif (is_link($this->target)) {
             $output->writeln('Refused to remove virtual environment activation script, as this is a symbolic link: ' . $this->target);
         } else {

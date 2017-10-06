@@ -68,6 +68,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         }
         $this->dirty = $this->get($key) !== $value;
         $this->data[$key] = $value;
+
         return $value;
     }
 
