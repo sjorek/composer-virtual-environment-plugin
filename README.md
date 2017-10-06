@@ -1,4 +1,4 @@
-# “virtual-environment” command-plugin for composer
+# [“virtual-environment” command-plugin for composer](https://sjorek.github.io/composer-virtual-environment-plugin/)
 
 [![Dependency Status](https://gemnasium.com/badges/github.com/sjorek/composer-virtual-environment-plugin.svg)](https://gemnasium.com/github.com/sjorek/composer-virtual-environment-plugin)
 
