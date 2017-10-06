@@ -99,7 +99,7 @@ Assuming the following:
   filesystem, let's say under `/path/to/composer.phar`
 
 ```console
-# install the plugin >>>globally<<< (in this case ${HOME}/.composer):
+$ # install the plugin >>>globally<<< (in this case ${HOME}/.composer):
 $ /path/to/bin/php70 /path/to/composer.phar global require sjorek/composer-virtual-environment-plugin
 Changed current directory to /Users/sjorek/.composer
 Using version ^X.Y.Z for sjorek/composer-virtual-environment-plugin
@@ -110,22 +110,23 @@ Package operations: 1 install, 0 updates, 0 removals
   - Installing sjorek/composer-virtual-environment-plugin (X.Y.Z)
 Writing lock file
 Generating autoload files
+```
 
-##############################
-# vendor/first-example-package
-##############################
 
-# change directory to your first package:
+#### vendor/first-example-package
+
+```console
+$ # change directory to your first package:
 $ cd /path/to/vendor/first-example-package
 
-# initial setup of the virtual composer shell environment (run this only once per packe):
+$ # initial setup of the virtual composer shell environment (run this only once per packe):
 $ /path/to/bin/php70 /path/to/composer.phar venv --php=/path/to/bin/php70 --shell=bash
 Installed virtual environment activation script: /path/to/vendor/first-example-package/vendor/bin/activate.bash
 Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/activate -> activate.bash
 Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/composer -> /path/to/composer.phar
 Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/php -> /path/to/bin/php70
 
-# after this you can activate the virtual composer shell environment:
+$ # after this you can activate the virtual composer shell environment:
 $ source vendor/bin/activate
 
 virtual composer shell environment
@@ -135,19 +136,19 @@ virtual composer shell environment
 
 Run 'deactivate' to exit the environment and return to normal shell.
 
-# the directory '/path/to/vendor/first-example-package/vendor/bin' is 
-# now prepended to your PATH environment variable
+$ # the directory '/path/to/vendor/first-example-package/vendor/bin' is 
+$ # now prepended to your PATH environment variable
 
-# now use any binary from package requirements located in 'vendor/bin':
+$ # now use any binary from package requirements located in 'vendor/bin':
 (vendor/first-example-package) $ php-cs-fixer fix # <-- just an example!
 
 ...
 
-# you can use `composer` without specifying the path to php anymore:
+$ # you can use `composer` without specifying the path to php anymore:
 (vendor/first-example-package) $ composer --version
 Composer version 1.5.2 2017-09-11 16:59:25
 
-# and of course you can now also use `php` directly:
+$ # and of course you can now also use `php` directly:
 (vendor/first-example-package) $ php --version
 PHP 7.0.24 (cli) (built: Sep 29 2017 00:27:16) ( NTS )
 Copyright (c) 1997-2017 The PHP Group
@@ -155,24 +156,24 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
     with Zend OPcache v7.0.24, Copyright (c) 1999-2017, by Zend Technologies
     with Xdebug v2.5.5, Copyright (c) 2002-2017, by Derick Rethans
 
-# if you're done, run ...
+$ # if you're done, run ...
 $ deactivate
 
 Left virtual composer shell environment.
 
 Good Bye!
 
-# ... and vendor/bin will be removed from your PATH
+$ # ... and vendor/bin will be removed from your PATH
+```
 
 
-###############################
-# vendor/second-example-package
-###############################
+#### vendor/second-example-package
 
-# now change directory to your second package:
+```console
+$ # now change directory to your second package:
 $ cd /path/to/vendor/second-example-package
 
-# initial setup of the virtual composer shell environment (run this only once per packe):
+$ # initial setup of the virtual composer shell environment (run this only once per packe):
 $ /path/to/bin/php72 /path/to/composer.phar venv --php=/path/to/bin/php72 --shell=bash
 Installed virtual environment activation script: /path/to/vendor/second-example-package/vendor/bin/activate.bash
 Installed virtual environment symlink: /path/to/vendor/second-example-package/vendor/bin/activate -> activate.bash
@@ -181,7 +182,7 @@ Installed virtual environment symlink: /path/to/vendor/second-example-package/ve
 
 ...
 
-# after this you can activate the virtual composer shell environment:
+$ # after this you can activate the virtual composer shell environment:
 $ source vendor/bin/activate
 
 virtual composer shell environment
@@ -191,10 +192,10 @@ virtual composer shell environment
 
 Run 'deactivate' to exit the environment and return to normal shell.
 
-# the directory '/path/to/vendor/first-example-package/vendor/bin' is 
-# now prepended to your PATH environment variable
+$ # the directory '/path/to/vendor/first-example-package/vendor/bin' is 
+$ # now prepended to your PATH environment variable
 
-# now use any binary from package requirements located in 'vendor/bin':
+$ # now use any binary from package requirements located in 'vendor/bin':
 (vendor/second-example-package) $ composer --version # <-- notice that we don't need to specify path to php anymore
 Composer version 1.5.2 2017-09-11 16:59:25
 
@@ -204,14 +205,14 @@ Copyright (c) 1997-2017 The PHP Group
 Zend Engine v3.2.0-dev, Copyright (c) 1998-2017 Zend Technologies
     with Zend OPcache v7.2.0RC3, Copyright (c) 1999-2017, by Zend Technologies
 
-# if you're done, run ...
+$ # if you're done, run ...
 (vendor/second-example-package) $ deactivate
 
 Left virtual composer shell environment.
 
 Good Bye!
 
-# ... and 'vendor/bin' will be removed from your PATH
+$ # ... and 'vendor/bin' will be removed from your PATH
 ```
 
 ## Want more?
