@@ -34,7 +34,7 @@ class VirtualEnvironmentCommand extends BaseCommand
         $composerJson = new JsonFile($composerFile, null, $io);
         $manifest = $composerJson->read();
 
-        $name = $manifest['name'];
+        $name = isset($manifest['name']) ? $manifest['name'] : null;
         $composer = realpath($_SERVER['argv'][0]) ?: null;
 
         $this
