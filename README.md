@@ -224,6 +224,11 @@ Good Bye!
 $ # ... and 'vendor/bin' will be removed from your PATH
 ```
 
+## Contributing
+
+Look at the [contribution guidelines](CONTRIBUTING.md)
+
+
 ## Want more?
 
 There is a [bash-completion implementation](https://sjorek.github.io/composer-bash-completion/)
