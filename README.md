@@ -16,7 +16,7 @@ php composer.phar global require sjorek/composer-virtual-environment-plugin
 ```
 
 
-### Method 2: As a package requirement
+### Method 2: as a package requirement
 
 ```bash
 php composer.phar require-dev sjorek/composer-virtual-environment-plugin
