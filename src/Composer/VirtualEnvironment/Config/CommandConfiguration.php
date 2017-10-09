@@ -52,8 +52,6 @@ class CommandConfiguration extends AbstractConfiguration
         $input = $this->input;
         $composerFile = Factory::getComposerFile();
         $filesystem = new Filesystem();
-        $composerJson = new JsonFile($composerFile, null, $this->io);
-        $manifest = $composerJson->read();
 
         $recipe = $this->set(
             'recipe',
@@ -70,7 +68,12 @@ class CommandConfiguration extends AbstractConfiguration
         $this->set('resPath', $filesystem->normalizePath(__DIR__ . '/../../../../res'));
         $binPath = $this->set('binPath', $filesystem->normalizePath($this->composer->getConfig()->get('bin-dir')));
 
-        $name = $manifest['name'];
+        $name = dirname(getcwd());
+        if (file_exists($composerFile)) {
+            $composerJson = new JsonFile($composerFile, null, $this->io);
+            $manifest = $composerJson->read();
+            $name = $manifest['name'];
+        }
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
         } else {

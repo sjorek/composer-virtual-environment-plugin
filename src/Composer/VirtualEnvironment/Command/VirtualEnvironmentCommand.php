@@ -31,11 +31,16 @@ class VirtualEnvironmentCommand extends BaseCommand
     {
         $io = $this->getIO();
         $composerFile = Factory::getComposerFile();
-        $composerJson = new JsonFile($composerFile, null, $io);
-        $manifest = $composerJson->read();
 
-        $name = isset($manifest['name']) ? $manifest['name'] : null;
+        $name = dirname(getcwd());
         $composer = realpath($_SERVER['argv'][0]) ?: null;
+        if (file_exists($composerFile)) {
+            $composerJson = new JsonFile($composerFile, null, $io);
+            $manifest = $composerJson->read();
+            if (isset($manifest['name'])) {
+                $name = $manifest['name'];
+            }
+        }
 
         $this
             ->setName('virtual-environment')
