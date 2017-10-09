@@ -22,7 +22,7 @@ _COMPOSER_VENV_getcolor () {
     # see if it supports colors...
     ncolors=$(tput colors)
 
-    if test -n "$ncolors" && test $ncolors -ge 8; then
+    if [ -z "$COMPOSER_VENV_DISABLE_COLOR_PROMPT" ] && [ -n "$ncolors" ] && [ $ncolors -ge 8 ] ; then
         bold="$(tput bold)"
         underline="$(tput smul)"
         standout="$(tput smso)"
