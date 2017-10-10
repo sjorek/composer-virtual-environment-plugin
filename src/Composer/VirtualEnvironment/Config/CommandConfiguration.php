@@ -93,6 +93,14 @@ class CommandConfiguration extends AbstractConfiguration
         );
         $recipe->set('shell', $activators);
 
+        $colorPrompt = false;
+        if ($input->getOption('color-prompt')) {
+            $colorPrompt = true;
+        } else {
+            $colorPrompt = $recipe->get('color-prompt', $colorPrompt);
+        }
+        $this->set('color-prompt', $recipe->set('color-prompt', $colorPrompt));
+
         $symlinks = array(
             'activate' => null,
             'composer' => null,

@@ -36,8 +36,12 @@ class ActivationScriptProcessor
         $candidates = array_map('trim', array_map('strtolower', $candidates));
         $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
 
+        if (in_array('detect', $candidates, true) && !empty($_SERVER['SHELL'])) {
+            $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
+        }
+
         // Get a list of valid $activators
-        return array_intersect($candidates, $activators);
+        return array_values(array_unique(array_intersect($candidates, $activators)));
     }
 
     /**

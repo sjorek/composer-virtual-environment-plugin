@@ -48,9 +48,10 @@ class VirtualEnvironmentCommand extends BaseCommand
             ->setDescription('Setup or teardown a virtual environment, with shell activation scripts and/or symbolic links to php and composer.')
             ->setDefinition(array(
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
-                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.'),
+                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', array('detect')),
                 new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php.'),
                 new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer.', $composer),
+                new InputOption('color-prompt', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
                 new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local virtual environment configuration recipe in "./composer.venv".'),
                 new InputOption('update-global', null, InputOption::VALUE_NONE, 'Update the global virtual environment configuration recipe in "~/.composer/composer.venv".'),
                 new InputOption('ignore-local', null, InputOption::VALUE_NONE, 'Ignore the local virtual environment configuration recipe in "./composer.venv".'),
@@ -67,7 +68,7 @@ in the bin directory.
 
 Usage:
 
-    <info>php composer.phar virtual-environment</info>
+    <info>php composer.phar venv</info>
 
 After this you can source the activation-script
 corresponding to your shell.
@@ -108,16 +109,36 @@ EOT
 
     protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)
     {
-        $data = array(
-            '@NAME@' => $config->get('name'),
-            '@BASE_DIR@' => $config->get('basePath'),
-            '@BIN_DIR@' => $config->get('binPath'),
-        );
-
         $activators = $config->get('activators');
         if (empty($activators)) {
             $output->writeln('Skipping creation shell activators, none available.');
         } else {
+            $data = array(
+                '@NAME@' => $config->get('name'),
+                '@BASE_DIR@' => $config->get('basePath'),
+                '@BIN_DIR@' => $config->get('binPath'),
+            );
+            if (in_array('bash', $activators)) {
+                $data = array_merge(
+                    $data,
+                    array(
+                        '@COLOR_PROMPT@' => $config->get('color-prompt') ? '1' : '',
+                        '@TPUT_COLORS@' => exec('echo "tput colors" | bash -ls 2>/dev/null'),
+                        '@TPUT_BOLD@' => exec('echo "tput bold" | bash -ls 2>/dev/null'),
+                        '@TPUT_SMUL@' => exec('echo "tput smul" | bash -ls 2>/dev/null'),
+                        '@TPUT_SMSO@' => exec('echo "tput smso" | bash -ls 2>/dev/null'),
+                        '@TPUT_SGR0@' => exec('echo "tput sgr0" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_0@' => exec('echo "tput setaf 0" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_1@' => exec('echo "tput setaf 1" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_2@' => exec('echo "tput setaf 2" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_3@' => exec('echo "tput setaf 3" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_4@' => exec('echo "tput setaf 4" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_5@' => exec('echo "tput setaf 5" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_6@' => exec('echo "tput setaf 6" | bash -ls 2>/dev/null'),
+                        '@TPUT_SETAF_7@' => exec('echo "tput setaf 7" | bash -ls 2>/dev/null'),
+                    )
+                );
+            }
             $activators = Processor\ActivationScriptProcessor::export($activators);
             foreach ($activators as $filename) {
                 $source = $config->get('resPath') . DIRECTORY_SEPARATOR .$filename;

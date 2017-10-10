@@ -34,9 +34,10 @@ Usage:
 
 Options:
       --name=NAME                Name of the virtual environment. [default: "vendor/package-name"]
-      --shell=SHELL              Set the list of shell activators to deploy. (multiple values allowed)
+      --shell=SHELL              Set the list of shell activators to deploy. [default: ["detect"]] (multiple values allowed)
       --php=PHP                  Add symlink to php.
       --composer=COMPOSER        Add symlink to composer. [default: "composer.phar"]
+      --color-prompt             Enable the color prompt per default. Works currently only for "bash".
       --update-local             Update the local virtual environment configuration recipe in "./composer.venv".
       --update-global            Update the global virtual environment configuration recipe in "~/.composer/composer.venv".
       --ignore-local             Ignore the local virtual environment configuration recipe in "./composer.venv".
@@ -62,7 +63,7 @@ Help:
   
   Usage:
   
-      php composer.phar virtual-environment
+      php composer.phar venv
   
   After this you can source the activation-script
   corresponding to your shell.
