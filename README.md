@@ -1,7 +1,5 @@
 # [“virtual-environment” command-plugin](https://sjorek.github.io/composer-virtual-environment-plugin/) for [composer](http://getcomposer.org)
 
-[![Dependency Status](https://gemnasium.com/badges/github.com/sjorek/composer-virtual-environment-plugin.svg)](https://gemnasium.com/github.com/sjorek/composer-virtual-environment-plugin)
-
 A [composer](http://getcomposer.org)-plugin adding a command to activate/deactivate the current
 bin-directory in shell, optionally creating symlinks to the composer-
 and php-binary in the bin-directory.
@@ -237,4 +235,34 @@ complementing this composer-plugin. And if you're using [MacPorts](http://macpor
 especially if you're using my [MacPorts-PHP](https://sjorek.github.io/MacPorts-PHP/)
 repository, everything should work like a breeze.
 
-Cheers!
+## Links
+
+### Status
+
+[![Build Status](https://img.shields.io/travis/sjorek/composer-virtual-environment-plugin.svg)](https://travis-ci.org/sjorek/composer-virtual-environment-plugin)
+[![Dependency Status](https://img.shields.io/gemnasium/sjorek/composer-virtual-environment-plugin.svg)](https://gemnasium.com/github.com/sjorek/composer-virtual-environment-plugin)
+
+
+### GitHub
+
+[![GitHub Issues](https://img.shields.io/github/issues/sjorek/composer-virtual-environment-plugin.svg)](https://github.com/sjorek/composer-virtual-environment-plugin/issues)
+[![GitHub Latest Tag](https://img.shields.io/github/tag/sjorek/composer-virtual-environment-plugin.svg)](https://github.com/sjorek/composer-virtual-environment-plugin/tags)
+[![GitHub Total Downloads](https://img.shields.io/github/downloads/sjorek/composer-virtual-environment-plugin/total.svg)](https://github.com/sjorek/composer-virtual-environment-plugin/releases)
+
+
+### Packagist
+
+[![Packagist Latest Stable Version](https://poser.pugx.org/sjorek/composer-virtual-environment-plugin/version)](https://packagist.org/packages/sjorek/composer-virtual-environment-plugin)
+[![Packagist Total Downloads](https://poser.pugx.org/sjorek/composer-virtual-environment-plugin/downloads)](https://packagist.org/packages/sjorek/composer-virtual-environment-plugin)
+[![Packagist Latest Unstable Version](https://poser.pugx.org/sjorek/composer-virtual-environment-plugin/v/unstable)](https:////packagist.org/packages/sjorek/composer-virtual-environment-plugin)
+[![Packagist License](https://poser.pugx.org/sjorek/composer-virtual-environment-plugin/license)](https://packagist.org/packages/sjorek/composer-virtual-environment-plugin)
+
+
+### Social
+
+[![GitHub Forks](https://img.shields.io/github/forks/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://github.com/sjorek/composer-virtual-environment-plugin/network)
+[![GitHub Stars](https://img.shields.io/github/stars/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://github.com/sjorek/composer-virtual-environment-plugin/stargazers)
+[![GitHub Watchers](https://img.shields.io/github/watchers/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://github.com/sjorek/composer-virtual-environment-plugin/watchers)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fsjorek.github.io%2Fcomposer-virtual-environment-plugin%2F)
+
+
