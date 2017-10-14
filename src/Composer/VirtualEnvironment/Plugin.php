@@ -16,6 +16,8 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capable;
 use Composer\Plugin\Capability\CommandProvider;
+use Sjorek\Composer\VirtualEnvironment\Command\ShellActivatorCommand;
+use Sjorek\Composer\VirtualEnvironment\Command\SymbolicLinkCommand;
 
 /**
  * A plugin providing a command to activate/deactivate the current bin directory
@@ -50,6 +52,9 @@ class Plugin implements PluginInterface, Capable, CommandProvider
      */
     public function getCommands()
     {
-        return array(new Command\VirtualEnvironmentCommand());
+        return array(
+            new ShellActivatorCommand(),
+            new SymbolicLinkCommand(),
+        );
     }
 }

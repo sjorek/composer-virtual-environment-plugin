@@ -15,7 +15,7 @@ use Composer\Command\BaseCommand;
 use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Util\Platform;
-use Sjorek\Composer\VirtualEnvironment\Config\CommandConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\Command\ShellActivatorConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,15 +25,15 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class VirtualEnvironmentCommand extends BaseCommand
+class ShellActivatorCommand extends BaseCommand
 {
     protected function configure()
     {
         $io = $this->getIO();
         $composerFile = Factory::getComposerFile();
+        $home = $this->getComposer()->getConfig()->get('home');
 
         $name = dirname(getcwd());
-        $composer = realpath($_SERVER['argv'][0]) ?: null;
         if (file_exists($composerFile)) {
             $composerJson = new JsonFile($composerFile, null, $io);
             $manifest = $composerJson->read();
@@ -43,28 +43,24 @@ class VirtualEnvironmentCommand extends BaseCommand
         }
 
         $this
-            ->setName('virtual-environment')
-            ->setAliases(array('virtualenvironment', 'venv'))
-            ->setDescription('Setup or teardown a virtual environment, with shell activation scripts and/or symbolic links to php and composer.')
+            ->setName('virtual-environment:shell-activator')
+            ->setAliases(array('virtualenvironment:shellactivator', 'venv:shell'))
+            ->setDescription('Setup or teardown a virtual environment with shell activation scripts.')
             ->setDefinition(array(
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
                 new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', array('detect')),
-                new InputOption('php', null, InputOption::VALUE_REQUIRED, 'Add symlink to php.'),
-                new InputOption('composer', null, InputOption::VALUE_REQUIRED, 'Add symlink to composer.', $composer),
                 new InputOption('color-prompt', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
-                new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local virtual environment configuration recipe in "./composer.venv".'),
-                new InputOption('update-global', null, InputOption::VALUE_NONE, 'Update the global virtual environment configuration recipe in "~/.composer/composer.venv".'),
-                new InputOption('ignore-local', null, InputOption::VALUE_NONE, 'Ignore the local virtual environment configuration recipe in "./composer.venv".'),
-                new InputOption('ignore-global', null, InputOption::VALUE_NONE, 'Ignore the global virtual environment configuration recipe in "~/.composer/composer.venv".'),
-                new InputOption('remove', null, InputOption::VALUE_NONE, 'Remove any deployed shell activators or symbolic links.'),
-                new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment scripts'),
+                new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local configuration recipe in "./composer.venv".'),
+                new InputOption('ignore-local', null, InputOption::VALUE_NONE, 'Ignore the local configuration recipe in "./composer.venv".'),
+                new InputOption('update-global', null, InputOption::VALUE_NONE, 'Update the global configuration in "' . $home .'/composer.venv".'),
+                new InputOption('ignore-global', null, InputOption::VALUE_NONE, 'Ignore the global configuration in "' . $home .'/composer.venv".'),
+                new InputOption('remove', null, InputOption::VALUE_NONE, 'Remove any deployed shell activation scripts.'),
+                new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment files and links'),
             ))
             ->setHelp(
                 <<<EOT
-The <info>virtual-environment</info> command creates files to activate
-and deactivate the current bin directory in shell,
-optionally placing symlinks to php- and composer-binaries
-in the bin directory.
+The <info>virtual-environment:shell-activator</info> command creates files
+to activate and deactivate the current bin directory in shell.
 
 Usage:
 
@@ -94,7 +90,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = new CommandConfiguration(
+        $config = new ShellActivatorConfiguration(
             $input,
             $output,
             $this->getComposer(),
@@ -109,9 +105,11 @@ EOT
 
     protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)
     {
-        $activators = $config->get('activators');
+        $activators = $config->get('shell');
         if (empty($activators)) {
-            $output->writeln('Skipping creation shell activators, none available.');
+            $output->writeln(
+                '<comment>Skipping creation of shell activators, none available.</comment>'
+            );
         } else {
             $data = array(
                 '@NAME@' => $config->get('name'),
@@ -141,25 +139,30 @@ EOT
             }
             $activators = Processor\ActivationScriptProcessor::export($activators);
             foreach ($activators as $filename) {
-                $source = $config->get('resPath') . DIRECTORY_SEPARATOR .$filename;
-                $target = $config->get('binPath') . DIRECTORY_SEPARATOR .$filename;
+                $source = $config->get('resPath') . '/' . $filename;
+                $target = $config->get('binPath') . '/' . $filename;
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
                 $processor->deploy($output, $input->getOption('force'));
             }
-        }
-
-        $symlinks = $config->get('symlinks');
-        if (empty($symlinks)) {
-            $output->writeln('Skipping creation of symbolic links, none available.');
-        } elseif (Platform::isWindows()) {
-            $output->writeln('    <warning>Symbolic links are not supported on windows</warning>');
-        } else {
-            foreach ($symlinks as $name => $source) {
-                $target = $config->get('binPath') . DIRECTORY_SEPARATOR . $name;
-                $processor = new Processor\SymbolicLinkProcessor($source, $target);
-                $processor->deploy($output, $input->getOption('force'));
+            if ($config->has('link')) {
+                $symlinks = $config->get('link');
+                if (empty($symlinks)) {
+                    $output->writeln(
+                        '<comment>Skipping creation of symbolic link to shell activation script, as none is available.</comment>'
+                    );
+                } elseif (Platform::isWindows()) {
+                    $output->writeln(
+                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>'
+                    );
+                } else {
+                    foreach ($symlinks as $source => $target) {
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target);
+                        $processor->deploy($output, $input->getOption('force'));
+                    }
+                }
             }
         }
+
         $config->persist($input->getOption('force'));
     }
 
@@ -167,7 +170,9 @@ EOT
     {
         $activators = $config->get('activators');
         if (empty($activators)) {
-            $output->writeln('Skipping removal of shell activators, none available.');
+            $output->writeln(
+                '<comment>Skipping removal of shell activation scripts, as none is available.</comment>'
+            );
         } else {
             $activators = Processor\ActivationScriptProcessor::export($activators);
             foreach ($activators as $filename) {
@@ -176,16 +181,22 @@ EOT
                 $processor = new Processor\ActivationScriptProcessor($source, $target, array());
                 $processor->rollback($output);
             }
-        }
-
-        $symlinks = $config->get('symlinks');
-        if (empty($symlinks)) {
-            $output->writeln('Skipping removal of symbolic links, none available.');
-        } elseif (!Platform::isWindows()) {
-            foreach ($symlinks as $name => $source) {
-                $target = $config->get('binPath') . DIRECTORY_SEPARATOR . $name;
-                $processor = new Processor\SymbolicLinkProcessor($source, $target);
-                $processor->rollback($output);
+            if ($config->has('link')) {
+                $symlinks = $config->get('link');
+                if (empty($symlinks)) {
+                    $output->writeln(
+                        '<comment>Skipping removal of symbolic link to shell activation script, as none is available.</comment>'
+                    );
+                } elseif (Platform::isWindows()) {
+                    $output->writeln(
+                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>'
+                    );
+                } else {
+                    foreach ($symlinks as $source => $target) {
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target);
+                        $processor->deploy($output, $input->getOption('force'));
+                    }
+                }
             }
         }
     }

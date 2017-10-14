@@ -89,25 +89,48 @@ class ActivationScriptProcessor
      */
     public function deploy(OutputInterface $output, $force = false)
     {
-        if (file_exists($this->target) || is_link($this->target)) {
+        $source = $this->source;
+        $target = $this->target;
+        if (file_exists($target) || is_link($target)) {
             if ($force) {
-                if ($this->filesystem->unlink($this->target)) {
-                    $output->writeln('Removed existing virtual environment activation script: ' . $this->target);
+                if ($this->filesystem->unlink($target)) {
+                    $output->writeln(
+                        sprintf(
+                            '<comment>Removed existing shell activation script %s.</comment>',
+                            $target
+                        )
+                    );
                 } else {
-                    $output->writeln('    <error>Could not remove virtual environment activation script:</error> ' . $this->target);
+                    $output->writeln(
+                        sprintf(
+                            '<error>Failed to remove the shell activation script %s.</error>',
+                            $target
+                        )
+                    );
 
                     return false;
                 }
             } else {
-                $output->writeln('    <error>Skipped installation of shell activator:</error> file "'.$this->target.'" already exists');
+                $output->writeln(
+                    sprintf(
+                        '<error>Skipped installation of the shell activation script %s, as the file already exists.</error>',
+                        $target
+                    )
+                );
 
                 return false;
             }
         }
 
-        $content = file_get_contents($this->source, false);
+        $content = file_get_contents($source, false);
         if ($content === false) {
-            $output->writeln('    <error>Skipped installation of shell activator:</error> could not read the template file "'.$this->source.'"');
+            $output->writeln(
+                sprintf(
+                    '<error>Failed to read the template file %s for shell activation script %s.</error>',
+                    $source,
+                    $target
+                )
+            );
 
             return false;
         }
@@ -116,14 +139,27 @@ class ActivationScriptProcessor
             array_values($this->data),
             $content
         );
-        $this->filesystem->ensureDirectoryExists(dirname($this->target));
-        if (file_put_contents($this->target, $content) === false) {
-            $output->writeln('    <error>Skipped installation of shell activator:</error> could not write the shell activator file "'.$this->target.'"');
+        if (strpos($target, '/') !== false) {
+            $this->filesystem->ensureDirectoryExists(dirname($target));
+        }
+        if (file_put_contents($target, $content) === false) {
+            $output->writeln(
+                sprintf(
+                    '<error>Failed to write the shell activation script %s.</error>',
+                    $target
+                )
+            );
 
             return false;
         }
-        Silencer::call('chmod', $this->target, 0777 & ~umask());
-        $output->writeln('Installed virtual environment activation script: ' . $this->target);
+        Silencer::call('chmod', $target, 0777 & ~umask());
+
+        $output->writeln(
+            sprintf(
+                '<comment>Installed shell activation script %s.</comment>',
+                $target
+            )
+        );
 
         return true;
     }
@@ -134,24 +170,52 @@ class ActivationScriptProcessor
      */
     public function rollback(OutputInterface $output)
     {
-        if (file_exists($this->target)) {
+        $target = $this->target;
+        if (file_exists($target)) {
             // For existing symlinks
-            if (is_link($this->target)) {
-                $output->writeln('Refused to remove virtual environment activation script, as this is a symbolic link: ' . $this->target);
+            if (is_link($target)) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Refused to remove the shell activation script %s, as it is a symbolic link.</error>',
+                        $target
+                    )
+                );
             } else {
-                if ($this->filesystem->unlink($this->target)) {
-                    $output->writeln('Removed virtual environment activation script: ' . $this->target);
+                if ($this->filesystem->unlink($target)) {
+                    $output->writeln(
+                        sprintf(
+                            '<comment>Removed shell activation script %s.</comment>',
+                            $target
+                        )
+                    );
 
                     return true;
                 } else {
-                    $output->writeln('Could not remove virtual environment activation script: ' . $this->target);
+                    $output->writeln(
+                        sprintf(
+                            '<error>Failed to remove the shell activation script %s.</error>',
+                            $target
+                        )
+                    );
                 }
             }
             // For dangeling symlinks
-        } elseif (is_link($this->target)) {
-            $output->writeln('Refused to remove virtual environment activation script, as this is a symbolic link: ' . $this->target);
+        } elseif (is_link($target)) {
+            $output->writeln(
+                sprintf(
+                    '<error>Refused to remove the shell activation script %s, as it is a dangeling symbolic link.</error>',
+                    $target
+                )
+            );
         } else {
-            $output->writeln('Skipped removing virtual environment activation script, as it does not exist: ' . $this->target);
+            $output->writeln(
+                sprintf(
+                    '<comment>Skipped removing the shell activation script %s, as it does not exist.</comment>',
+                    $target
+                )
+            );
+
+            return true;
         }
 
         return false;

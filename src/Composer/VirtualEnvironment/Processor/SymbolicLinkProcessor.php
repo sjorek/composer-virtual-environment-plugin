@@ -3,7 +3,7 @@
 /*
  * This file is part of Composer Virtual Environment Plugin.
  *
- * (c) Stephan Jorek <stephnan.jorek@gmail.com>
+ * (c) Stephan Jorek <stephan.jorek@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,54 +32,121 @@ class SymbolicLinkProcessor
 
     public function deploy(OutputInterface $output, $force = false)
     {
-        if ($this->source === $this->target) {
-            $output->writeln('    <error>Skipped creation of symbolic link:</error> source and target are the same '.$this->target.' -> ' . $this->source);
+        $source = $this->source;
+        $target = $this->target;
+        if (strpos($target, '/') === false && strpos($source, '/') !== false) {
+            $target = dirname($source) . '/' . $target;
+        }
+
+        if ($source === $target) {
+            $output->writeln(
+                sprintf(
+                    '<error>Skipped creation of symbolic link, as source %s and target %s are the same.</error>',
+                    $source,
+                    $target
+                )
+            );
 
             return false;
         }
-        if (file_exists($this->target) || is_link($this->target)) {
+        if (file_exists($source) || is_link($source)) {
             if ($force) {
-                if ($this->filesystem->unlink($this->target)) {
-                    $output->writeln('Removed existing symbolic link: ' . $this->target);
+                if ($this->filesystem->unlink($source)) {
+                    $output->writeln(
+                        sprintf(
+                            '<comment>Removed existing symbolic link %s.</comment>',
+                            $source
+                        )
+                    );
                 } else {
-                    $output->writeln('    <error>Could not remove existing symbolic link:</error> ' . $this->target);
+                    $output->writeln(
+                        sprintf(
+                            '<error>Could not remove existing symbolic link %s.</error>',
+                            $source
+                        )
+                    );
 
                     return false;
                 }
             } else {
-                $output->writeln('    <error>Skipped creation of symbolic link:</error> file "'.$this->target.'" already exists');
+                $output->writeln(
+                    sprintf(
+                        '<error>Skipped creation of symbolic link, as the source %s already exists.</error>',
+                        $source
+                    )
+                );
 
                 return false;
             }
         }
-        if (!(file_exists($this->source) || is_link($this->source))) {
-            $output->writeln('    <error>Skipped creation of symbolic link:</error> For "'.$this->target.'" the target "' . $this->source . '" does not exist');
+        if (!(file_exists($target) || is_link($target))) {
+            $output->writeln(
+                sprintf(
+                    '<error>Skipped creation of symbolic link, as the target %s does not exist.</error>',
+                    $target
+                )
+            );
 
             return false;
         }
-        $this->filesystem->ensureDirectoryExists(dirname($this->target));
-        if (!$this->filesystem->relativeSymlink($this->source, $this->target)) {
-            $output->writeln('    <error>Creation of symbolic link failed:</error> "'.$this->target.'" -> "' . $this->source . '"');
-
-            return false;
+        if (strpos($source, '/') !== false) {
+            $this->filesystem->ensureDirectoryExists(dirname($source));
         }
-        $output->writeln('Installed virtual environment symlink: ' . $this->target .' -> ' . $this->source);
+        // Attention: we deliberately use $this->target instead of $target to allow relative targets!
+        if ($this->filesystem->relativeSymlink($this->target, $source)) {
+            $output->writeln(
+                sprintf(
+                    '<comment>Installed symbolic link link from source %s to target %s.</comment>',
+                    $source,
+                    $target
+                )
+            );
 
-        return true;
+            return true;
+        } else {
+            $output->writeln(
+                sprintf(
+                    '<error>Creation of symbolic link failed for source %s and target %s.</error>',
+                    $source,
+                    $target
+                )
+            );
+        }
+
+        return false;
     }
 
     public function rollback(OutputInterface $output)
     {
-        if (file_exists($this->target) || is_link($this->target)) {
-            if ($this->filesystem->unlink($this->target)) {
-                $output->writeln('Removed virtual environment symbolic link: ' . $this->target);
+        $source = $this->source;
+        // Attention: Dangling symlinks return false for is_link(), hence we have to use file_exists()!
+        if (file_exists($source) || is_link($source)) {
+            if ($this->filesystem->unlink($source)) {
+                $output->writeln(
+                    sprintf(
+                        '<comment>Removed symbolic link %s.</comment>',
+                        $source
+                    )
+                );
 
                 return true;
             } else {
-                $output->writeln('Could not remove virtual environment symbolic link: ' . $this->target);
+                $output->writeln(
+                    sprintf(
+                        '<error>Could not remove symbolic link %s.</error>',
+                        $source
+                    )
+                );
             }
         } else {
-            $output->writeln('Skipped removing virtual environment symbolic link, as it does not exist: ' . $this->target);
+            $output->writeln(
+                sprintf(
+                    '<comment>Skipped removing symbolic link, as %s does not exist.</comment>',
+                    $source
+                )
+            );
+
+            return true;
         }
 
         return false;
