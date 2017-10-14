@@ -38,7 +38,7 @@ class Plugin implements PluginInterface, Capable, CommandProvider
     protected $io;
 
     /**
-     * @param Composer $composer
+     * @param Composer    $composer
      * @param IOInterface $io
      */
     public function __construct(array $ctorArgs = array())

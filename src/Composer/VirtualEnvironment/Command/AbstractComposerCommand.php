@@ -23,8 +23,8 @@ abstract class AbstractComposerCommand extends BaseCommand
     /**
      * Constructor.
      *
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
-     * @param Composer $composer
+     * @param string|null $name     The name of the command; passing null means it must be set in configure()
+     * @param Composer    $composer
      * @param IOInterface $io
      *
      * @throws \Symfony\Component\Console\Exception\LogicException When the command name is empty

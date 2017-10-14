@@ -38,10 +38,10 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param Composer $composer
-     * @param IOInterface $io
+     * @param  InputInterface         $input
+     * @param  OutputInterface        $output
+     * @param  Composer               $composer
+     * @param  IOInterface            $io
      * @return ConfigurationInterface
      */
     abstract protected function getCommandConfiguration(
