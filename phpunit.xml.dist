@@ -6,7 +6,7 @@
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
-         backupGlobals="false"
+         backupGlobals="true"
          backupStaticAttributes="false"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
