@@ -11,8 +11,9 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
-use Composer\Command\BaseCommand;
+use Composer\Composer;
 use Composer\Factory;
+use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Config\Command\ShellActivatorConfiguration;
@@ -25,7 +26,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellActivatorCommand extends BaseCommand
+class ShellActivatorCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
@@ -43,9 +44,8 @@ class ShellActivatorCommand extends BaseCommand
         }
 
         $this
-            ->setName('virtual-environment:shell-activator')
-            ->setAliases(array('virtualenvironment:shellactivator', 'venv:shell'))
-            ->setDescription('Setup or teardown a virtual environment with shell activation scripts.')
+            ->setName('venv:shell')
+            ->setDescription('Setup or teardown virtual environment shell activation scripts.')
             ->setDefinition(array(
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
                 new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', array('detect')),
@@ -88,19 +88,17 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $config = new ShellActivatorConfiguration(
-            $input,
-            $output,
-            $this->getComposer(),
-            $this->getIO()
-        );
-        if ($input->getOption('remove')) {
-            $this->rollback($input, $output, $config);
-        } else {
-            $this->deploy($input, $output, $config);
-        }
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommand::getCommandConfiguration()
+     */
+    protected function getCommandConfiguration(
+        InputInterface $input,
+        OutputInterface $output,
+        Composer $composer,
+        IOInterface $io
+    ) {
+        return new ShellActivatorConfiguration($input, $output, $composer, $io);
     }
 
     protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)

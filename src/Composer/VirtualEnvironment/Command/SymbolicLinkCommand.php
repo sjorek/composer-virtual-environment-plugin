@@ -11,8 +11,9 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
+use Composer\Composer;
 use Composer\Config;
-use Composer\Command\BaseCommand;
+use Composer\IO\IOInterface;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Config\Command\SymbolicLinkConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class SymbolicLinkCommand extends BaseCommand
+class SymbolicLinkCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
@@ -47,9 +48,8 @@ class SymbolicLinkCommand extends BaseCommand
         }
 
         $this
-            ->setName('virtual-environment:symbolic-link')
-            ->setAliases(array('virtualenvironment:symboliclink', 'venv:symlink'))
-            ->setDescription('Setup or teardown virtual environment symbolic links.')
+            ->setName('venv:link')
+            ->setDescription('Add or remove virtual environment symbolic links.')
             ->setDefinition(array(
                 new InputOption('link', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add symbolic link to "' . $example . '".', $symlinks),
                 new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local configuration in "composer.venv".'),
@@ -75,19 +75,17 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $config = new SymbolicLinkConfiguration(
-            $input,
-            $output,
-            $this->getComposer(),
-            $this->getIO()
-        );
-        if ($input->getOption('remove')) {
-            $this->rollback($input, $output, $config);
-        } else {
-            $this->deploy($input, $output, $config);
-        }
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommand::getCommandConfiguration()
+     */
+    protected function getCommandConfiguration(
+        InputInterface $input,
+        OutputInterface $output,
+        Composer $composer,
+        IOInterface $io
+    ) {
+        return new SymbolicLinkConfiguration($input, $output, $composer, $io);
     }
 
     protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)

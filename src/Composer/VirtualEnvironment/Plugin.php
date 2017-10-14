@@ -28,11 +28,37 @@ use Sjorek\Composer\VirtualEnvironment\Command\SymbolicLinkCommand;
 class Plugin implements PluginInterface, Capable, CommandProvider
 {
     /**
+     * @var Composer
+     */
+    protected $composer;
+
+    /**
+     * @var IOInterface
+     */
+    protected $io;
+
+    /**
+     * @param Composer $composer
+     * @param IOInterface $io
+     */
+    public function __construct(array $ctorArgs = array())
+    {
+        if (isset($ctorArgs['composer']) && $ctorArgs['composer'] instanceof Composer) {
+            $this->composer = $ctorArgs['composer'];
+        }
+        if (isset($ctorArgs['io']) && $ctorArgs['io'] instanceof IOInterface) {
+            $this->io = $ctorArgs['io'];
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * @see \Composer\Plugin\PluginInterface::activate()
      */
     public function activate(Composer $composer, IOInterface $io)
     {
+        $this->composer = $composer;
+        $this->io = $io;
     }
 
     /**
@@ -53,8 +79,8 @@ class Plugin implements PluginInterface, Capable, CommandProvider
     public function getCommands()
     {
         return array(
-            new ShellActivatorCommand(),
-            new SymbolicLinkCommand(),
+            new ShellActivatorCommand(null, $this->composer, $this->io),
+            new SymbolicLinkCommand(null, $this->composer, $this->io),
         );
     }
 }
