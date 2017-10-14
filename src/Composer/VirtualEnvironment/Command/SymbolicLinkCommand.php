@@ -44,7 +44,7 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
         $symlinks = null;
         $composerPhar = realpath($_SERVER['argv'][0]) ?: null;
         if ($composerPhar) {
-            $symlinks = array($binDir . '/composer' . PATH_SEPARATOR . $composerPhar);
+            $symlinks = array($binDir . '/composer.phar' . PATH_SEPARATOR . $composerPhar);
         }
 
         $this
