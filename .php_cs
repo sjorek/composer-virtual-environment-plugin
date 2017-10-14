@@ -14,7 +14,7 @@ $finder = PhpCsFixer\Finder::create()
     ->name('*.php')
     ->exclude('Fixtures')
     ->in(__DIR__.'/src')
-//    ->in(__DIR__.'/tests')
+    ->in(__DIR__.'/tests')
 ;
 
 return PhpCsFixer\Config::create()
