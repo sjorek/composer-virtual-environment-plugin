@@ -18,10 +18,8 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Sjorek\\Composer\\" : "src/Composer"
-		},
-		"psr-0" : {
-			"Sjorek\\Composer\\" : "src/Composer"
+			"Sjorek\\Composer\\VirtualEnvironment\\" : "src/Composer/VirtualEnvironment",
+			"Sjorek\\Composer\\VirtualEnvironment\\Tests\\" : "tests/Composer/VirtualEnvironment/Tests"
 		}
 	},
 	"require" : {
