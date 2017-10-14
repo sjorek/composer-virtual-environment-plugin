@@ -29,12 +29,16 @@
 		"composer-plugin-api" : "^1.1"
 	},
 	"require-dev" : {
-		"friendsofphp/php-cs-fixer" : "^2.8@dev"
+		"friendsofphp/php-cs-fixer" : "^2.7",
+		"phpunit/phpunit" : "^6.4"
 	},
 	"extra" : {
 		"class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
 	},
 	"scripts": {
-		"build": "php-cs-fixer fix"
+		"build": "php-cs-fixer fix",
+		"test": "phpunit -v",
+		"test-quick": "phpunit -v --exclude-group",
+		"test-large": "phpunit -v --group=large"
 	}
 }
