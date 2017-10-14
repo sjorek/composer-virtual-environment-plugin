@@ -58,6 +58,9 @@ class ActivationScriptProcessor
         // Remove duplicates introduced by user or shortcut addition from above
         $activators = array_unique($activators);
 
+        // sort them to get nice order
+        sort($activators);
+
         // Create filenames
         $activators = array_map(
             function ($activator) {
