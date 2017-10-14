@@ -96,18 +96,21 @@ class ActivationScriptProcessor
         $target = $this->target;
         if (file_exists($target) || is_link($target)) {
             if ($force) {
-                if ($this->filesystem->unlink($target)) {
+                try {
+                    if ($this->filesystem->unlink($target)) {
+                        $output->writeln(
+                            sprintf(
+                                '<comment>Removed existing shell activation script %s.</comment>',
+                                $target
+                            )
+                        );
+                    }
+                } catch (\RuntimeException $e) {
                     $output->writeln(
                         sprintf(
-                            '<comment>Removed existing shell activation script %s.</comment>',
-                            $target
-                        )
-                    );
-                } else {
-                    $output->writeln(
-                        sprintf(
-                            '<error>Failed to remove the shell activation script %s.</error>',
-                            $target
+                            '<error>Failed to remove the existing shell activation script %s: %s.</error>',
+                            $target,
+                            $e->getMessage()
                         )
                     );
 
@@ -116,7 +119,7 @@ class ActivationScriptProcessor
             } else {
                 $output->writeln(
                     sprintf(
-                        '<error>Skipped installation of the shell activation script %s, as the file already exists.</error>',
+                        '<error>Shell activation script %s already exists.</error>',
                         $target
                     )
                 );
@@ -125,13 +128,23 @@ class ActivationScriptProcessor
             }
         }
 
-        $content = file_get_contents($source, false);
+        if (!file_exists($source)) {
+            $output->writeln(
+                sprintf(
+                    '<error>The shell activation script template %s does not exist.</error>',
+                    $source
+                )
+            );
+
+            return false;
+        }
+
+        $content = @file_get_contents($source, false);
         if ($content === false) {
             $output->writeln(
                 sprintf(
-                    '<error>Failed to read the template file %s for shell activation script %s.</error>',
-                    $source,
-                    $target
+                    '<error>Failed to read the template file %s.</error>',
+                    $source
                 )
             );
 
@@ -142,10 +155,22 @@ class ActivationScriptProcessor
             array_values($this->data),
             $content
         );
-        if (strpos($target, '/') !== false) {
-            $this->filesystem->ensureDirectoryExists(dirname($target));
+        if (dirname($target)) {
+            try {
+                $this->filesystem->ensureDirectoryExists(dirname($target));
+            } catch (\RuntimeException $e) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Failed to create the target directory %s: %s</error>',
+                        dirname($target),
+                        $e->getMessage()
+                    )
+                );
+
+                return false;
+            }
         }
-        if (file_put_contents($target, $content) === false) {
+        if (@file_put_contents($target, $content) === false) {
             $output->writeln(
                 sprintf(
                     '<error>Failed to write the shell activation script %s.</error>',
@@ -184,29 +209,34 @@ class ActivationScriptProcessor
                     )
                 );
             } else {
-                if ($this->filesystem->unlink($target)) {
+                try {
+                    if ($this->filesystem->unlink($target)) {
+                        $output->writeln(
+                            sprintf(
+                                '<comment>Removed shell activation script %s.</comment>',
+                                $target
+                            )
+                        );
+
+                        return true;
+                    }
+                } catch (\RuntimeException $e) {
                     $output->writeln(
                         sprintf(
-                            '<comment>Removed shell activation script %s.</comment>',
-                            $target
+                            '<error>Failed to remove the shell activation script %s: %s</error>',
+                            $target,
+                            $e->getMessage()
                         )
                     );
 
-                    return true;
-                } else {
-                    $output->writeln(
-                        sprintf(
-                            '<error>Failed to remove the shell activation script %s.</error>',
-                            $target
-                        )
-                    );
+                    return false;
                 }
             }
-            // For dangeling symlinks
+            // For dangling symlinks
         } elseif (is_link($target)) {
             $output->writeln(
                 sprintf(
-                    '<error>Refused to remove the shell activation script %s, as it is a dangeling symbolic link.</error>',
+                    '<error>Refused to remove the shell activation script %s, as it is a dangling symbolic link.</error>',
                     $target
                 )
             );
