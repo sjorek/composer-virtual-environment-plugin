@@ -3,5 +3,4 @@
 /.settings
 /.php_cs.cache
 /vendor
-/composer.lock
 /composer.phar
