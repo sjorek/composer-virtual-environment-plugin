@@ -51,18 +51,21 @@ class SymbolicLinkProcessor
         }
         if (file_exists($source) || is_link($source)) {
             if ($force) {
-                if ($this->filesystem->unlink($source)) {
+                try {
+                    if ($this->filesystem->unlink($source)) {
+                        $output->writeln(
+                            sprintf(
+                                '<comment>Removed existing file for symbolic link %s.</comment>',
+                                $source
+                            )
+                        );
+                    }
+                } catch (\RuntimeException $e) {
                     $output->writeln(
                         sprintf(
-                            '<comment>Removed existing symbolic link %s.</comment>',
-                            $source
-                        )
-                    );
-                } else {
-                    $output->writeln(
-                        sprintf(
-                            '<error>Could not remove existing symbolic link %s.</error>',
-                            $source
+                            '<error>Could not remove existing symbolic link %s: %s</error>',
+                            $source,
+                            $e->getMessage()
                         )
                     );
 
@@ -89,14 +92,36 @@ class SymbolicLinkProcessor
 
             return false;
         }
-        if (strpos($source, '/') !== false) {
-            $this->filesystem->ensureDirectoryExists(dirname($source));
+        if (dirname($source)) {
+            try {
+                $this->filesystem->ensureDirectoryExists(dirname($source));
+            } catch (\RuntimeException $e) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Failed to create the symlink directory %s: %s</error>',
+                        dirname($source),
+                        $e->getMessage()
+                    )
+                );
+
+                return false;
+            }
         }
-        // Attention: we deliberately use $this->target instead of $target to allow relative targets!
-        if ($this->filesystem->relativeSymlink($this->target, $source)) {
+        // special treatment for relative symlinks in the same directory
+        if (strpos($this->target, '/') === false && symlink($this->target, $source)) {
             $output->writeln(
                 sprintf(
-                    '<comment>Installed symbolic link link from source %s to target %s.</comment>',
+                    '<comment>Installed symbolic link from source %s to target %s.</comment>',
+                    $source,
+                    $this->target
+                )
+            );
+
+            return true;
+        } elseif (strpos($this->target, '/') !== false && $this->filesystem->relativeSymlink($target, $source)) {
+            $output->writeln(
+                sprintf(
+                    '<comment>Installed symbolic link from source %s to target %s.</comment>',
                     $source,
                     $target
                 )
@@ -121,22 +146,27 @@ class SymbolicLinkProcessor
         $source = $this->source;
         // Attention: Dangling symlinks return false for is_link(), hence we have to use file_exists()!
         if (file_exists($source) || is_link($source)) {
-            if ($this->filesystem->unlink($source)) {
+            try {
+                if ($this->filesystem->unlink($source)) {
+                    $output->writeln(
+                        sprintf(
+                            '<comment>Removed symbolic link %s.</comment>',
+                            $source
+                        )
+                    );
+    
+                    return true;
+                }
+            } catch(\RuntimeException $e) {
                 $output->writeln(
                     sprintf(
-                        '<comment>Removed symbolic link %s.</comment>',
-                        $source
+                        '<error>Could not remove symbolic link %s: %s</error>',
+                        $source,
+                        $e->getMessage()
                     )
                 );
 
-                return true;
-            } else {
-                $output->writeln(
-                    sprintf(
-                        '<error>Could not remove symbolic link %s.</error>',
-                        $source
-                    )
-                );
+                return false;
             }
         } else {
             $output->writeln(
