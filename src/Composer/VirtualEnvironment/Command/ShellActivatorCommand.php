@@ -90,7 +90,7 @@ EOT
 
     /**
      * {@inheritDoc}
-     * @see AbstractCommand::getCommandConfiguration()
+     * @see AbstractProcessorCommand::getCommandConfiguration()
      */
     protected function getCommandConfiguration(
         InputInterface $input,
@@ -101,6 +101,26 @@ EOT
         return new ShellActivatorConfiguration($input, $output, $composer, $io);
     }
 
+    const BASH_TEMPLATE_COMMANDS = array(
+        '@TPUT_COLORS@' => 'tput colors',
+        '@TPUT_BOLD@' => 'tput bold',
+        '@TPUT_SMUL@' => 'tput smul',
+        '@TPUT_SMSO@' => 'tput smso',
+        '@TPUT_SGR0@' => 'tput sgr0',
+        '@TPUT_SETAF_0@' => 'tput setaf 0',
+        '@TPUT_SETAF_1@' => 'tput setaf 1',
+        '@TPUT_SETAF_2@' => 'tput setaf 2',
+        '@TPUT_SETAF_3@' => 'tput setaf 3',
+        '@TPUT_SETAF_4@' => 'tput setaf 4',
+        '@TPUT_SETAF_5@' => 'tput setaf 5',
+        '@TPUT_SETAF_6@' => 'tput setaf 6',
+        '@TPUT_SETAF_7@' => 'tput setaf 7',
+    );
+
+    /**
+     * {@inheritDoc}
+     * @see \Sjorek\Composer\VirtualEnvironment\Command\AbstractProcessorCommand::deploy()
+     */
     protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)
     {
         $activators = $config->get('shell');
@@ -113,27 +133,25 @@ EOT
                 '@NAME@' => $config->get('name'),
                 '@BASE_DIR@' => $config->get('basePath'),
                 '@BIN_DIR@' => $config->get('binPath'),
+                '@COLOR_PROMPT@' => $config->get('color-prompt') ? '1' : '',
             );
             if (in_array('bash', $activators)) {
-                $data = array_merge(
-                    $data,
-                    array(
-                        '@COLOR_PROMPT@' => $config->get('color-prompt') ? '1' : '',
-                        '@TPUT_COLORS@' => exec('echo "tput colors" | bash -ls 2>/dev/null'),
-                        '@TPUT_BOLD@' => exec('echo "tput bold" | bash -ls 2>/dev/null'),
-                        '@TPUT_SMUL@' => exec('echo "tput smul" | bash -ls 2>/dev/null'),
-                        '@TPUT_SMSO@' => exec('echo "tput smso" | bash -ls 2>/dev/null'),
-                        '@TPUT_SGR0@' => exec('echo "tput sgr0" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_0@' => exec('echo "tput setaf 0" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_1@' => exec('echo "tput setaf 1" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_2@' => exec('echo "tput setaf 2" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_3@' => exec('echo "tput setaf 3" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_4@' => exec('echo "tput setaf 4" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_5@' => exec('echo "tput setaf 5" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_6@' => exec('echo "tput setaf 6" | bash -ls 2>/dev/null'),
-                        '@TPUT_SETAF_7@' => exec('echo "tput setaf 7" | bash -ls 2>/dev/null'),
-                    )
-                );
+                $bash = 'bash';
+                if (isset($_SERVER['SHELL']) && basename($_SERVER['SHELL']) === 'bash') {
+                    $bash = $_SERVER['SHELL'];
+                } elseif (isset($_ENV['SHELL']) && basename($_ENV['SHELL']) === 'bash') {
+                    $bash = $_ENV['SHELL'];
+                }
+                // TODO check that $bash is really a bash? check version or issue a command only bash supports!
+                foreach(self::BASH_TEMPLATE_COMMANDS as $key => $command) {
+                    $data[$key] = exec(
+                        sprintf(
+                            '( echo %s | %s -ls ) 2>/dev/null',
+                            escapeshellarg($command),
+                            escapeshellcmd($bash)
+                        )
+                    );
+                }
             }
             $activators = Processor\ActivationScriptProcessor::export($activators);
             foreach ($activators as $filename) {

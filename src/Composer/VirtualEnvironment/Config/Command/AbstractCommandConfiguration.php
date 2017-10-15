@@ -9,12 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\Composer\VirtualEnvironment\Config;
+namespace Sjorek\Composer\VirtualEnvironment\Config\Command;
 
 use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
+use Sjorek\Composer\VirtualEnvironment\Config\AbstractConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\CompositeConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

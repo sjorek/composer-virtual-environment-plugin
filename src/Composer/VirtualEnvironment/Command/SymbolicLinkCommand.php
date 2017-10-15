@@ -77,7 +77,7 @@ EOT
 
     /**
      * {@inheritDoc}
-     * @see AbstractCommand::getCommandConfiguration()
+     * @see AbstractProcessorCommand::getCommandConfiguration()
      */
     protected function getCommandConfiguration(
         InputInterface $input,

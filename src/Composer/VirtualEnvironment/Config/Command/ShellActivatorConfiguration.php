@@ -15,7 +15,6 @@ use Composer\Config;
 use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
-use Sjorek\Composer\VirtualEnvironment\Config\AbstractCommandConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor;
 

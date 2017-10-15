@@ -11,7 +11,6 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Config\Command;
 
-use Sjorek\Composer\VirtualEnvironment\Config\AbstractCommandConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 
 /**
