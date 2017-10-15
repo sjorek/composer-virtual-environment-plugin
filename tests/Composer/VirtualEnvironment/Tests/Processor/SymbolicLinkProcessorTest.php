@@ -371,7 +371,7 @@ class SymbolicLinkProcessorTest extends TestCase
                 array('source' => array('source.sh' => 'symlink')),
                 array('source' => array('source.sh' => 'symlink')),
                 false,
-                0555
+                0555,
             ),
             'everything works as expected' => array(
                 true,

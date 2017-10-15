@@ -143,7 +143,7 @@ EOT
                     $bash = $_ENV['SHELL'];
                 }
                 // TODO check that $bash is really a bash? check version or issue a command only bash supports!
-                foreach(self::BASH_TEMPLATE_COMMANDS as $key => $command) {
+                foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
                     $data[$key] = exec(
                         sprintf(
                             '( echo %s | %s -ls ) 2>/dev/null',

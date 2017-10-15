@@ -154,10 +154,10 @@ class SymbolicLinkProcessor
                             $source
                         )
                     );
-    
+
                     return true;
                 }
-            } catch(\RuntimeException $e) {
+            } catch (\RuntimeException $e) {
                 $output->writeln(
                     sprintf(
                         '<error>Could not remove symbolic link %s: %s</error>',
