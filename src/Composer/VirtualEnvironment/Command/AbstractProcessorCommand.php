@@ -30,10 +30,10 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
             $this->getComposer(),
             $this->getIO()
         );
-        if ($input->getOption('remove')) {
-            $this->rollback($input, $output, $config);
+        if ($config->get('remove')) {
+            $this->rollback($config, $output);
         } else {
-            $this->deploy($input, $output, $config);
+            $this->deploy($config, $output);
         }
     }
 
@@ -52,14 +52,12 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
     );
 
     abstract protected function deploy(
-        InputInterface $input,
-        OutputInterface $output,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        OutputInterface $output
     );
 
     abstract protected function rollback(
-        InputInterface $input,
-        OutputInterface $output,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        OutputInterface $output
     );
 }

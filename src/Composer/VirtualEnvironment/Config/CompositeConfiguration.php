@@ -28,36 +28,36 @@ class CompositeConfiguration implements ConfigurationInterface
      */
     public $local;
 
-    public $updateLocal;
-    public $ignoreLocal;
-    public $updateGlobal;
-    public $ignoreGlobal;
+    public $saveLocal;
+    public $skipLocal;
+    public $saveGlobal;
+    public $skipGlobal;
 
     /**
      */
     public function __construct(
         Composer $composer,
-        $updateLocal = false,
-        $ignoreLocal = false,
-        $updateGlobal = false,
-        $ignoreGlobal = false
+        $saveLocal = false,
+        $skipLocal = false,
+        $saveGlobal = false,
+        $skipGlobal = false
     ) {
         $this->local = new LocalConfiguration($composer);
-        $this->updateLocal = $updateLocal;
-        $this->ignoreLocal = $ignoreLocal;
+        $this->saveLocal = $saveLocal;
+        $this->skipLocal = $skipLocal;
 
         $this->global = new GlobalConfiguration($composer);
-        $this->updateGlobal = $updateGlobal;
-        $this->ignoreGlobal = $ignoreGlobal;
+        $this->saveGlobal = $saveGlobal;
+        $this->skipGlobal = $skipGlobal;
     }
 
     public function all()
     {
-        if ($this->ignoreLocal && $this->ignoreGlobal) {
+        if ($this->skipLocal && $this->skipGlobal) {
             return array();
-        } elseif ($this->ignoreLocal) {
+        } elseif ($this->skipLocal) {
             return $this->global->all();
-        } elseif ($this->ignoreGlobal) {
+        } elseif ($this->skipGlobal) {
             return $this->local->all();
         }
 
@@ -66,11 +66,11 @@ class CompositeConfiguration implements ConfigurationInterface
 
     public function has($key)
     {
-        if ($this->ignoreLocal && $this->ignoreGlobal) {
+        if ($this->skipLocal && $this->skipGlobal) {
             return false;
-        } elseif ($this->ignoreLocal) {
+        } elseif ($this->skipLocal) {
             return $this->global->has($key);
-        } elseif ($this->ignoreGlobal) {
+        } elseif ($this->skipGlobal) {
             return $this->local->has($key);
         }
 
@@ -79,11 +79,11 @@ class CompositeConfiguration implements ConfigurationInterface
 
     public function get($key, $default = null)
     {
-        if ($this->ignoreLocal && $this->ignoreGlobal) {
+        if ($this->skipLocal && $this->skipGlobal) {
             return $default;
-        } elseif ($this->ignoreLocal) {
+        } elseif ($this->skipLocal) {
             return $this->global->get($key, $default);
-        } elseif ($this->ignoreGlobal) {
+        } elseif ($this->skipGlobal) {
             return $this->local->get($key, $default);
         }
 
@@ -92,10 +92,10 @@ class CompositeConfiguration implements ConfigurationInterface
 
     public function set($key, $value)
     {
-        if ($this->updateLocal) {
+        if ($this->saveLocal) {
             $this->local->set($key, $value);
         }
-        if ($this->updateGlobal) {
+        if ($this->saveGlobal) {
             $this->global->set($key, $value);
         }
 
@@ -104,10 +104,10 @@ class CompositeConfiguration implements ConfigurationInterface
 
     public function remove($key)
     {
-        if ($this->updateLocal) {
+        if ($this->saveLocal) {
             $this->local->remove($key);
         }
-        if ($this->updateGlobal) {
+        if ($this->saveGlobal) {
             $this->global->remove($key);
         }
     }
@@ -115,11 +115,11 @@ class CompositeConfiguration implements ConfigurationInterface
     public function load()
     {
         $local = true;
-        if (!$this->ignoreLocal) {
+        if (!$this->skipLocal) {
             $local = $this->local->load();
         }
         $global = true;
-        if (!$this->ignoreGlobal) {
+        if (!$this->skipGlobal) {
             $global = $this->global->load();
         }
 
@@ -129,11 +129,11 @@ class CompositeConfiguration implements ConfigurationInterface
     public function persist($force = false)
     {
         $local = true;
-        if ($this->updateLocal) {
+        if ($this->saveLocal) {
             $local = $this->local->persist($force);
         }
         $global = true;
-        if ($this->updateGlobal) {
+        if ($this->saveGlobal) {
             $global = $this->global->persist($force);
         }
 

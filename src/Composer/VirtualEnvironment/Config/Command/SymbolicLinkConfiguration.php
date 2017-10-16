@@ -22,15 +22,15 @@ class SymbolicLinkConfiguration extends AbstractCommandConfiguration
     {
         $input = $this->input;
         $symlinks = array();
-        if ($input->getOption('link')) {
-            foreach ($input->getOption('link') as $link) {
+        if ($input->getArgument('link')) {
+            foreach ($input->getArgument('link') as $link) {
                 list($source, $target) = explode(PATH_SEPARATOR, $link, 2);
                 $symlinks[$source] = $target;
             }
         } elseif ($recipe->has('link')) {
             $symlinks = $recipe->get('link');
         }
-        $symlinks = array_map('realpath', $symlinks);
+//         $symlinks = array_map('realpath', $symlinks);
         $this->set('link', $symlinks);
     }
 

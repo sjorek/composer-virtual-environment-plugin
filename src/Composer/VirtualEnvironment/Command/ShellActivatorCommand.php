@@ -20,8 +20,9 @@ use Sjorek\Composer\VirtualEnvironment\Config\Command\ShellActivatorConfiguratio
 use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -44,16 +45,17 @@ class ShellActivatorCommand extends AbstractProcessorCommand
         }
 
         $this
-            ->setName('venv:shell')
+            ->setName('virtual-environment:shell')
+            ->setAliases(array('venv:shell'))
             ->setDescription('Setup or teardown virtual environment shell activation scripts.')
             ->setDefinition(array(
+                new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'Set the list of shell activators to deploy.'),
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
-                new InputOption('shell', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set the list of shell activators to deploy.', array('detect')),
                 new InputOption('color-prompt', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
-                new InputOption('update-local', null, InputOption::VALUE_NONE, 'Update the local configuration recipe in "./composer.venv".'),
-                new InputOption('ignore-local', null, InputOption::VALUE_NONE, 'Ignore the local configuration recipe in "./composer.venv".'),
-                new InputOption('update-global', null, InputOption::VALUE_NONE, 'Update the global configuration in "' . $home .'/composer.venv".'),
-                new InputOption('ignore-global', null, InputOption::VALUE_NONE, 'Ignore the global configuration in "' . $home .'/composer.venv".'),
+                new InputOption('save-local', null, InputOption::VALUE_NONE, 'Store configuration locally in "./composer.venv".'),
+                new InputOption('save-global', null, InputOption::VALUE_NONE, 'Store configuration globally in "' . $home .'/composer.venv".'),
+                new InputOption('skip-local', null, InputOption::VALUE_NONE, 'Ignore the local configuration.'),
+                new InputOption('skip-global', null, InputOption::VALUE_NONE, 'Ignore the global configuration.'),
                 new InputOption('remove', null, InputOption::VALUE_NONE, 'Remove any deployed shell activation scripts.'),
                 new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment files and links'),
             ))
@@ -121,7 +123,7 @@ EOT
      * {@inheritDoc}
      * @see \Sjorek\Composer\VirtualEnvironment\Command\AbstractProcessorCommand::deploy()
      */
-    protected function deploy(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)
+    protected function deploy(ConfigurationInterface $config, OutputInterface $output)
     {
         $activators = $config->get('shell');
         if (empty($activators)) {
@@ -153,12 +155,12 @@ EOT
                     );
                 }
             }
-            $activators = Processor\ActivationScriptProcessor::export($activators);
-            foreach ($activators as $filename) {
+            $basePath = $config->get('basePath');
+            foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
                 $source = $config->get('resPath') . '/' . $filename;
-                $target = $config->get('binPath') . '/' . $filename;
-                $processor = new Processor\ActivationScriptProcessor($source, $target, $data);
-                $processor->deploy($output, $input->getOption('force'));
+                $target = $config->get('relativeBinPath') . '/' . $filename;
+                $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, $data);
+                $processor->deploy($output, $config->get('force'));
             }
             if ($config->has('link')) {
                 $symlinks = $config->get('link');
@@ -172,29 +174,33 @@ EOT
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {
-                        $processor = new Processor\SymbolicLinkProcessor($source, $target);
-                        $processor->deploy($output, $input->getOption('force'));
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                        $processor->deploy($output, $config->get('force'));
                     }
                 }
             }
         }
 
-        $config->persist($input->getOption('force'));
+        $config->persist($config->get('force'));
     }
 
-    protected function rollback(InputInterface $input, OutputInterface $output, ConfigurationInterface $config)
+    /**
+     * {@inheritDoc}
+     * @see \Sjorek\Composer\VirtualEnvironment\Command\AbstractProcessorCommand::rollback()
+     */
+    protected function rollback(ConfigurationInterface $config, OutputInterface $output)
     {
-        $activators = $config->get('activators');
+        $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
                 '<comment>Skipping removal of shell activation scripts, as none is available.</comment>'
             );
         } else {
-            $activators = Processor\ActivationScriptProcessor::export($activators);
-            foreach ($activators as $filename) {
-                $source = $config->get('resPath') . DIRECTORY_SEPARATOR .$filename;
-                $target = $config->get('binPath') . DIRECTORY_SEPARATOR .$filename;
-                $processor = new Processor\ActivationScriptProcessor($source, $target, array());
+            $basePath = $config->get('basePath');
+            foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
+                $source = $config->get('resPath') . '/' . $filename;
+                $target = $config->get('relativeBinPath') . '/' . $filename;
+                $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, array());
                 $processor->rollback($output);
             }
             if ($config->has('link')) {
@@ -209,8 +215,8 @@ EOT
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {
-                        $processor = new Processor\SymbolicLinkProcessor($source, $target);
-                        $processor->deploy($output, $input->getOption('force'));
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                        $processor->rollback($output);
                     }
                 }
             }

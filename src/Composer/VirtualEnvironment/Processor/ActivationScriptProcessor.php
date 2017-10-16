@@ -24,6 +24,7 @@ class ActivationScriptProcessor
 
     protected $source;
     protected $target;
+    protected $basePath;
     protected $data;
     protected $filesystem;
 
@@ -75,9 +76,10 @@ class ActivationScriptProcessor
     /**
      * @param string $source
      * @param string $target
+     * @param string $basePath
      * @param array  $data
      */
-    public function __construct($source, $target, array $data)
+    public function __construct($source, $target, $basePath, array $data)
     {
         $this->source = $source;
         $this->target = $target;
@@ -101,7 +103,7 @@ class ActivationScriptProcessor
                         $output->writeln(
                             sprintf(
                                 '<comment>Removed existing shell activation script %s.</comment>',
-                                $target
+                                $this->target
                             )
                         );
                     }
@@ -109,7 +111,7 @@ class ActivationScriptProcessor
                     $output->writeln(
                         sprintf(
                             '<error>Failed to remove the existing shell activation script %s: %s.</error>',
-                            $target,
+                            $this->target,
                             $e->getMessage()
                         )
                     );
@@ -120,7 +122,7 @@ class ActivationScriptProcessor
                 $output->writeln(
                     sprintf(
                         '<error>Shell activation script %s already exists.</error>',
-                        $target
+                        $this->target
                     )
                 );
 
@@ -132,7 +134,7 @@ class ActivationScriptProcessor
             $output->writeln(
                 sprintf(
                     '<error>The shell activation script template %s does not exist.</error>',
-                    $source
+                    $this->source
                 )
             );
 
@@ -144,7 +146,7 @@ class ActivationScriptProcessor
             $output->writeln(
                 sprintf(
                     '<error>Failed to read the template file %s.</error>',
-                    $source
+                    $this->source
                 )
             );
 
@@ -174,7 +176,7 @@ class ActivationScriptProcessor
             $output->writeln(
                 sprintf(
                     '<error>Failed to write the shell activation script %s.</error>',
-                    $target
+                    $this->target
                 )
             );
 
@@ -185,7 +187,7 @@ class ActivationScriptProcessor
         $output->writeln(
             sprintf(
                 '<comment>Installed shell activation script %s.</comment>',
-                $target
+                $this->target
             )
         );
 
@@ -194,6 +196,7 @@ class ActivationScriptProcessor
 
     /**
      * @param  OutputInterface $output
+     * @param bool $force
      * @return bool
      */
     public function rollback(OutputInterface $output)
@@ -205,7 +208,7 @@ class ActivationScriptProcessor
                 $output->writeln(
                     sprintf(
                         '<error>Refused to remove the shell activation script %s, as it is a symbolic link.</error>',
-                        $target
+                        $this->target
                     )
                 );
             } else {
@@ -214,7 +217,7 @@ class ActivationScriptProcessor
                         $output->writeln(
                             sprintf(
                                 '<comment>Removed shell activation script %s.</comment>',
-                                $target
+                                $this->target
                             )
                         );
 
@@ -224,7 +227,7 @@ class ActivationScriptProcessor
                     $output->writeln(
                         sprintf(
                             '<error>Failed to remove the shell activation script %s: %s</error>',
-                            $target,
+                            $this->target,
                             $e->getMessage()
                         )
                     );
@@ -237,14 +240,14 @@ class ActivationScriptProcessor
             $output->writeln(
                 sprintf(
                     '<error>Refused to remove the shell activation script %s, as it is a dangling symbolic link.</error>',
-                    $target
+                    $this->target
                 )
             );
         } else {
             $output->writeln(
                 sprintf(
                     '<comment>Skipped removing the shell activation script %s, as it does not exist.</comment>',
-                    $target
+                    $this->target
                 )
             );
 

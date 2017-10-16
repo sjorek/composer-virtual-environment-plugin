@@ -188,7 +188,7 @@ class SymbolicLinkProcessorTest extends TestCase
     {
         $this->assertInstanceOf(
             SymbolicLinkProcessor::class,
-            new SymbolicLinkProcessor(null, null)
+            new SymbolicLinkProcessor(null, null, null)
         );
     }
 
@@ -253,7 +253,7 @@ class SymbolicLinkProcessorTest extends TestCase
                 true,
                 array(
                     'Removed existing file for symbolic link vfs://test/source/source.sh.',
-                    'Installed symbolic link from source vfs://test/source/source.sh to target vfs://test/target/target.sh.',
+                    'Installed symbolic link vfs://test/source/source.sh to target vfs://test/target/target.sh.',
                     '',
                 ),
                 array('source' => array('source.sh' => 'symlink ../target/target.sh'), 'target' => array('target.sh' => '')),
@@ -264,7 +264,7 @@ class SymbolicLinkProcessorTest extends TestCase
                 true,
                 array(
                     'Removed existing file for symbolic link vfs://test/source/source.sh.',
-                    'Installed symbolic link from source vfs://test/source/source.sh to target target.sh.',
+                    'Installed symbolic link vfs://test/source/source.sh to target target.sh.',
                     '',
                 ),
                 array('source' => array('source.sh' => 'symlink target.sh', 'target.sh' => '')),
@@ -322,7 +322,7 @@ class SymbolicLinkProcessorTest extends TestCase
         if (strpos($target, '/') !== false) {
             $target = $root->url() . '/' . $target;
         }
-        $processor = new SymbolicLinkProcessor($source, $target);
+        $processor = new SymbolicLinkProcessor($source, $target, $root->url());
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;
@@ -419,7 +419,7 @@ class SymbolicLinkProcessorTest extends TestCase
         }
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
-        $processor = new SymbolicLinkProcessor($source, $target);
+        $processor = new SymbolicLinkProcessor($source, $target, $root->url());
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;

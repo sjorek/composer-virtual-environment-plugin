@@ -282,7 +282,7 @@ class ActivationScriptProcessorTest extends TestCase
     {
         $this->assertInstanceOf(
             ActivationScriptProcessor::class,
-            new ActivationScriptProcessor(null, null, array())
+            new ActivationScriptProcessor(null, null, null, array())
         );
     }
 
@@ -395,7 +395,7 @@ class ActivationScriptProcessorTest extends TestCase
         }
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, $data);
+        $processor = new ActivationScriptProcessor($source, $target, $root->url(), $data);
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;
@@ -514,7 +514,7 @@ class ActivationScriptProcessorTest extends TestCase
         }
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, array());
+        $processor = new ActivationScriptProcessor($source, $target, $root->url(), array());
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;

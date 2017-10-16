@@ -58,14 +58,16 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration
             'recipe',
             new CompositeConfiguration(
                 $this->composer,
-                $input->getOption('update-local'),
-                $input->getOption('ignore-local'),
-                $input->getOption('update-global'),
-                $input->getOption('ignore-global')
+                $input->getOption('save-local'),
+                $input->getOption('skip-local'),
+                $input->getOption('save-global'),
+                $input->getOption('skip-global')
             )
         );
 
         $this->set('basePath', $filesystem->normalizePath(realpath(realpath(dirname($composerFile)))));
+        $this->set('force', $input->getOption('force'));
+        $this->set('remove', $input->getOption('remove'));
 
         $this->setUp($recipe);
     }
@@ -78,7 +80,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration
 
         $this->tearDown($recipe);
 
-        if ($recipe->updateLocal) {
+        if ($recipe->saveLocal) {
             if ($recipe->local->persist($force)) {
                 $output->writeln('<comment>Update of local configuration "' . $recipe->local->filename . '" succeeded.</comment>');
             } else {
@@ -86,7 +88,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration
                 $result = false;
             }
         }
-        if ($recipe->updateGlobal) {
+        if ($recipe->saveGlobal) {
             if ($recipe->global->persist($force)) {
                 $output->writeln('<comment>Update of global configuration "' . $recipe->global->filename . '" succeeded.</comment>');
             } else {

@@ -50,26 +50,23 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         }
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
-        } else {
+        } elseif($recipe->has('name')) {
             $name = $recipe->get('name', $name);
         }
         $this->set('name', $name);
 
-        $candidates = array(); // explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
-        if ($input->getOption('shell')) {
-            $candidates = $input->getOption('shell');
-        } else {
+        $candidates = array('detect'); // = explode(',', Processor\ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
+        if ($input->getArgument('shell')) {
+            $candidates = $input->getArgument('shell');
+        } elseif($recipe->has('shell')) {
             $candidates = $recipe->get('shell', $candidates);
         }
-        $activators = $this->set(
-            'shell',
-            ActivationScriptProcessor::import($candidates)
-        );
+        $activators = $this->set('shell', ActivationScriptProcessor::import($candidates));
 
         $colorPrompt = false;
         if ($input->getOption('color-prompt')) {
             $colorPrompt = true;
-        } else {
+        } elseif($recipe->has('color-prompt')) {
             $colorPrompt = $recipe->get('color-prompt', $colorPrompt);
         }
         $this->set('color-prompt', $colorPrompt);
