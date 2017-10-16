@@ -2,48 +2,42 @@
 # This file must be used with "source bin/activate" *from bash*
 # you cannot run it directly
 
-if [ -z "$COMPOSER_VENV_COLOR_PROMPT" ] ; then
-     COMPOSER_VENV_COLOR_PROMPT=@COLOR_PROMPT@
+if [ -z "${COMPOSER_VENV_COLORS}" ] ; then
+    COMPOSER_VENV_COLORS=@COLORS@
 fi
+export COMPOSER_VENV_COLORS
 
-_COMPOSER_VENV_getcolor () {
-    local color ncolors bold underline standout normal black red green yellow blue magenta cyan white
+if [ -n "${COMPOSER_VENV_COLORS}" ] && [ ! "${COMPOSER_VENV_COLORS}" = "0" ] ; then
+    _COMPOSER_VENV_getcolor () {
+        local color ncolors bold underline standout normal black red green yellow blue magenta cyan white
 
-    color=$1
-    bold=""
-    underline=""
-    standout=""
-    normal=""
-    black=""
-    red=""
-    green=""
-    yellow=""
-    blue=""
-    magenta=""
-    cyan=""
-    white=""
+        color=$1
 
-    if [ ! -z "$COMPOSER_VENV_COLOR_PROMPT" ] && [ ! "$COMPOSER_VENV_COLOR_PROMPT" = "0" ] ; then
-        # see if it supports colors...
-        ncolors=@TPUT_COLORS@ # $(tput colors)
-    
+        # see if bash supports colors...
+        ncolors=@TPUT_COLORS@        # $(tput colors)
+
         if [ -n "$ncolors" ] && [ $ncolors -ge 8 ] ; then
-            bold="@TPUT_BOLD@" # "$(tput bold)"
-            underline="@TPUT_SMUL@" # "$(tput smul)"
-            standout="@TPUT_SMSO@" # "$(tput smso)"
-            normal="@TPUT_SGR0@" # "$(tput sgr0)"
-            black="@TPUT_SETAF_0@" # "$(tput setaf 0)"
-            red="@TPUT_SETAF_1@" # "$(tput setaf 1)"
-            green="@TPUT_SETAF_2@" # "$(tput setaf 2)"
-            yellow="@TPUT_SETAF_3@" # "$(tput setaf 3)"
-            blue="@TPUT_SETAF_4@" # "$(tput setaf 4)"
+            bold="@TPUT_BOLD@"       # "$(tput bold)"
+            underline="@TPUT_SMUL@"  # "$(tput smul)"
+            standout="@TPUT_SMSO@"   # "$(tput smso)"
+            normal="@TPUT_SGR0@"     # "$(tput sgr0)"
+            black="@TPUT_SETAF_0@"   # "$(tput setaf 0)"
+            red="@TPUT_SETAF_1@"     # "$(tput setaf 1)"
+            green="@TPUT_SETAF_2@"   # "$(tput setaf 2)"
+            yellow="@TPUT_SETAF_3@"  # "$(tput setaf 3)"
+            blue="@TPUT_SETAF_4@"    # "$(tput setaf 4)"
             magenta="@TPUT_SETAF_5@" # "$(tput setaf 5)"
-            cyan="@TPUT_SETAF_6@" # "$(tput setaf 6)"
-            white="@TPUT_SETAF_7@" # "$(tput setaf 7)"
+            cyan="@TPUT_SETAF_6@"    # "$(tput setaf 6)"
+            white="@TPUT_SETAF_7@"   # "$(tput setaf 7)"
+            echo ${!color}
         fi
-    fi
-    echo ${!color}
-}
+    }
+
+else
+    _COMPOSER_VENV_getcolor () {
+        echo ""
+    }
+fi
 
 if [ ! -z "${COMPOSER_VENV}" ] ; then
     echo ""
@@ -57,6 +51,7 @@ if [ ! -z "${COMPOSER_VENV}" ] ; then
 
     # remove color helper
     unset -f _COMPOSER_VENV_getcolor
+    unset -f COMPOSER_VENV_COLORS
 
     return 
 fi
@@ -84,6 +79,7 @@ deactivate () {
 
     unset COMPOSER_VENV
     unset COMPOSER_VENV_DIR
+    unset COMPOSER_VENV_COLORS
     if [ ! "$1" = "nondestructive" ] ; then
         # Self destruct!
         unset -f deactivate

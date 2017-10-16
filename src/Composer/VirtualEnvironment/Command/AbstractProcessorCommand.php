@@ -11,11 +11,11 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
+use Composer\Composer;
+use Composer\IO\IOInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Composer\IO\IOInterface;
-use Composer\Composer;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -30,10 +30,12 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
             $this->getComposer(),
             $this->getIO()
         );
-        if ($config->get('remove')) {
-            $this->rollback($config, $output);
-        } else {
-            $this->deploy($config, $output);
+        if ($config->load()) {
+            if ($config->get('remove')) {
+                $this->rollback($config, $output);
+            } else {
+                $this->deploy($config, $output);
+            }
         }
     }
 
@@ -51,13 +53,21 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
         IOInterface $io
     );
 
+    /**
+     * @param ConfigurationInterface $config
+     * @param OutputInterface        $output
+     */
     abstract protected function deploy(
-        ConfigurationInterface $config,
+        Config\ConfigurationInterface $config,
         OutputInterface $output
     );
 
+    /**
+     * @param ConfigurationInterface $config
+     * @param OutputInterface        $output
+     */
     abstract protected function rollback(
-        ConfigurationInterface $config,
+        Config\ConfigurationInterface $config,
         OutputInterface $output
     );
 }

@@ -11,9 +11,9 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
+use Composer\Composer;
 use Composer\Command\BaseCommand;
 use Composer\IO\IOInterface;
-use Composer\Composer;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>

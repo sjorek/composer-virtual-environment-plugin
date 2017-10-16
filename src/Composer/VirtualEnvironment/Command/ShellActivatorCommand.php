@@ -16,8 +16,8 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Util\Platform;
-use Sjorek\Composer\VirtualEnvironment\Config\Command\ShellActivatorConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,13 +51,14 @@ class ShellActivatorCommand extends AbstractProcessorCommand
             ->setDefinition(array(
                 new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'Set the list of shell activators to deploy.'),
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
-                new InputOption('color-prompt', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
-                new InputOption('save-local', null, InputOption::VALUE_NONE, 'Store configuration locally in "./composer.venv".'),
-                new InputOption('save-global', null, InputOption::VALUE_NONE, 'Store configuration globally in "' . $home .'/composer.venv".'),
-                new InputOption('skip-local', null, InputOption::VALUE_NONE, 'Ignore the local configuration.'),
-                new InputOption('skip-global', null, InputOption::VALUE_NONE, 'Ignore the global configuration.'),
-                new InputOption('remove', null, InputOption::VALUE_NONE, 'Remove any deployed shell activation scripts.'),
-                new InputOption('force', "f", InputOption::VALUE_NONE, 'Force overwriting existing environment files and links'),
+                new InputOption('colors', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
+                new InputOption('no-colors', null, InputOption::VALUE_NONE, 'Disable the color prompt per default.'),
+                new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
+                new InputOption('local', 'l', InputOption::VALUE_NONE, 'Use local configuration file "./composer.venv".'),
+                new InputOption('global', 'g', InputOption::VALUE_NONE, 'Use global configuration file "' . $home .'/composer.venv".'),
+                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save configuration file.'),
+                new InputOption('remove', 'r', InputOption::VALUE_NONE, 'Remove any deployed shell activation scripts.'),
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force overwriting existing environment files and links'),
             ))
             ->setHelp(
                 <<<EOT
@@ -135,7 +136,7 @@ EOT
                 '@NAME@' => $config->get('name'),
                 '@BASE_DIR@' => $config->get('basePath'),
                 '@BIN_DIR@' => $config->get('binPath'),
-                '@COLOR_PROMPT@' => $config->get('color-prompt') ? '1' : '',
+                '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
             if (in_array('bash', $activators)) {
                 $bash = 'bash';
@@ -181,7 +182,7 @@ EOT
             }
         }
 
-        $config->persist($config->get('force'));
+        $config->save($config->get('force'));
     }
 
     /**

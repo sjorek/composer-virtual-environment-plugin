@@ -16,17 +16,45 @@ namespace Sjorek\Composer\VirtualEnvironment\Config;
  */
 interface ConfigurationInterface
 {
+    /**
+     * @return array
+     */
     public function all();
 
+    /**
+     * @param  string $key
+     * @return bool
+     */
     public function has($key);
 
+    /**
+     * @param  string $key
+     * @param  mixed  $default
+     * @return mixed
+     */
     public function get($key, $default = null);
 
+    /**
+     * @param  string $key
+     * @param  mixed  $default
+     * @return mixed
+     */
     public function set($key, $value);
 
+    /**
+     * @param  string                 $key
+     * @return ConfigurationInterface
+     */
     public function remove($key);
 
-    public function load();
+    /**
+     * @param  string                 $key
+     * @return ConfigurationInterface
+     */
+    public function import(ConfigurationInterface $config);
 
-    public function persist($force = false);
+    /**
+     * @return array
+     */
+    public function export();
 }

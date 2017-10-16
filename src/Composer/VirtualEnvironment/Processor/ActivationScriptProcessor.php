@@ -196,7 +196,7 @@ class ActivationScriptProcessor
 
     /**
      * @param  OutputInterface $output
-     * @param bool $force
+     * @param  bool            $force
      * @return bool
      */
     public function rollback(OutputInterface $output)

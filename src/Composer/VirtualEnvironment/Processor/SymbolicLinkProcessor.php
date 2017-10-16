@@ -38,9 +38,9 @@ class SymbolicLinkProcessor
     }
 
     /**
-     * @param OutputInterface $output
-     * @param boolean $force
-     * @return boolean
+     * @param  OutputInterface $output
+     * @param  bool            $force
+     * @return bool
      */
     public function deploy(OutputInterface $output, $force = false)
     {
@@ -158,8 +158,8 @@ class SymbolicLinkProcessor
     }
 
     /**
-     * @param OutputInterface $output
-     * @return boolean
+     * @param  OutputInterface $output
+     * @return bool
      */
     public function rollback(OutputInterface $output)
     {
