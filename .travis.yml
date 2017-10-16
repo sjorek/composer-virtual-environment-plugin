@@ -33,7 +33,7 @@ script:
 - if [[ $LINT = true ]]; then
     composer venv:cs-lint;
   fi
-- if [[ $(( $TRAVIS_BUILD_NUMBER % 25 )) = 0 ]]; then
+- if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer venv:test-all;
   else
     composer venv:test;
