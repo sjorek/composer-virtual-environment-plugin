@@ -7,7 +7,7 @@ matrix:
   include:
     - php: 7.0
     - php: 7.1
-      env: LINT=true VALIDATE_GITATTRIBUTES=true
+      env: LINT=true
     - php: 7.2
     - php: nightly
   fast_finish: true
