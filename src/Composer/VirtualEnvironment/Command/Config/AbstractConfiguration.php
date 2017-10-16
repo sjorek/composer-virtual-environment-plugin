@@ -148,7 +148,10 @@ abstract class AbstractConfiguration extends Config\AbstractConfiguration implem
             $output = $this->output;
             $recipe = $this->recipe;
             if ($recipe->save($force)) {
-                $output->writeln('<comment>Saving configuration "' . $recipe->filename . '" succeeded.</comment>');
+                $output->writeln(
+                    '<comment>Saving configuration "' . $recipe->filename . '" succeeded.</comment>',
+                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                );
 
                 return true;
             } else {

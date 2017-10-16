@@ -129,7 +129,8 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<comment>Skipping creation of shell activators, none available.</comment>'
+                '<comment>Skipping creation of shell activators, none available.</comment>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {
             $data = array(
@@ -167,7 +168,8 @@ EOT
                 $symlinks = $config->get('link');
                 if (empty($symlinks)) {
                     $output->writeln(
-                        '<comment>Skipping creation of symbolic link to shell activation script, as none is available.</comment>'
+                        '<comment>Skipping creation of symbolic link to shell activation script, as none is needed.</comment>',
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(
@@ -194,7 +196,8 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<comment>Skipping removal of shell activation scripts, as none is available.</comment>'
+                '<comment>Skipping removal of shell activation scripts, as none is available.</comment>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {
             $basePath = $config->get('basePath');
@@ -208,7 +211,8 @@ EOT
                 $symlinks = $config->get('link');
                 if (empty($symlinks)) {
                     $output->writeln(
-                        '<comment>Skipping removal of symbolic link to shell activation script, as none is available.</comment>'
+                        '<comment>Skipping removal of symbolic link to shell activation script, as none is needed.</comment>',
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(

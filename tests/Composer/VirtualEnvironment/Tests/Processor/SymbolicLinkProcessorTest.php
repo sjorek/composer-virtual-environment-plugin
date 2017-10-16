@@ -304,7 +304,7 @@ class SymbolicLinkProcessorTest extends TestCase
         $source = 'source/source.sh',
         $target = 'target/target.sh'
     ) {
-        $io = new BufferedOutput();
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         foreach (array($source, $target) as $file) {
@@ -404,7 +404,7 @@ class SymbolicLinkProcessorTest extends TestCase
         $directoryMode = null,
         $fileMode = null
     ) {
-        $io = new BufferedOutput();
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';

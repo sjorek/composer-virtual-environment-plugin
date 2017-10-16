@@ -98,7 +98,8 @@ EOT
         $symlinks = $config->get('link');
         if (empty($symlinks)) {
             $output->writeln(
-                '<comment>Skipping creation of symbolic links, as none is available.</comment>'
+                '<comment>Skipping creation of symbolic links, as none is available.</comment>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(
@@ -119,7 +120,8 @@ EOT
         $symlinks = $config->get('link');
         if (empty($symlinks)) {
             $output->writeln(
-                '<comment>Skipping removal of symbolic links, as none is available.</comment>'
+                '<comment>Skipping removal of symbolic links, as none is available.</comment>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } elseif (!Platform::isWindows()) {
             $basePath = $config->get('basePath', '');

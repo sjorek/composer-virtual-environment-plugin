@@ -104,7 +104,8 @@ class ActivationScriptProcessor
                             sprintf(
                                 '<comment>Removed existing shell activation script %s.</comment>',
                                 $this->target
-                            )
+                            ),
+                            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                         );
                     }
                 } catch (\RuntimeException $e) {
@@ -188,7 +189,8 @@ class ActivationScriptProcessor
             sprintf(
                 '<comment>Installed shell activation script %s.</comment>',
                 $this->target
-            )
+            ),
+            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
         );
 
         return true;
@@ -218,7 +220,8 @@ class ActivationScriptProcessor
                             sprintf(
                                 '<comment>Removed shell activation script %s.</comment>',
                                 $this->target
-                            )
+                            ),
+                            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                         );
 
                         return true;
@@ -248,7 +251,8 @@ class ActivationScriptProcessor
                 sprintf(
                     '<comment>Skipped removing the shell activation script %s, as it does not exist.</comment>',
                     $this->target
-                )
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
 
             return true;

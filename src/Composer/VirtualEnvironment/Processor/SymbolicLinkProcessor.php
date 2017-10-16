@@ -72,7 +72,8 @@ class SymbolicLinkProcessor
                             sprintf(
                                 '<comment>Removed existing file for symbolic link %s.</comment>',
                                 $this->source
-                            )
+                            ),
+                            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                         );
                     }
                 } catch (\RuntimeException $e) {
@@ -130,7 +131,8 @@ class SymbolicLinkProcessor
                     '<comment>Installed symbolic link %s to target %s.</comment>',
                     $this->source,
                     $this->target
-                )
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
 
             return true;
@@ -140,7 +142,8 @@ class SymbolicLinkProcessor
                     '<comment>Installed symbolic link %s to target %s.</comment>',
                     $this->source,
                     $this->target
-                )
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
 
             return true;
@@ -175,7 +178,8 @@ class SymbolicLinkProcessor
                         sprintf(
                             '<comment>Removed symbolic link %s.</comment>',
                             $this->source
-                        )
+                        ),
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
 
                     return true;
@@ -196,7 +200,8 @@ class SymbolicLinkProcessor
                 sprintf(
                     '<comment>Skipped removing symbolic link, as %s does not exist.</comment>',
                     $this->source
-                )
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
 
             return true;

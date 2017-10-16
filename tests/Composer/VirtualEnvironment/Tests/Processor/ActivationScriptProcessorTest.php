@@ -380,7 +380,7 @@ class ActivationScriptProcessorTest extends TestCase
         $fileMode = null,
         array $data = array()
     ) {
-        $io = new BufferedOutput();
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';
@@ -499,7 +499,7 @@ class ActivationScriptProcessorTest extends TestCase
         $directoryMode = null,
         $fileMode = null
     ) {
-        $io = new BufferedOutput();
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';
