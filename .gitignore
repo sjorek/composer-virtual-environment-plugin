@@ -2,5 +2,6 @@
 /.project
 /.settings
 /.php_cs.cache
-/vendor
 /composer.phar
+/coverage
+/vendor

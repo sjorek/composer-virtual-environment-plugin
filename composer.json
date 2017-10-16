@@ -36,9 +36,12 @@
 		"class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
 	},
 	"scripts": {
-		"build": "php-cs-fixer fix",
-		"test": "phpunit -v",
-		"test-quick": "phpunit -v --exclude-group",
-		"test-large": "phpunit -v --group=large"
+		"venv:build": "composer venv:cs-lint && composer venv:test-all",
+		"venv:test": "phpunit -v --exclude-group=large",
+		"venv:test-all": "phpunit -v",
+		"venv:test-large": "phpunit -v --group=large",
+		"venv:test-coverage": "phpunit -v --coverage-html coverage",
+		"venv:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
+		"venv:cs-fix": "php-cs-fixer fix -vv || true"
 	}
 }
