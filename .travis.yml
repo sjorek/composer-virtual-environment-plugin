@@ -29,7 +29,6 @@ before_script:
   - travis_retry composer dump-autoload --optimize
 
 script:
-- composer venv:build
 - if [[ $LINT = true ]]; then
     composer venv:cs-lint;
   fi
