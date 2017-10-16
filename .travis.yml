@@ -30,12 +30,12 @@ before_script:
 
 script:
 - if [[ $LINT = true ]]; then
-    composer venv:cs-lint;
+    composer composer-virtual-environment-plugin:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer venv:test-all;
+    composer composer-virtual-environment-plugin:test-all;
   else
-    composer venv:test;
+    composer composer-virtual-environment-plugin:test;
   fi
 
 sudo: false
