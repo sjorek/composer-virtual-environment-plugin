@@ -12,7 +12,6 @@
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
 use Composer\Composer;
-use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\SymbolicLinkConfiguration;
@@ -31,7 +30,6 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
     protected function configure()
     {
         $config = $this->getComposer()->getConfig();
-        $binDir = $config->get('bin-dir', Config::RELATIVE_PATHS);
         $home = $config->get('home');
 
         $composerPhar = null;
@@ -46,7 +44,7 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
         $example = implode(
             PATH_SEPARATOR,
             array(
-                $binDir . '/composer.phar',
+                '\'{$bin-dir}/composer\'',
                 $composerPhar ?: '../../composer.phar',
             )
         );
@@ -66,15 +64,18 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
             ))
             ->setHelp(
                 <<<EOT
-The <info>virtual-environment:link</info> command places 
-symlinks to php- and composer-binaries in the bin directory.
+The <info>virtual-environment:link</info> command places symlinks
+to php- and composer-binaries in the bin directory.
 
 Example:
 
     <info>php composer.phar venv:link ${example}</info>
 
-After this you can use the linked binaries in composer's <info>run-script</info>
-or in <info>virtual-environment:shell</info>.
+After this you can use the linked binaries in composer's
+<info>run-script</info> or in <info>virtual-environment:shell</info>.
+
+Attention: only link the composer like in the example above,
+if your project does not require the <info>composer/composer</info> package.
 
 EOT
             );
