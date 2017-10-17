@@ -134,7 +134,7 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
         $composerFile = Factory::getComposerFile();
         $filesystem = new Filesystem();
 
-        $this->set('basePath', $filesystem->normalizePath(realpath(realpath(dirname($composerFile)))));
+        $this->set('base-dir', $filesystem->normalizePath(realpath(realpath(dirname($composerFile)))));
         $this->set('force', $input->getOption('force'));
         $this->set('remove', $input->getOption('remove'));
 
@@ -168,12 +168,12 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
     }
 
     /**
-     * @param  array $candidates
+     * @param  array $input
      * @return array
      */
-    protected function expandPaths(array $candidates)
+    protected function expandConfig(array $input)
     {
-        $paths = array();
+        $result = array();
         $config = $this->composer->getConfig();
         $composerFile = Factory::getComposerFile();
         if (file_exists($composerFile)) {
@@ -182,30 +182,34 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
         } else {
             $manifest = array();
         }
-        foreach ($candidates as $source => $target) {
-            $expand = $this->parseConfig(
-                Platform::expandPath($this->parseManifest($source, $manifest)),
-                Config::RELATIVE_PATHS,
-                $config
+        foreach ($input as $key => $value) {
+            $expand = Platform::expandPath(
+                $this->parseConfig(
+                    Platform::expandPath($this->parseManifest(Platform::expandPath($key), $manifest)),
+                    Config::RELATIVE_PATHS,
+                    $config
+                )
             );
-            if (isset($paths[$expand])) {
+            if (isset($result[$expand])) {
                 $this->output->writeln(
                     sprintf(
                         '<warning>Duplicate path found while expanding paths: %s vs %s</warning>',
-                        $source,
+                        $key,
                         $expand
-                        )
-                    );
+                    )
+                );
                 continue;
             }
-            $paths[$expand] = $this->parseConfig(
-                Platform::expandPath($this->parseManifest($target, $manifest)),
-                Config::RELATIVE_PATHS,
-                $config
+            $result[$expand] = Platform::expandPath(
+                $this->parseConfig(
+                    Platform::expandPath($this->parseManifest(Platform::expandPath($value), $manifest)),
+                    Config::RELATIVE_PATHS,
+                    $config
+                )
             );
         }
 
-        return $paths;
+        return $result;
     }
 
     /**

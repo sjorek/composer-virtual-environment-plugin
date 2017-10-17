@@ -36,7 +36,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
             ->setAliases(array('venv:shell'))
             ->setDescription('Setup or teardown virtual environment shell activation scripts.')
             ->setDefinition(array(
-                new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'Set the list of shell activators to deploy.'),
+                new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'List of shell activators to add or remove.'),
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', '{$name}'),
                 new InputOption('colors', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
                 new InputOption('no-colors', null, InputOption::VALUE_NONE, 'Disable the color prompt per default.'),
@@ -121,9 +121,9 @@ EOT
             );
         } else {
             $data = array(
-                '@NAME@' => $config->get('realName'),
-                '@BASE_DIR@' => $config->get('basePath'),
-                '@BIN_DIR@' => $config->get('binPath'),
+                '@NAME@' => $config->get('name-expanded'),
+                '@BASE_DIR@' => $config->get('base-dir'),
+                '@BIN_DIR@' => $config->get('bin-dir'),
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
             if (in_array('bash', $activators)) {
@@ -144,15 +144,15 @@ EOT
                     );
                 }
             }
-            $basePath = $config->get('basePath');
+            $baseDir = $config->get('base-dir');
             foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
-                $source = $config->get('resPath') . '/' . $filename;
-                $target = $config->get('relativeBinPath') . '/' . $filename;
-                $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, $data);
+                $source = $config->get('resource-dir') . '/' . $filename;
+                $target = $config->get('bin-dir-relative') . '/' . $filename;
+                $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, $data);
                 $processor->deploy($output, $config->get('force'));
             }
-            if ($config->has('symlinks')) {
-                $symlinks = $config->get('symlinks');
+            if ($config->has('link-expanded')) {
+                $symlinks = $config->get('link-expanded');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping creation of symbolic link to shell activation script, as none is needed.</comment>',
@@ -164,7 +164,7 @@ EOT
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {
-                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $baseDir);
                         $processor->deploy($output, $config->get('force'));
                     }
                 }
@@ -187,15 +187,15 @@ EOT
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {
-            $basePath = $config->get('basePath');
+            $baseDir = $config->get('base-dir');
             foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
-                $source = $config->get('resPath') . '/' . $filename;
-                $target = $config->get('relativeBinPath') . '/' . $filename;
-                $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, array());
+                $source = $config->get('resource-dir') . '/' . $filename;
+                $target = $config->get('bin-dir-relative') . '/' . $filename;
+                $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, array());
                 $processor->rollback($output);
             }
-            if ($config->has('symlinks')) {
-                $symlinks = $config->get('symlinks');
+            if ($config->has('link-expanded')) {
+                $symlinks = $config->get('link-expanded');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping removal of symbolic link to shell activation script, as none is needed.</comment>',
@@ -207,7 +207,7 @@ EOT
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {
-                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                        $processor = new Processor\SymbolicLinkProcessor($source, $target, $baseDir);
                         $processor->rollback($output);
                     }
                 }

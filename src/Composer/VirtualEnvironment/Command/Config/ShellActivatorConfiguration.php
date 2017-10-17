@@ -51,15 +51,15 @@ class ShellActivatorConfiguration extends AbstractConfiguration
         $filesystem = new Filesystem();
 
         $this->set(
-            'resPath',
+            'resource-dir',
             $filesystem->normalizePath(__DIR__ . '/../../../../../res')
         );
         $this->set(
-            'binPath',
+            'bin-dir',
             $filesystem->normalizePath($this->composer->getConfig()->get('bin-dir'))
         );
-        $relativeBinPath = $this->set(
-            'relativeBinPath',
+        $bindDir = $this->set(
+            'bin-dir-relative',
             $this->composer->getConfig()->get('bin-dir', Config::RELATIVE_PATHS)
         );
 
@@ -70,7 +70,7 @@ class ShellActivatorConfiguration extends AbstractConfiguration
             $name = $recipe->get('name', $name);
         }
         $this->set('name', $name);
-        $this->set('realName', $this->parseConfig($this->parseManifest($name)));
+        $this->set('name-expanded', $this->parseConfig($this->parseManifest($name)));
 
         $candidates = array('detect'); // = explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
         if ($input->getArgument('shell')) {
@@ -92,9 +92,9 @@ class ShellActivatorConfiguration extends AbstractConfiguration
 
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
-            $symlinks = array($relativeBinPath . '/activate' => 'activate.' . $activators[0]);
+            $symlinks = array($bindDir . '/activate' => 'activate.' . $activators[0]);
             $this->set('link', $symlinks);
-            $this->set('symlinks', $this->expandPaths($symlinks));
+            $this->set('link-expanded', $this->expandConfig($symlinks));
         }
 
         return true;

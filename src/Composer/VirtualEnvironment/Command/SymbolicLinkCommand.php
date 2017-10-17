@@ -56,7 +56,7 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
             ->setAliases(array('venv:link'))
             ->setDescription('Add or remove virtual environment symbolic links.')
             ->setDefinition(array(
-                new InputArgument('link', InputOption::VALUE_OPTIONAL, 'List of symbolic links to add.'),
+                new InputArgument('link', InputOption::VALUE_OPTIONAL, 'List of symbolic links to add or remove.'),
                 new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
                 new InputOption('local', 'l', InputOption::VALUE_NONE, 'Use local configuration file "./composer.venv".'),
                 new InputOption('global', 'g', InputOption::VALUE_NONE, 'Use global configuration file "' . $home .'/composer.venv".'),
@@ -95,7 +95,7 @@ EOT
 
     protected function deploy(ConfigurationInterface $config, OutputInterface $output)
     {
-        $symlinks = $config->get('symlinks');
+        $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
                 '<comment>Skipping creation of symbolic links, as none is available.</comment>',
@@ -106,9 +106,9 @@ EOT
                 '<warning>Symbolic links are not (yet) supported on windows.</warning>'
             );
         } else {
-            $basePath = $config->get('basePath', '');
+            $baseDir = $config->get('base-dir', '');
             foreach ($symlinks as $source => $target) {
-                $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                $processor = new Processor\SymbolicLinkProcessor($source, $target, $baseDir);
                 $processor->deploy($output, $config->get('force'));
             }
         }
@@ -117,16 +117,16 @@ EOT
 
     protected function rollback(ConfigurationInterface $config, OutputInterface $output)
     {
-        $symlinks = $config->get('symlinks');
+        $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
                 '<comment>Skipping removal of symbolic links, as none is available.</comment>',
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } elseif (!Platform::isWindows()) {
-            $basePath = $config->get('basePath', '');
+            $baseDir = $config->get('base-dir', '');
             foreach ($symlinks as $source => $target) {
-                $processor = new Processor\SymbolicLinkProcessor($source, $target, $basePath);
+                $processor = new Processor\SymbolicLinkProcessor($source, $target, $baseDir);
                 $processor->rollback($output);
             }
         }

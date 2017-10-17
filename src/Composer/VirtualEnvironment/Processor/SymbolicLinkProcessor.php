@@ -21,19 +21,19 @@ class SymbolicLinkProcessor
 {
     protected $source;
     protected $target;
-    protected $basePath;
+    protected $baseDir;
     protected $filesystem;
 
     /**
      * @param string $source
      * @param string $target
-     * @param string $basePath
+     * @param string $baseDir
      */
-    public function __construct($source, $target, $basePath)
+    public function __construct($source, $target, $baseDir)
     {
         $this->source = $source;
         $this->target = $target;
-        $this->basePath = $basePath;
+        $this->baseDir = $baseDir;
         $this->filesystem = new Filesystem();
     }
 
@@ -46,7 +46,7 @@ class SymbolicLinkProcessor
     {
         $source = $this->source;
         if (!$this->filesystem->isAbsolutePath($source)) {
-            $source = $this->basePath . '/' . $source;
+            $source = $this->baseDir . '/' . $source;
         }
         $target = $this->target;
         if (!$this->filesystem->isAbsolutePath($target)) {
@@ -168,7 +168,7 @@ class SymbolicLinkProcessor
     {
         $source = $this->source;
         if (!$this->filesystem->isAbsolutePath($source)) {
-            $source = $this->basePath . '/' . $source;
+            $source = $this->baseDir . '/' . $source;
         }
         // Attention: Dangling symlinks return false for is_link(), hence we have to use file_exists()!
         if (file_exists($source) || is_link($source)) {

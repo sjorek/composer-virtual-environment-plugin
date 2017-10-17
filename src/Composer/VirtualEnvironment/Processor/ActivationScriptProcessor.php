@@ -24,7 +24,7 @@ class ActivationScriptProcessor
 
     protected $source;
     protected $target;
-    protected $basePath;
+    protected $baseDir;
     protected $data;
     protected $filesystem;
 
@@ -76,10 +76,10 @@ class ActivationScriptProcessor
     /**
      * @param string $source
      * @param string $target
-     * @param string $basePath
+     * @param string $baseDir
      * @param array  $data
      */
-    public function __construct($source, $target, $basePath, array $data)
+    public function __construct($source, $target, $baseDir, array $data)
     {
         $this->source = $source;
         $this->target = $target;
