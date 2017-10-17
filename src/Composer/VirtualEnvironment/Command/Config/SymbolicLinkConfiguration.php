@@ -65,7 +65,7 @@ class SymbolicLinkConfiguration extends AbstractConfiguration
             $symlinks = $recipe->get('link');
         }
         $this->set('link', $symlinks);
-        $this->set('link-expanded', $this->expandPaths($symlinks));
+        $this->set('link-expanded', $this->expandConfig($symlinks));
 
         return true;
     }
