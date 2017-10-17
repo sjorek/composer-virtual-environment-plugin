@@ -12,20 +12,23 @@
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Composer\Composer;
+use Composer\Config;
 use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
-use Sjorek\Composer\VirtualEnvironment\Config;
+use Composer\Util\Platform;
+use Sjorek\Composer\VirtualEnvironment\Config\AbstractConfiguration as AbstractBaseConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\FileConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\FileConfiguration;
+use Composer\Json\JsonFile;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-abstract class AbstractConfiguration extends Config\AbstractConfiguration implements ConfigurationInterface
+abstract class AbstractConfiguration extends AbstractBaseConfiguration implements ConfigurationInterface
 {
     /**
      * @var InputInterface
@@ -43,7 +46,7 @@ abstract class AbstractConfiguration extends Config\AbstractConfiguration implem
     protected $io;
 
     /**
-     * @var Config\FileConfigurationInterface
+     * @var \Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface
      */
     public $recipe;
 
@@ -162,5 +165,99 @@ abstract class AbstractConfiguration extends Config\AbstractConfiguration implem
         }
 
         return true;
+    }
+
+    /**
+     * @param  array $candidates
+     * @return array
+     */
+    protected function expandPaths(array $candidates)
+    {
+        $paths = array();
+        $config = $this->composer->getConfig();
+        $composerFile = Factory::getComposerFile();
+        if (file_exists($composerFile)) {
+            $composerJson = new JsonFile($composerFile, null, $this->io);
+            $manifest = $composerJson->read();
+        } else {
+            $manifest = array();
+        }
+        foreach ($candidates as $source => $target) {
+            $expand = $this->parseConfig(
+                Platform::expandPath($this->parseManifest($source, $manifest)),
+                Config::RELATIVE_PATHS,
+                $config
+            );
+            if (isset($paths[$expand])) {
+                $this->output->writeln(
+                    sprintf(
+                        '<warning>Duplicate path found while expanding paths: %s vs %s</warning>',
+                        $source,
+                        $expand
+                        )
+                    );
+                continue;
+            }
+            $paths[$expand] = $this->parseConfig(
+                Platform::expandPath($this->parseManifest($target, $manifest)),
+                Config::RELATIVE_PATHS,
+                $config
+            );
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Replaces {$refs} inside a config string
+     *
+     * @param  string|int|null $value  a config string that can contain {$refs-to-other-config}
+     * @param  int             $flags  Options (see class constants)
+     * @param  Config          $config
+     * @return string|int|null
+     */
+    protected function parseConfig($value, $flags = 0, Config $config = null)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+        if ($config === null) {
+            $config = $this->composer->getConfig();
+        }
+
+        return preg_replace_callback('#\{\$(.+)\}#', function ($match) use ($config, $flags) {
+            return $config->has($match[1]) ? $config->get($match[1], $flags) : $match[0];
+        }, $value);
+    }
+
+    /**
+     * Replaces {$refs} inside a manifest string
+     *
+     * @param  string|int|null $value    a config string that can contain {$refs-to-other-config-in-manifest}
+     * @param  array|null      $manifest
+     * @return string|int|null
+     */
+    protected function parseManifest($value, array $manifest = null)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+        if ($manifest === null) {
+            $composerFile = Factory::getComposerFile();
+            if (file_exists($composerFile)) {
+                $composerJson = new JsonFile($composerFile, null, $this->io);
+                $manifest = $composerJson->read();
+            } else {
+                return $value;
+            }
+        }
+
+        return preg_replace_callback('#\{\$(.+)\}#', function ($match) use ($manifest) {
+            if (isset($manifest[$match[1]]) && is_string($manifest[$match[1]])) {
+                return $manifest[$match[1]];
+            } else {
+                return $match[0];
+            }
+        }, $value);
     }
 }

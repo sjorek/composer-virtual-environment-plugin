@@ -11,8 +11,8 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Processor;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Util\Filesystem;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>

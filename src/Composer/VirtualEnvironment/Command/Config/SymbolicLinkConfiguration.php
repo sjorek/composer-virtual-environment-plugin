@@ -64,9 +64,8 @@ class SymbolicLinkConfiguration extends AbstractConfiguration
         } elseif ($recipe->has('link')) {
             $symlinks = $recipe->get('link');
         }
-        // NOPE !
-        // $symlinks = array_map('realpath', $symlinks);
         $this->set('link', $symlinks);
+        $this->set('symlinks', $this->expandPaths($symlinks));
 
         return true;
     }

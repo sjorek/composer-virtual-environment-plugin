@@ -12,9 +12,7 @@
 namespace Sjorek\Composer\VirtualEnvironment\Command;
 
 use Composer\Composer;
-use Composer\Factory;
 use Composer\IO\IOInterface;
-use Composer\Json\JsonFile;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration;
@@ -31,18 +29,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
-        $io = $this->getIO();
-        $composerFile = Factory::getComposerFile();
         $home = $this->getComposer()->getConfig()->get('home');
-
-        $name = dirname(getcwd());
-        if (file_exists($composerFile)) {
-            $composerJson = new JsonFile($composerFile, null, $io);
-            $manifest = $composerJson->read();
-            if (isset($manifest['name'])) {
-                $name = $manifest['name'];
-            }
-        }
 
         $this
             ->setName('virtual-environment:shell')
@@ -50,7 +37,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
             ->setDescription('Setup or teardown virtual environment shell activation scripts.')
             ->setDefinition(array(
                 new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'Set the list of shell activators to deploy.'),
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', $name),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', '{$name}'),
                 new InputOption('colors', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
                 new InputOption('no-colors', null, InputOption::VALUE_NONE, 'Disable the color prompt per default.'),
                 new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
@@ -134,7 +121,7 @@ EOT
             );
         } else {
             $data = array(
-                '@NAME@' => $config->get('name'),
+                '@NAME@' => $config->get('realName'),
                 '@BASE_DIR@' => $config->get('basePath'),
                 '@BIN_DIR@' => $config->get('binPath'),
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
@@ -164,8 +151,8 @@ EOT
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, $data);
                 $processor->deploy($output, $config->get('force'));
             }
-            if ($config->has('link')) {
-                $symlinks = $config->get('link');
+            if ($config->has('symlinks')) {
+                $symlinks = $config->get('symlinks');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping creation of symbolic link to shell activation script, as none is needed.</comment>',
@@ -207,8 +194,8 @@ EOT
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $basePath, array());
                 $processor->rollback($output);
             }
-            if ($config->has('link')) {
-                $symlinks = $config->get('link');
+            if ($config->has('symlinks')) {
+                $symlinks = $config->get('symlinks');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping removal of symbolic link to shell activation script, as none is needed.</comment>',

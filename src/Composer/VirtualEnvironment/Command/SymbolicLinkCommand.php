@@ -95,7 +95,7 @@ EOT
 
     protected function deploy(ConfigurationInterface $config, OutputInterface $output)
     {
-        $symlinks = $config->get('link');
+        $symlinks = $config->get('symlinks');
         if (empty($symlinks)) {
             $output->writeln(
                 '<comment>Skipping creation of symbolic links, as none is available.</comment>',
@@ -117,7 +117,7 @@ EOT
 
     protected function rollback(ConfigurationInterface $config, OutputInterface $output)
     {
-        $symlinks = $config->get('link');
+        $symlinks = $config->get('symlinks');
         if (empty($symlinks)) {
             $output->writeln(
                 '<comment>Skipping removal of symbolic links, as none is available.</comment>',

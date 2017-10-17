@@ -29,7 +29,7 @@ class ActivationScriptProcessor
     protected $filesystem;
 
     /**
-     * @param  string $candidates
+     * @param  array $candidates
      * @return array
      */
     public static function import(array $candidates)
@@ -46,7 +46,7 @@ class ActivationScriptProcessor
     }
 
     /**
-     * @param  string $activators
+     * @param  array $activators
      * @return array
      */
     public static function export(array $activators)

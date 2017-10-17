@@ -12,8 +12,6 @@
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Composer\Config;
-use Composer\Factory;
-use Composer\Json\JsonFile;
 use Composer\Util\Filesystem;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
@@ -51,7 +49,6 @@ class ShellActivatorConfiguration extends AbstractConfiguration
         $recipe = $this->recipe;
 
         $filesystem = new Filesystem();
-        $composerFile = Factory::getComposerFile();
 
         $this->set(
             'resPath',
@@ -66,18 +63,14 @@ class ShellActivatorConfiguration extends AbstractConfiguration
             $this->composer->getConfig()->get('bin-dir', Config::RELATIVE_PATHS)
         );
 
-        $name = dirname(getcwd());
-        if (file_exists($composerFile)) {
-            $composerJson = new JsonFile($composerFile, null, $this->io);
-            $manifest = $composerJson->read();
-            $name = $manifest['name'];
-        }
+        $name = '{$name}';
         if ($input->getOption('name')) {
             $name = $input->getOption('name');
         } elseif ($recipe->has('name')) {
             $name = $recipe->get('name', $name);
         }
         $this->set('name', $name);
+        $this->set('realName', $this->parseConfig($this->parseManifest($name)));
 
         $candidates = array('detect'); // = explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
         if ($input->getArgument('shell')) {
@@ -99,7 +92,9 @@ class ShellActivatorConfiguration extends AbstractConfiguration
 
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
-            $this->set('link', array($relativeBinPath . '/activate' => 'activate.' . $activators[0]));
+            $symlinks = array($relativeBinPath . '/activate' => 'activate.' . $activators[0]);
+            $this->set('link', $symlinks);
+            $this->set('symlinks', $this->expandPaths($symlinks));
         }
 
         return true;
@@ -112,9 +107,6 @@ class ShellActivatorConfiguration extends AbstractConfiguration
             $recipe->set('name', $this->get('name'));
             $recipe->set('shell', $this->get('shell'));
             $recipe->set('colors', $this->get('colors'));
-            // if ($this->has('link')) {
-            //    $recipe->set('link', array_merge($recipe->get('link', array()), $this->get('link')));
-            // }
         }
 
         return parent::save($force);
