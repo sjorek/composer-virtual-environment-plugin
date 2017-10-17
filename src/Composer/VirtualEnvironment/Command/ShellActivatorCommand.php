@@ -34,7 +34,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
         $this
             ->setName('virtual-environment:shell')
             ->setAliases(array('venv:shell'))
-            ->setDescription('Setup or teardown virtual environment shell activation scripts.')
+            ->setDescription('Add or remove virtual environment shell activation scripts.')
             ->setDefinition(array(
                 new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'List of shell activators to add or remove.'),
                 new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', '{$name}'),
@@ -54,7 +54,7 @@ to activate and deactivate the current bin directory in shell.
 
 Usage:
 
-    <info>php composer.phar venv</info>
+    <info>php composer.phar venv:shell</info>
 
 After this you can source the activation-script
 corresponding to your shell.
