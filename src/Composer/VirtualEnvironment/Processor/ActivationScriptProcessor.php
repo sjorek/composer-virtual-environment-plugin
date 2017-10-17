@@ -213,6 +213,8 @@ class ActivationScriptProcessor
                         $this->target
                     )
                 );
+
+                return false;
             } else {
                 try {
                     if ($this->filesystem->unlink($target)) {
@@ -246,6 +248,8 @@ class ActivationScriptProcessor
                     $this->target
                 )
             );
+
+            return false;
         } else {
             $output->writeln(
                 sprintf(
