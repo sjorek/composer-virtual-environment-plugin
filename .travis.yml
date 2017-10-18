@@ -31,8 +31,8 @@ install:
 - travis_retry composer dump-autoload --optimize
 
 script:
-- composer validate
 - if [[ $LINT = true ]]; then
+    composer validate;
     composer composer-virtual-environment-plugin:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
