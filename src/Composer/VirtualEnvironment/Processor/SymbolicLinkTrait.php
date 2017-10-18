@@ -197,19 +197,17 @@ trait SymbolicLinkTrait
 
                 return false;
             }
-        } else {
-            $output->writeln(
-                sprintf(
-                    '<comment>Skipped removing %s, as %s does not exist.</comment>',
-                    static::PROCESSOR_NAME,
-                    $this->source
-                ),
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
-            );
-
-            return true;
         }
 
-        return false;
+        $output->writeln(
+            sprintf(
+                '<comment>Skipped removing %s, as %s does not exist.</comment>',
+                static::PROCESSOR_NAME,
+                $this->source
+            ),
+            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        return true;
     }
 }

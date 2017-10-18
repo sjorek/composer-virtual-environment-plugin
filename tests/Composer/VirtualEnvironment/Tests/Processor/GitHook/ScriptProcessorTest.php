@@ -9,111 +9,121 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor;
+namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor\GitHook;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
-use Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor;
+use Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor;
+use Sjorek\Composer\VirtualEnvironment\Tests\Processor\AbstractVfsStreamTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
- * ActivationScriptProcessor test case.
+ * ScriptProcessor test case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
+class ScriptProcessorTest extends AbstractVfsStreamTestCase
 {
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @see ActivationScriptProcessor::__construct()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
+     * @see ScriptProcessor::__construct()
      */
     public function check__construct()
     {
         $this->assertInstanceOf(
-            ActivationScriptProcessor::class,
-            new ActivationScriptProcessor(null, null, null, array())
+            ScriptProcessor::class,
+            new ScriptProcessor(null, null, null, null)
         );
     }
 
     public function provideCheckDeployData()
     {
         return array(
+            'refuse to deploy for invalid hook' => array(
+                false,
+                'Invalid git-hook invalid-hook given.',
+                array(),
+                array(),
+                false,
+                null,
+                null,
+                'target/invalid-hook',
+            ),
             'target already exists' => array(
                 false,
-                'The shell activation script vfs://test/target/target.sh already exists.',
-                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
-                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
+                'The git-hook script vfs://test/target/pre-commit already exists.',
+                array('target' => array('pre-commit' => '')),
+                array('target' => array('pre-commit' => '')),
             ),
             'target already exists, forced removal' => array(
                 true,
-                'Removed existing shell activation script vfs://test/target/target.sh.',
-                array('target' => array('target.sh' => 'X'), 'source' => array('source.sh' => 'X')),
-                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => 'X')),
+                'Removed existing git-hook script vfs://test/target/pre-commit.',
+                array('target' => array('pre-commit' => '#!/bin/sh' . PHP_EOL . 'test')),
+                array('target' => array('pre-commit' => '')),
                 true,
             ),
             'target already exists, forced removal fails due to lack of permissions' => array(
                 false,
-                '/^Failed to remove the existing shell activation script vfs:\/\/test\/target\/target.sh: Could not delete/',
-                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
-                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
+                '/^Failed to remove the existing git-hook script vfs:\/\/test\/target\/pre-commit: Could not delete/',
+                array('target' => array('pre-commit' => '')),
+                array('target' => array('pre-commit' => '')),
                 true,
                 0555,
             ),
-            'missing template' => array(
+            'fail to fetch empty template' => array(
                 false,
-                'The shell activation script template vfs://test/source/source.sh does not exist.',
+                'Failed to fetch the git-hook script template .',
                 array(),
-            ),
-            'template is not readable' => array(
+                array(),
                 false,
-                'Failed to fetch the shell activation script template vfs://test/source/source.sh.',
-                array('source' => array('source.sh' => '')),
-                array('source' => array('source.sh' => '')),
-                true,
                 null,
-                0222,
+                null,
+                'target/pre-commit',
+                ''
             ),
             'no permission to create target directory' => array(
                 false,
-                'Failed to create the shell activation script target directory vfs://test/target: vfs://test/target does not exist and could not be created.',
-                array('source' => array('source.sh' => '')),
-                array('source' => array('source.sh' => '')),
+                'Failed to create the git-hook script target directory vfs://test/target: vfs://test/target does not exist and could not be created.',
+                array(),
+                array(),
                 true,
                 0555,
             ),
             'no permission to write target file' => array(
                 false,
-                'Failed to write the shell activation script vfs://test/target/target.sh.',
-                array('source' => array('source.sh' => ''), 'target' => array()),
-                array('source' => array('source.sh' => ''), 'target' => array()),
+                'Failed to write the git-hook script vfs://test/target/pre-commit.',
+                array('target' => array()),
+                array('target' => array()),
                 true,
                 0555,
             ),
             'everything works as expected' => array(
                 true,
                 array(
-                    'Removed existing shell activation script vfs://test/target/target.sh.',
-                    'Installed shell activation script vfs://test/target/target.sh.',
+                    'Removed existing git-hook script vfs://test/target/pre-commit.',
+                    'Installed git-hook script vfs://test/target/pre-commit.',
                     '',
                 ),
-                array('source' => array('source.sh' => 'X'), 'target' => array('target.sh' => 'Y')),
-                array('source' => array('source.sh' => 'X'), 'target' => array('target.sh' => 'Z')),
+                array('target' => array('pre-commit' => '#!/bin/sh' . PHP_EOL . 'test')),
+                array('target' => array('pre-commit' => 'Y')),
                 true,
                 0755,
-                0644,
-                array('X' => 'Y'),
+                0644
             ),
         );
     }
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::deploy()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::deploy()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::deployHook()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::deployTemplate()
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::fetchTemplate()
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::renderTemplate()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::fetchTemplate()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::renderTemplate()
      * @dataProvider provideCheckDeployData
      *
      * @param bool   $expectedResult
@@ -123,8 +133,9 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
      * @param bool   $force
      * @param int    $directoryMode
      * @param int    $fileMode
-     * @param array  $data
-     * @see ActivationScriptProcessor::deploy()
+     * @param string $hook
+     * @param string $script
+     * @see ScriptProcessor::deploy()
      */
     public function checkDeploy(
         $expectedResult,
@@ -134,24 +145,20 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         $force = false,
         $directoryMode = null,
         $fileMode = null,
-        array $data = array()
+        $hook = 'target/pre-commit',
+        $script = 'test'
     ) {
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
-        $source = 'source/source.sh';
-        $target = 'target/target.sh';
-        foreach (array($source, $target) as $file) {
-            if ($fileMode !== null && $root->hasChild($file)) {
-                $root->getChild($file)->chmod($fileMode);
-            }
-            if ($directoryMode !== null && $root->hasChild(dirname($file))) {
-                $root->getChild(dirname($file))->chmod($directoryMode);
-            }
+        if ($fileMode !== null && $root->hasChild($hook)) {
+            $root->getChild($hook)->chmod($fileMode);
         }
-        $source = $root->url() . '/' . $source;
-        $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, $root->url(), $data);
+        if ($directoryMode !== null && $root->hasChild(dirname($hook))) {
+            $root->getChild(dirname($hook))->chmod($directoryMode);
+        }
+        $hook = $root->url() . '/' . $hook;
+        $processor = new ScriptProcessor(basename($hook), $script, $root->url(), dirname($hook));
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;
@@ -185,9 +192,9 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
             'Assert that the filesystem structure is equal.'
         );
 
-        if ($root->hasChild($target)) {
+        if ($root->hasChild($hook)) {
             $this->assertTrue(
-                $root->getChild($target)->getPermissions() === 0777,
+                $root->getChild($hook)->getPermissions() === 0777,
                 'Assert that the target file is executable.'
             );
         }
@@ -196,48 +203,59 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
     public function provideCheckRoolbackData()
     {
         return array(
+            'refuse to remove an invalid hook' => array(
+                false,
+                'Invalid git-hook invalid-hook given.',
+                array(),
+                array(),
+                null,
+                null,
+                'target/invalid-hook'
+            ),
             'refuse removal of symlink' => array(
                 false,
-                'Refused to remove the shell activation script vfs://test/target/target.sh, as it is a symbolic link.',
-                array('target' => array('target.sh' => 'symlink')),
-                array('target' => array('target.sh' => 'symlink')),
+                'Refused to remove the git-hook script vfs://test/target/pre-commit, as it is a symbolic link.',
+                array('target' => array('pre-commit' => 'symlink')),
+                array('target' => array('pre-commit' => 'symlink')),
             ),
             'removal fails due to lack of permissions' => array(
                 false,
-                '/^Failed to remove the shell activation script vfs:\/\/test\/target\/target.sh: Could not delete/',
-                array('target' => array('target.sh' => '')),
-                array('target' => array('target.sh' => '')),
+                '/^Failed to remove the git-hook script vfs:\/\/test\/target\/pre-commit: Could not delete/',
+                array('target' => array('pre-commit' => '')),
+                array('target' => array('pre-commit' => '')),
                 0555,
             ),
             'refuse removal of dangling symlink' => array(
                 false,
-                'Refused to remove the shell activation script vfs://test/target/target.sh, as it is a dangling symbolic link.',
-                array('target' => array('target.sh' => 'dangling symlink')),
-                array('target' => array('target.sh' => 'dangling symlink')),
+                'Refused to remove the git-hook script vfs://test/target/pre-commit, as it is a dangling symbolic link.',
+                array('target' => array('pre-commit' => 'dangling symlink')),
+                array('target' => array('pre-commit' => 'dangling symlink')),
                 0555,
             ),
             'skip removing missing file' => array(
                 true,
-                'Skipped removing the shell activation script vfs://test/target/target.sh, as it does not exist.',
+                'Skipped removing the git-hook script vfs://test/target/pre-commit, as it does not exist.',
                 array('target' => array()),
                 array('target' => array()),
             ),
             'everything works as expected' => array(
                 true,
                 array(
-                    'Removed shell activation script vfs://test/target/target.sh.',
+                    'Removed git-hook script vfs://test/target/pre-commit.',
                     '',
                 ),
                 array('target' => array()),
-                array('target' => array('target.sh' => '')),
+                array('target' => array('pre-commit' => '')),
             ),
         );
     }
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::rollback()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::rollback()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\ScriptProcessor::rollbackHook()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
      * @dataProvider provideCheckRoolbackData
      *
@@ -247,7 +265,8 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
      * @param array  $structure
      * @param int    $directoryMode
      * @param int    $fileMode
-     * @see ActivationScriptProcessor::rollback()
+     * @param string $hook
+     * @see ScriptProcessor::rollback()
      */
     public function checkRollback(
         $expectedResult,
@@ -255,24 +274,21 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         array $expectedFilesystem,
         array $filesystem = array(),
         $directoryMode = null,
-        $fileMode = null
+        $fileMode = null,
+        $hook = 'target/pre-commit'
     ) {
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
-        $source = 'source/source.sh';
-        $target = 'target/target.sh';
-        foreach (array($source, $target) as $file) {
-            if ($fileMode !== null && $root->hasChild($file)) {
-                $root->getChild($file)->chmod($fileMode);
-            }
-            if ($directoryMode !== null && $root->hasChild(dirname($file))) {
-                $root->getChild(dirname($file))->chmod($directoryMode);
-            }
+        $script = 'test';
+        if ($fileMode !== null && $root->hasChild($hook)) {
+            $root->getChild($hook)->chmod($fileMode);
         }
-        $source = $root->url() . '/' . $source;
-        $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, $root->url(), array());
+        if ($directoryMode !== null && $root->hasChild(dirname($hook))) {
+            $root->getChild(dirname($hook))->chmod($directoryMode);
+        }
+        $hook = $root->url() . '/' . $hook;
+        $processor = new ScriptProcessor(basename($hook), $script, $root->url(), dirname($hook));
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;

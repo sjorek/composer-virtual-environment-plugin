@@ -25,6 +25,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 {
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::__construct
      * @see SymbolicLinkProcessor::__construct()
      */
     public function check__construct()
@@ -123,6 +124,9 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::deploy()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::deploySymbolicLink()
      * @dataProvider provideCheckDeployData
      *
      * @param bool   $expectedResult
@@ -213,7 +217,6 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 '/^Could not remove symbolic link vfs:\/\/test\/source\/source.sh: Could not delete/',
                 array('source' => array('source.sh' => 'symlink')),
                 array('source' => array('source.sh' => 'symlink')),
-                false,
                 0555,
             ),
             'everything works as expected' => array(
@@ -230,13 +233,15 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::rollback()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::rollbackSymbolicLink()
      * @dataProvider provideCheckRoolbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput
      * @param array  $expectedFilesystem
      * @param array  $structure
-     * @param bool   $force
      * @param int    $directoryMode
      * @param int    $fileMode
      * @see SymbolicLinkProcessor::rollback()
@@ -246,7 +251,6 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         $expectedOutput,
         array $expectedFilesystem,
         array $filesystem = array(),
-        $force = false,
         $directoryMode = null,
         $fileMode = null
     ) {
@@ -271,7 +275,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         \Composer\Util\vfsFilesystem::$cwd = $root;
         $this->setProtectedProperty($processor, 'filesystem', new \Composer\Util\vfsFilesystem());
 
-        $result = $processor->rollback($io, $force);
+        $result = $processor->rollback($io);
         $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
 
         $output = explode(PHP_EOL, $io->fetch());

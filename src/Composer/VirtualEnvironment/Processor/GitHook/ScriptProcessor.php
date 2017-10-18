@@ -36,7 +36,7 @@ class ScriptProcessor extends AbstractProcessor
     public function __construct($name, $script, $baseDir, $gitHookDir = null, $shebang = null)
     {
         parent::__construct($name, $script, $baseDir, $gitHookDir);
-        $this->shebang = ($shebang === null || $shebang === true) ? static::SHEBANG : $shebang;
+        $this->shebang = $shebang === null ? static::DEFAULT_SHEBANG : $shebang;
     }
 
     /**
@@ -54,15 +54,26 @@ class ScriptProcessor extends AbstractProcessor
      */
     protected function fetchTemplate(OutputInterface $output, $force)
     {
-        return $this->source;
+        return empty($this->source) ? false : $this->source;
+    }
+
+    /**
+     * @param  string          $content
+     * @param  OutputInterface $output
+     * @param  string          $force
+     * @return string|bool
+     */
+    protected function renderTemplate($content, OutputInterface $output, $force = false)
+    {
+        return sprintf('#!%s%s%s', $this->shebang, PHP_EOL, $content);
     }
 
     /**
      * {@inheritDoc}
-     * @see \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::deployHook()
+     * @see \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::rollbackHook()
      */
-    protected function rollbackHook(OutputInterface $output, $force)
+    protected function rollbackHook(OutputInterface $output)
     {
-        return $this->rollbackTemplate($output, $force);
+        return $this->rollbackTemplate($output);
     }
 }

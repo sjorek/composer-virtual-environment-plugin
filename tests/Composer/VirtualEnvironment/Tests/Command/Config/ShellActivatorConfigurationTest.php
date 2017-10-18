@@ -51,6 +51,7 @@ class ShellActivatorConfigurationTest extends TestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::validate
      * @dataProvider provideCheckValidateData
      *
      * @param array       $expected
@@ -104,6 +105,7 @@ class ShellActivatorConfigurationTest extends TestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::translate
      * @dataProvider provideCheckTranslateData
      *
      * @param array $expected

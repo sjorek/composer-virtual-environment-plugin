@@ -40,7 +40,7 @@ trait ExecutableFromTemplateTrait
         if ($content === false) {
             $output->writeln(
                 sprintf(
-                    '<error>Failed to fetch the %s template file %s.</error>',
+                    '<error>Failed to fetch the %s template %s.</error>',
                     static::PROCESSOR_NAME,
                     $this->source
                 )
@@ -222,19 +222,17 @@ trait ExecutableFromTemplateTrait
             );
 
             return false;
-        } else {
-            $output->writeln(
-                sprintf(
-                    '<comment>Skipped removing the %s %s, as it does not exist.</comment>',
-                    static::PROCESSOR_NAME,
-                    $this->target
-                ),
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
-            );
-
-            return true;
         }
 
-        return false;
+        $output->writeln(
+            sprintf(
+                '<comment>Skipped removing the %s %s, as it does not exist.</comment>',
+                static::PROCESSOR_NAME,
+                $this->target
+            ),
+            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        return true;
     }
 }

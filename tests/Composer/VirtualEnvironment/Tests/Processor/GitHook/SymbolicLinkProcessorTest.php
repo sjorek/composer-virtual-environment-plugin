@@ -26,6 +26,8 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 {
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
      * @see SymbolicLinkProcessor::__construct()
      */
     public function check__construct()
@@ -135,6 +137,11 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::deploy()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::deployHook()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::deploySymbolicLink()
      * @dataProvider provideCheckDeployData
      *
      * @param bool   $expectedResult
@@ -220,7 +227,6 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 'Invalid git-hook invalid-hook given.',
                 array(),
                 array(),
-                false,
                 null,
                 null,
                 'target/invalid-hook'
@@ -235,7 +241,6 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 '/^Could not remove git-hook symbolic link vfs:\/\/test\/target\/pre-commit: Could not delete/',
                 array('target' => array('pre-commit' => 'symlink')),
                 array('target' => array('pre-commit' => 'symlink')),
-                false,
                 0555,
             ),
             'everything works as expected' => array(
@@ -252,13 +257,17 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::rollback()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::rollbackHook()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::rollbackSymbolicLink()
      * @dataProvider provideCheckRoolbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput
      * @param array  $expectedFilesystem
      * @param array  $structure
-     * @param bool   $force
      * @param int    $directoryMode
      * @param int    $fileMode
      * @param string $hook
@@ -269,7 +278,6 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         $expectedOutput,
         array $expectedFilesystem,
         array $filesystem = array(),
-        $force = false,
         $directoryMode = null,
         $fileMode = null,
         $hook = 'target/pre-commit'
@@ -294,7 +302,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         \Composer\Util\vfsFilesystem::$cwd = $root;
         $this->setProtectedProperty($processor, 'filesystem', new \Composer\Util\vfsFilesystem());
 
-        $result = $processor->rollback($io, $force);
+        $result = $processor->rollback($io);
         $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
 
         $output = explode(PHP_EOL, $io->fetch());

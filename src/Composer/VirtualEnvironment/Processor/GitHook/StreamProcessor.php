@@ -21,7 +21,7 @@ class StreamProcessor extends AbstractProcessor
 {
     use ExecutableFromTemplateTrait;
 
-    const PROCESSOR_NAME = 'git-hook url';
+    const PROCESSOR_NAME = 'git-hook stream';
 
     /**
      * @param string $name
@@ -54,7 +54,8 @@ class StreamProcessor extends AbstractProcessor
         if ($source === false) {
             $output->writeln(
                 sprintf(
-                    '<error>Invalid url given for template %s.</error>',
+                    '<error>Invalid url given for %s template %s.</error>',
+                    static::PROCESSOR_NAME,
                     $this->source
                 )
             );
@@ -75,7 +76,8 @@ class StreamProcessor extends AbstractProcessor
             ) {
                 $output->writeln(
                     sprintf(
-                        '<error>The template %s was not found.</error>',
+                        '<error>The %s template %s was not found.</error>',
+                        static::PROCESSOR_NAME,
                         $this->source
                     )
                 );
@@ -85,7 +87,8 @@ class StreamProcessor extends AbstractProcessor
         } elseif (!file_exists($source)) {
             $output->writeln(
                 sprintf(
-                    '<error>The template %s does not exist.</error>',
+                    '<error>The %s template %s does not exist.</error>',
+                    static::PROCESSOR_NAME,
                     $this->source
                 )
             );
