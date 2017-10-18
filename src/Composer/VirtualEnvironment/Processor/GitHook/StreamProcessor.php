@@ -22,7 +22,6 @@ class StreamProcessor extends AbstractProcessor
     use ExecutableFromTemplateTrait;
 
     const PROCESSOR_NAME = 'git-hook url';
-    const SUPPORTED_STREAMS = array('http', 'https', 'file', 'vfs');
 
     /**
      * @param string $name
@@ -64,36 +63,29 @@ class StreamProcessor extends AbstractProcessor
         }
 
         $scheme = parse_url($source, PHP_URL_SCHEME);
-        if (in_array($scheme, self::SUPPORTED_STREAMS, true)) {
-            if ($scheme === 'http' || $scheme === 'https') {
-                $headers = @get_headers($source);
-                if ($headers === false || strpos($headers[0], '404') !== false) {
-                    $output->writeln(
-                        sprintf(
-                            '<error>The template %s was not found.</error>',
-                            $this->source
-                        )
-                    );
-
-                    return false;
-                }
-            } elseif (!file_exists($source)) {
+        if ($scheme === 'http' || $scheme === 'https') {
+            $headers = @get_headers($source);
+            if ($headers === false ||
+                empty(
+                    array_filter(
+                        $headers,
+                        function($header) { return strpos($header, '200 OK') !== false; }
+                    )
+                )
+            ) {
                 $output->writeln(
                     sprintf(
-                        '<error>The template %s does not exist.</error>',
+                        '<error>The template %s was not found.</error>',
                         $this->source
                     )
                 );
 
                 return false;
             }
-
-            return @file_get_contents($source, false);
-        } else {
+        } elseif (!file_exists($source)) {
             $output->writeln(
                 sprintf(
-                    '<error>Invalid url scheme %s for template %s.</error>',
-                    $scheme,
+                    '<error>The template %s does not exist.</error>',
                     $this->source
                 )
             );
@@ -101,7 +93,7 @@ class StreamProcessor extends AbstractProcessor
             return false;
         }
 
-        return false;
+        return @file_get_contents($source, false);
     }
 
     /**
