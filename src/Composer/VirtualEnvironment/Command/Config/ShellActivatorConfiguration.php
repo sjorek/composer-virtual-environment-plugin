@@ -15,13 +15,59 @@ use Composer\Config;
 use Composer\Util\Filesystem;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class ShellActivatorConfiguration extends AbstractConfiguration
 {
+    const AVAILABLE_ACTIVATORS = 'bash,csh,fish,zsh';
+
+    /**
+     * @param  array $candidates
+     * @return array
+     */
+    public static function validate(array $candidates)
+    {
+        $candidates = array_map('trim', array_map('strtolower', $candidates));
+        $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
+
+        if (in_array('detect', $candidates, true) && !empty($_SERVER['SHELL'])) {
+            $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
+        }
+
+        // Get a list of valid $activators
+        return array_values(array_unique(array_intersect($candidates, $activators)));
+    }
+
+    /**
+     * @param  array $activators
+     * @return array
+     */
+    public static function translate(array $activators)
+    {
+        // Make the 'activate' shortcut available if needed
+        if (in_array('bash', $activators, true) && in_array('zsh', $activators, true)) {
+            $activators[] = 'activate';
+        }
+
+        // Remove duplicates introduced by user or shortcut addition from above
+        $activators = array_unique($activators);
+
+        // sort them to get nice order
+        sort($activators);
+
+        // Create filenames
+        $activators = array_map(
+            function ($activator) {
+                return $activator === 'activate' ? $activator : ('activate.' . $activator);
+            },
+            $activators
+        );
+
+        return $activators;
+    }
+
     public function load()
     {
         $input = $this->input;
@@ -72,13 +118,13 @@ class ShellActivatorConfiguration extends AbstractConfiguration
         $this->set('name', $name);
         $this->set('name-expanded', $this->parseConfig($this->parseManifest($name)));
 
-        $candidates = array('detect'); // = explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS);
+        $candidates = array('detect'); // = explode(',', static::AVAILABLE_ACTIVATORS);
         if ($input->getArgument('shell')) {
             $candidates = $input->getArgument('shell');
         } elseif ($recipe->has('shell')) {
             $candidates = $recipe->get('shell', $candidates);
         }
-        $activators = $this->set('shell', ActivationScriptProcessor::import($candidates));
+        $activators = $this->set('shell', self::validate($candidates));
 
         $colors = true;
         if ($input->getOption('no-colors')) {

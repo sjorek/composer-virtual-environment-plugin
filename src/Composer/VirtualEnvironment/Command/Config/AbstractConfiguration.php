@@ -169,9 +169,10 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
 
     /**
      * @param  array $input
+     * @param  bool  $expandKey
      * @return array
      */
-    protected function expandConfig(array $input)
+    protected function expandConfig(array $input, $expandKey = true)
     {
         $result = array();
         $config = $this->composer->getConfig();
@@ -183,22 +184,26 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
             $manifest = array();
         }
         foreach ($input as $key => $value) {
-            $expand = Platform::expandPath(
-                $this->parseConfig(
-                    Platform::expandPath($this->parseManifest(Platform::expandPath($key), $manifest)),
-                    Config::RELATIVE_PATHS,
-                    $config
-                )
-            );
-            if (isset($result[$expand])) {
-                $this->output->writeln(
-                    sprintf(
-                        '<warning>Duplicate path found while expanding paths: %s vs %s</warning>',
-                        $key,
-                        $expand
+            if ($expandKey) {
+                $expand = Platform::expandPath(
+                    $this->parseConfig(
+                        Platform::expandPath($this->parseManifest(Platform::expandPath($key), $manifest)),
+                        Config::RELATIVE_PATHS,
+                        $config
                     )
                 );
-                continue;
+                if (isset($result[$expand])) {
+                    $this->output->writeln(
+                        sprintf(
+                            '<warning>Duplicate entry found while expanding configuration: %s vs %s</warning>',
+                            $key,
+                            $expand
+                        )
+                    );
+                    continue;
+                }
+            } else {
+                $expand = $key;
             }
             $result[$expand] = Platform::expandPath(
                 $this->parseConfig(

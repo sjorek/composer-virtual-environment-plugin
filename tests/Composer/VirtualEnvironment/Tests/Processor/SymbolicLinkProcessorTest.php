@@ -235,7 +235,7 @@ class SymbolicLinkProcessorTest extends TestCase
             ),
             'create directory for symlink fails due to lack of permission' => array(
                 false,
-                'Failed to create the symlink directory vfs://test/source: vfs://test/source does not exist and could not be created.',
+                'Failed to create the symbolic link directory vfs://test/source: vfs://test/source does not exist and could not be created.',
                 array('target' => array('target.sh' => '')),
                 array('target' => array('target.sh' => '')),
                 false,

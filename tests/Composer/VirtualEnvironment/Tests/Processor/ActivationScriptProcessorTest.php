@@ -180,100 +180,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 class ActivationScriptProcessorTest extends TestCase
 {
-    public function provideCheckImportData()
-    {
-        return array(
-            'empty candidates return empty activators' => array(
-                array(), array(),
-            ),
-            'nonsense candidates return empty activators' => array(
-                array(), array('nonsense'),
-            ),
-            'upper-case candidate return lower-case activator' => array(
-                array('bash'), array('BASH'),
-            ),
-            'candidate repetitions return unique activator' => array(
-                array('bash'), array('bash', 'BASH'),
-            ),
-            'detection returns shell for supported shell' => array(
-                array('bash'), array('detect'), '/absolute/path/to/bash',
-            ),
-            'detection returns empty for unsupported shell' => array(
-                array(), array('detect'), '/absolute/path/to/xxsh',
-            ),
-            'all available return all available' => array(
-                explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS),
-                explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS),
-            ),
-        );
-    }
-
-    /**
-     * @test
-     * @dataProvider provideCheckImportData
-     *
-     * @param array       $expected
-     * @param array       $candidates
-     * @param string|null $shell
-     * @see ActivationScriptProcessor::import()
-     */
-    public function checkImport(array $expected, array $candidates, $shell = null)
-    {
-        if ($shell !== null) {
-            $_SERVER['SHELL'] = $shell;
-        }
-        $this->assertEquals($expected, ActivationScriptProcessor::import($candidates));
-    }
-
-    public function provideCheckExportData()
-    {
-        return array(
-            'empty activators return empty activator scripts' => array(
-                array(), array(),
-            ),
-            'one activator returns activator script' => array(
-                array('activate.bash'), array('bash'),
-            ),
-            'two activators, but not bash or zsh, return two activator scripts' => array(
-                array('activate.csh', 'activate.fish'), array('csh', 'fish'),
-            ),
-            'two activators, with one of them being bash, return two activator scripts' => array(
-                array('activate.bash', 'activate.csh'), array('bash', 'csh'),
-            ),
-            'two activators, with one of them being zsh, return two activator scripts' => array(
-                array('activate.csh', 'activate.zsh'), array('csh', 'zsh'),
-            ),
-            'bash- and zsh-activator return three activator scripts' => array(
-                array('activate', 'activate.bash', 'activate.zsh'), array('bash', 'zsh'),
-            ),
-            'all available return all available plus one' => array(
-                array_merge(
-                    array('activate'),
-                    array_map(
-                        function ($activator) {
-                            return 'activate.' . $activator;
-                        },
-                        explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS)
-                    )
-                ),
-                explode(',', ActivationScriptProcessor::AVAILABLE_ACTIVATORS),
-            ),
-        );
-    }
-
-    /**
-     * @test
-     * @dataProvider provideCheckExportData
-     *
-     * @param array $expected
-     * @param array $candidates
-     * @see ActivationScriptProcessor::export()
-     */
-    public function checkExport(array $expected, array $candidates)
-    {
-        $this->assertEquals($expected, ActivationScriptProcessor::export($candidates));
-    }
-
     /**
      * @test
      * @see ActivationScriptProcessor::__construct()
@@ -291,22 +197,22 @@ class ActivationScriptProcessorTest extends TestCase
         return array(
             'target already exists' => array(
                 false,
-                'Shell activation script vfs://test/target/target.sh already exists.',
-                array('target' => array('target.sh' => '')),
-                array('target' => array('target.sh' => '')),
+                'The shell activation script vfs://test/target/target.sh already exists.',
+                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
+                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
             ),
             'target already exists, forced removal' => array(
-                false,
+                true,
                 'Removed existing shell activation script vfs://test/target/target.sh.',
-                array('target' => array()),
-                array('target' => array('target.sh' => '')),
+                array('target' => array('target.sh' => 'X'), 'source' => array('source.sh' => 'X')),
+                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => 'X')),
                 true,
             ),
             'target already exists, forced removal fails due to lack of permissions' => array(
                 false,
                 '/^Failed to remove the existing shell activation script vfs:\/\/test\/target\/target.sh: Could not delete/',
-                array('target' => array('target.sh' => '')),
-                array('target' => array('target.sh' => '')),
+                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
+                array('target' => array('target.sh' => ''), 'source' => array('source.sh' => '')),
                 true,
                 0555,
             ),
@@ -317,7 +223,7 @@ class ActivationScriptProcessorTest extends TestCase
             ),
             'template is not readable' => array(
                 false,
-                'Failed to read the template file vfs://test/source/source.sh.',
+                'Failed to fetch the shell activation script template file vfs://test/source/source.sh.',
                 array('source' => array('source.sh' => '')),
                 array('source' => array('source.sh' => '')),
                 true,
@@ -326,7 +232,7 @@ class ActivationScriptProcessorTest extends TestCase
             ),
             'no permission to create target directory' => array(
                 false,
-                'Failed to create the target directory vfs://test/target: vfs://test/target does not exist and could not be created.',
+                'Failed to create the shell activation script target directory vfs://test/target: vfs://test/target does not exist and could not be created.',
                 array('source' => array('source.sh' => '')),
                 array('source' => array('source.sh' => '')),
                 true,
@@ -345,6 +251,7 @@ class ActivationScriptProcessorTest extends TestCase
                 array(
                     'Removed existing shell activation script vfs://test/target/target.sh.',
                     'Installed shell activation script vfs://test/target/target.sh.',
+                    '',
                 ),
                 array('source' => array('source.sh' => 'X'), 'target' => array('target.sh' => 'Y')),
                 array('source' => array('source.sh' => 'X'), 'target' => array('target.sh' => 'Z')),

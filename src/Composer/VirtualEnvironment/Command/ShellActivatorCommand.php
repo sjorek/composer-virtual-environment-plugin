@@ -145,7 +145,7 @@ EOT
                 }
             }
             $baseDir = $config->get('base-dir');
-            foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
+            foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
                 $source = $config->get('resource-dir') . '/' . $filename;
                 $target = $config->get('bin-dir-relative') . '/' . $filename;
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, $data);
@@ -188,7 +188,7 @@ EOT
             );
         } else {
             $baseDir = $config->get('base-dir');
-            foreach (Processor\ActivationScriptProcessor::export($activators) as $filename) {
+            foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
                 $source = $config->get('resource-dir') . '/' . $filename;
                 $target = $config->get('bin-dir-relative') . '/' . $filename;
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, array());

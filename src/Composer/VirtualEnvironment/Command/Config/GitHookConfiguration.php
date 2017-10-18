@@ -45,27 +45,44 @@ class GitHookConfiguration extends AbstractConfiguration
 
         $recipe = $this->recipe;
 
-        $hooks = array();
+        $config = array();
+        if ($input->getOption('script')) {
+            $config['script'] = $input->getOption('script');
+            if ($input->getOption('shebang')) {
+                $config['shebang'] = $input->getOption('shebang');
+            }
+        } elseif ($input->getOption('file')) {
+            $config['file'] = $input->getOption('file');
+        } elseif ($input->getOption('link')) {
+            $config['link'] = $input->getOption('link');
+        } elseif ($input->getOption('url')) {
+            $config['url'] = $input->getOption('url');
+        }
+        $config_expanded = $this->expandConfig($config, false);
+
+        $hooks = $recipe->get('git-hook', array());
+        $hooks_expanded = array();
         if ($input->getArgument('hook')) {
             foreach ($input->getArgument('hook') as $hook) {
-                if (strpos($hook, PATH_SEPARATOR) === false) {
-                    $this->output->writeln(
-                        sprintf(
-                            '<error>Invalid hook %s given. Hook format is: hook-name:"script to execute"</error>',
-                            $hook
-                        )
-                    );
-
-                    return false;
-                }
-                list($name, $script) = explode(PATH_SEPARATOR, $hook, 2);
-                $hooks[$name] = $script;
+                $hooks[$hook] = $config;
+                $hooks_expanded[$hook] = $config_expanded;
             }
-        } elseif ($recipe->has('git-hook')) {
-            $hooks = $recipe->get('git-hook');
+        }
+        if (empty($config)) {
+            foreach ($hooks as $hook => $config) {
+                if (!isset($hooks_expanded[$hook])) {
+                    $hooks_expanded[$hook] = $this->expandConfig($config, false);
+                }
+            }
+        } else {
+            foreach (array_keys($hooks) as $hook) {
+                if (!isset($hooks_expanded[$hook])) {
+                    $hooks_expanded[$hook] = $config_expanded;
+                }
+            }
         }
         $this->set('git-hook', $hooks);
-        $this->set('git-hook-expanded', $this->expandConfig($hooks));
+        $this->set('git-hook-expanded', $hooks_expanded);
 
         return true;
     }
