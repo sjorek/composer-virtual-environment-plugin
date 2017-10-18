@@ -10,25 +10,28 @@ matrix:
       env: LINT=true
     - php: 7.2
     - php: nightly
+      env: NIGHTLY=true
   fast_finish: true
   allow_failures:
     - php: nightly
 
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.composer/cache/files
     - $HOME/.php-cs-fixer
 
 install:
-- composer install --no-interaction
-
-before_script:
-  - phpenv config-rm xdebug.ini || true
-  - travis_retry composer self-update
-  - travis_retry composer install --no-interaction
-  - travis_retry composer dump-autoload --optimize
+- phpenv config-rm xdebug.ini || true
+- travis_retry composer self-update
+- if [[ $NIGHTLY = true ]]; then
+    composer remove --dev friendsofphp/php-cs-fixer;
+    composer validate;
+  fi
+- travis_retry composer install --no-interaction
+- travis_retry composer dump-autoload --optimize
 
 script:
+- composer validate
 - if [[ $LINT = true ]]; then
     composer composer-virtual-environment-plugin:cs-lint;
   fi
