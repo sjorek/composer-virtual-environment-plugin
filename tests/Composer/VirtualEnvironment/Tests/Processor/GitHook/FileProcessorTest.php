@@ -113,7 +113,7 @@ class FileProcessorTest extends AbstractVfsStreamTestCase
                 array('source' => array('source.sh' => 'X'), 'target' => array('pre-commit' => 'Y')),
                 true,
                 0755,
-                0644
+                0644,
             ),
         );
     }
@@ -216,7 +216,7 @@ class FileProcessorTest extends AbstractVfsStreamTestCase
                 array(),
                 null,
                 null,
-                'target/invalid-hook'
+                'target/invalid-hook',
             ),
             'refuse removal of symlink' => array(
                 false,

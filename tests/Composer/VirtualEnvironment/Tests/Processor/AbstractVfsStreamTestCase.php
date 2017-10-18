@@ -176,7 +176,6 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractVfsStreamTestCase extends TestCase
 {
-
     /**
      * @param  mixed  $object
      * @param  string $propertyName

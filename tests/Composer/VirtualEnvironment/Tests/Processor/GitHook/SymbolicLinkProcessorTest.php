@@ -229,7 +229,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 array(),
                 null,
                 null,
-                'target/invalid-hook'
+                'target/invalid-hook',
             ),
             'skip removing non-existent symlink' => array(
                 true,

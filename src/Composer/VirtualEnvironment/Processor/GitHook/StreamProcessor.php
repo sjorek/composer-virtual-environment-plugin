@@ -70,7 +70,9 @@ class StreamProcessor extends AbstractProcessor
                 empty(
                     array_filter(
                         $headers,
-                        function($header) { return strpos($header, '200 OK') !== false; }
+                        function ($header) {
+                            return strpos($header, '200 OK') !== false;
+                        }
                     )
                 )
             ) {

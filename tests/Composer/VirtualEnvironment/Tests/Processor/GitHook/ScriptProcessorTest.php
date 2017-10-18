@@ -81,7 +81,7 @@ class ScriptProcessorTest extends AbstractVfsStreamTestCase
                 null,
                 null,
                 'target/pre-commit',
-                ''
+                '',
             ),
             'no permission to create target directory' => array(
                 false,
@@ -110,7 +110,7 @@ class ScriptProcessorTest extends AbstractVfsStreamTestCase
                 array('target' => array('pre-commit' => 'Y')),
                 true,
                 0755,
-                0644
+                0644,
             ),
         );
     }
@@ -210,7 +210,7 @@ class ScriptProcessorTest extends AbstractVfsStreamTestCase
                 array(),
                 null,
                 null,
-                'target/invalid-hook'
+                'target/invalid-hook',
             ),
             'refuse removal of symlink' => array(
                 false,

@@ -81,7 +81,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
                 null,
                 null,
                 'pre-commit',
-                '://this is not an url'
+                '://this is not an url',
             ),
             'template http stream url not found' => array(
                 false,
@@ -92,7 +92,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
                 null,
                 null,
                 'pre-commit',
-                'http://' . WEBSERVER_HOST . ':' . WEBSERVER_PORT . '/non-existant'
+                'http://' . WEBSERVER_HOST . ':' . WEBSERVER_PORT . '/non-existant',
             ),
             'missing template' => array(
                 false,
@@ -135,7 +135,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
                 array('source' => array('source.sh' => 'X'), 'target' => array('pre-commit' => 'Y')),
                 true,
                 0755,
-                0644
+                0644,
             ),
             'everything works as expected for http stream' => array(
                 true,
@@ -150,7 +150,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
                 0755,
                 0644,
                 'target/pre-commit',
-                'http://' . WEBSERVER_HOST . ':' . WEBSERVER_PORT . '/blank.txt'
+                'http://' . WEBSERVER_HOST . ':' . WEBSERVER_PORT . '/blank.txt',
             ),
         );
     }
@@ -255,7 +255,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
                 array(),
                 null,
                 null,
-                'target/invalid-hook'
+                'target/invalid-hook',
             ),
             'refuse removal of symlink' => array(
                 false,
