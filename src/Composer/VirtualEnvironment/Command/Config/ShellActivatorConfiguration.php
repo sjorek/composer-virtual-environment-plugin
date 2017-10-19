@@ -13,13 +13,14 @@ namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Composer\Config;
 use Composer\Util\Filesystem;
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellActivatorConfiguration extends AbstractConfiguration
+class ShellActivatorConfiguration extends AbstractCommandConfiguration
 {
     const AVAILABLE_ACTIVATORS = 'bash,csh,fish,zsh';
 
@@ -146,15 +147,29 @@ class ShellActivatorConfiguration extends AbstractConfiguration
         return true;
     }
 
-    public function save($force = false)
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareSave()
+     */
+    protected function prepareSave(ConfigurationInterface $recipe)
     {
-        if ($this->get('save')) {
-            $recipe = $this->recipe;
-            $recipe->set('name', $this->get('name'));
-            $recipe->set('shell', $this->get('shell'));
-            $recipe->set('colors', $this->get('colors'));
-        }
+        $recipe->set('name', $this->get('name'));
+        $recipe->set('shell', $this->get('shell'));
+        $recipe->set('colors', $this->get('colors'));
 
-        return parent::save($force);
+        return $recipe;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareLock()
+     */
+    protected function prepareLock(ConfigurationInterface $recipe)
+    {
+        $recipe->set('name', $this->get('name-expanded'));
+        $recipe->set('shell', $this->get('shell'));
+        $recipe->set('colors', $this->get('colors'));
+
+        return $recipe;
     }
 }

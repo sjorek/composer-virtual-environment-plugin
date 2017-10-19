@@ -17,6 +17,11 @@ namespace Sjorek\Composer\VirtualEnvironment\Config;
 interface FileConfigurationInterface extends ConfigurationInterface
 {
     /**
+     * @return string
+     */
+    public function file();
+
+    /**
      * @return bool
      */
     public function load();

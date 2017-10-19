@@ -14,7 +14,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Command;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\GitHookConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor\GitHook;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -142,7 +142,11 @@ EOT
         return new GitHookConfiguration($input, $output, $composer, $io);
     }
 
-    protected function deploy(ConfigurationInterface $config, OutputInterface $output)
+    /**
+     * {@inheritDoc}
+     * @see AbstractProcessorCommand::deploy()
+     */
+    protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {
@@ -169,9 +173,14 @@ EOT
             }
         }
         $config->save($config->get('force'));
+        $config->lock($config->get('force'));
     }
 
-    protected function rollback(ConfigurationInterface $config, OutputInterface $output)
+    /**
+     * {@inheritDoc}
+     * @see AbstractProcessorCommand::rollback()
+     */
+    protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {

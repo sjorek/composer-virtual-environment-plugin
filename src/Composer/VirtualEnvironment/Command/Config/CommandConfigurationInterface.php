@@ -11,12 +11,12 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
-use Sjorek\Composer\VirtualEnvironment\Config;
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-interface ConfigurationInterface extends Config\ConfigurationInterface
+interface CommandConfigurationInterface extends ConfigurationInterface
 {
     /**
      * @return bool
@@ -28,4 +28,10 @@ interface ConfigurationInterface extends Config\ConfigurationInterface
      * @return bool
      */
     public function save($force = false);
+
+    /**
+     * @param  bool $force
+     * @return bool
+     */
+    public function lock($force = false);
 }

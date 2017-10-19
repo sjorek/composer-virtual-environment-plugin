@@ -14,7 +14,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Command;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Util\Platform;
-use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,9 +109,9 @@ EOT
 
     /**
      * {@inheritDoc}
-     * @see \Sjorek\Composer\VirtualEnvironment\Command\AbstractProcessorCommand::deploy()
+     * @see AbstractProcessorCommand::deploy()
      */
-    protected function deploy(ConfigurationInterface $config, OutputInterface $output)
+    protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $activators = $config->get('shell');
         if (empty($activators)) {
@@ -160,7 +160,8 @@ EOT
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(
-                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>'
+                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>',
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {
@@ -172,13 +173,14 @@ EOT
         }
 
         $config->save($config->get('force'));
+        $config->lock($config->get('force'));
     }
 
     /**
      * {@inheritDoc}
-     * @see \Sjorek\Composer\VirtualEnvironment\Command\AbstractProcessorCommand::rollback()
+     * @see AbstractProcessorCommand::rollback()
      */
-    protected function rollback(ConfigurationInterface $config, OutputInterface $output)
+    protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $activators = $config->get('shell');
         if (empty($activators)) {
@@ -203,7 +205,8 @@ EOT
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(
-                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>'
+                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>',
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } else {
                     foreach ($symlinks as $source => $target) {

@@ -11,14 +11,19 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class GitHookConfiguration extends AbstractConfiguration
+class GitHookConfiguration extends AbstractCommandConfiguration
 {
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::load()
+     */
     public function load()
     {
         $input = $this->input;
@@ -87,13 +92,25 @@ class GitHookConfiguration extends AbstractConfiguration
         return true;
     }
 
-    public function save($force = false)
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareSave()
+     */
+    protected function prepareSave(ConfigurationInterface $recipe)
     {
-        if ($this->get('save')) {
-            $recipe = $this->recipe;
-            $recipe->set('git-hook', $this->get('git-hook'));
-        }
+        $recipe->set('git-hook', $this->get('git-hook'));
 
-        return parent::save($force);
+        return $recipe;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareLock()
+     */
+    protected function prepareLock(ConfigurationInterface $recipe)
+    {
+        $recipe->set('git-hook', $this->get('git-hook-expanded'));
+
+        return $recipe;
     }
 }

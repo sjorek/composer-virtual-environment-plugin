@@ -17,7 +17,8 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
-use Sjorek\Composer\VirtualEnvironment\Config\AbstractConfiguration as AbstractBaseConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\AbstractConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
@@ -28,7 +29,7 @@ use Composer\Json\JsonFile;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-abstract class AbstractConfiguration extends AbstractBaseConfiguration implements ConfigurationInterface
+abstract class AbstractCommandConfiguration extends AbstractConfiguration implements CommandConfigurationInterface
 {
     /**
      * @var InputInterface
@@ -46,7 +47,7 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
     protected $io;
 
     /**
-     * @var \Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface
+     * @var ConfigurationInterface
      */
     public $recipe;
 
@@ -70,12 +71,11 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
 
     /**
      * {@inheritDoc}
-     * @see \Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface::load()
+     * @see CommandConfigurationInterface::load()
      */
     public function load()
     {
         $input = $this->input;
-
         $load = null;
         if ($input->getOption('config')) {
             $filename = $input->getOption('config');
@@ -89,9 +89,9 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
             $load = new GlobalConfiguration($this->composer);
         } else {
             $load = new LocalConfiguration($this->composer);
-            if (!file_exists($load->filename)) {
+            if (!file_exists($load->file())) {
                 $load = new GlobalConfiguration($this->composer);
-                if (!file_exists($load->filename)) {
+                if (!file_exists($load->file())) {
                     $load = new FileConfiguration($this->composer, 'php://memory');
                 }
             }
@@ -135,6 +135,7 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
         $filesystem = new Filesystem();
 
         $this->set('base-dir', $filesystem->normalizePath(realpath(realpath(dirname($composerFile)))));
+        $this->set('lock', $input->getOption('no-lock') ? false : ($input->getOption('lock') ?: true));
         $this->set('force', $input->getOption('force'));
         $this->set('remove', $input->getOption('remove'));
 
@@ -143,20 +144,18 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
 
     /**
      * {@inheritDoc}
-     * @see \Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface::save()
+     * @see ConfigurationInterface::save()
      */
     public function save($force = false)
     {
         if ($this->get('save')) {
             $output = $this->output;
             $recipe = $this->recipe;
-            if ($recipe->save($force)) {
+            if ($this->prepareSave($recipe)->save($force)) {
                 $output->writeln(
                     '<comment>Saving configuration "' . $recipe->filename . '" succeeded.</comment>',
                     OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                 );
-
-                return true;
             } else {
                 $output->writeln('<warning>Saving configuration "' . $recipe->filename . '" failed.</warning>');
 
@@ -166,6 +165,45 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
 
         return true;
     }
+
+    /**
+     * @param  ConfigurationInterface $recipe
+     * @return ConfigurationInterface
+     */
+    abstract protected function prepareSave(ConfigurationInterface $recipe);
+
+    /**
+     * {@inheritDoc}
+     * @see ConfigurationInterface::lock()
+     */
+    public function lock($force = false)
+    {
+        if ($this->get('lock')) {
+            $output = $this->output;
+            $filename = $this->recipe->filename;
+            $extension = pathinfo($filename, PATHINFO_EXTENSION) ?: 'json';
+            $filename = dirname($filename) . DIRECTORY_SEPARATOR . basename($filename, '.' . $extension) . '.lock';
+            $recipe = new FileConfiguration($this->composer, $filename);
+            if ($this->prepareLock($recipe)->save($force)) {
+                $output->writeln(
+                    '<comment>Locking configuration "' . $recipe->filePath . '" succeeded.</comment>',
+                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                );
+            } else {
+                $output->writeln('<warning>Locking configuration "' . $recipe->filePath . '" failed.</warning>');
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  ConfigurationInterface $recipe
+     * @return ConfigurationInterface
+     */
+    abstract protected function prepareLock(ConfigurationInterface $recipe);
 
     /**
      * @param  array $input
@@ -259,6 +297,7 @@ abstract class AbstractConfiguration extends AbstractBaseConfiguration implement
             } else {
                 return $value;
             }
+            $this->composer->getPackage()->getConfig();
         }
 
         return preg_replace_callback('#\{\$(.+)\}#', function ($match) use ($manifest) {

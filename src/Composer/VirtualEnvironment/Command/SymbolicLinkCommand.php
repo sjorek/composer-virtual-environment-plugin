@@ -15,7 +15,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\SymbolicLinkConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Command\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -94,7 +94,11 @@ EOT
         return new SymbolicLinkConfiguration($input, $output, $composer, $io);
     }
 
-    protected function deploy(ConfigurationInterface $config, OutputInterface $output)
+    /**
+     * {@inheritDoc}
+     * @see AbstractProcessorCommand::deploy()
+     */
+    protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
@@ -104,7 +108,8 @@ EOT
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(
-                '<warning>Symbolic links are not (yet) supported on windows.</warning>'
+                '<warning>Symbolic links are not (yet) supported on windows.</warning>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {
             $baseDir = $config->get('base-dir', '');
@@ -114,9 +119,14 @@ EOT
             }
         }
         $config->save($config->get('force'));
+        $config->lock($config->get('force'));
     }
 
-    protected function rollback(ConfigurationInterface $config, OutputInterface $output)
+    /**
+     * {@inheritDoc}
+     * @see AbstractProcessorCommand::rollback()
+     */
+    protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
@@ -124,7 +134,12 @@ EOT
                 '<comment>Skipping removal of symbolic links, as none is available.</comment>',
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
-        } elseif (!Platform::isWindows()) {
+        } elseif (Platform::isWindows()) {
+            $output->writeln(
+                '<warning>Symbolic links are not (yet) supported on windows.</warning>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+            );
+        } else {
             $baseDir = $config->get('base-dir', '');
             foreach ($symlinks as $source => $target) {
                 $processor = new Processor\SymbolicLinkProcessor($source, $target, $baseDir);

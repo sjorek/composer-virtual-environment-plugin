@@ -11,14 +11,19 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
+use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class SymbolicLinkConfiguration extends AbstractConfiguration
+class SymbolicLinkConfiguration extends AbstractCommandConfiguration
 {
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::load()
+     */
     public function load()
     {
         $input = $this->input;
@@ -70,13 +75,25 @@ class SymbolicLinkConfiguration extends AbstractConfiguration
         return true;
     }
 
-    public function save($force = false)
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareSave()
+     */
+    protected function prepareSave(ConfigurationInterface $recipe)
     {
-        if ($this->get('save')) {
-            $recipe = $this->recipe;
-            $recipe->set('link', $this->get('link'));
-        }
+        $recipe->set('link', $this->get('link'));
 
-        return parent::save($force);
+        return $recipe;
+    }
+
+    /**
+     * @param  ConfigurationInterface $recipe
+     * @return ConfigurationInterface
+     */
+    protected function prepareLock(ConfigurationInterface $recipe)
+    {
+        $recipe->set('link', $this->get('link-expanded'));
+
+        return $recipe;
     }
 }
