@@ -226,7 +226,7 @@ trait ExecutableFromTemplateTrait
 
         $output->writeln(
             sprintf(
-                '<warning>Skipped removing the %s %s, as it does not exist.</warning>',
+                '<error>Skipped removing the %s %s, as it does not exist.</error>',
                 static::PROCESSOR_NAME,
                 $this->target
             )

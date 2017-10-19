@@ -79,7 +79,7 @@ class ScriptProcessor extends AbstractProcessor
         if (!(file_exists($shebang[0]) || is_link($shebang[0]))) {
             $output->writeln(
                 sprintf(
-                    '<warning>The shebang executable "%s" does not exist for git-hook script: %s</warning>',
+                    '<error>The shebang executable "%s" does not exist for git-hook script: %s</error>',
                     $this->shebang,
                     $content
                 ),
@@ -99,7 +99,7 @@ class ScriptProcessor extends AbstractProcessor
             if (strpos($shebang, 'php') === false) {
                 $output->writeln(
                     sprintf(
-                        '<warning>Missing php in shebang "%s" for php-based git-hook script: %s</warning>',
+                        '<error>Missing php in shebang "%s" for php-based git-hook script: %s</error>',
                         $this->shebang,
                         $content
                     ),

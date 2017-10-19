@@ -132,7 +132,7 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<warning>Skipping creation of shell activators, none available.</warning>'
+                '<error>Skipping creation of shell activators, none available.</error>'
             );
         } else {
             $data = array(
@@ -175,7 +175,7 @@ EOT
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(
-                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>',
+                        '<error>Symbolic link to shell activation script is not (yet) supported on windows.</error>',
                         OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } else {
@@ -197,7 +197,7 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<warning>Skipping removal of shell activation scripts, as none is available.</warning>'
+                '<error>Skipping removal of shell activation scripts, as none is available.</error>'
             );
         } else {
             $baseDir = $config->get('base-dir');
@@ -216,7 +216,7 @@ EOT
                     );
                 } elseif (Platform::isWindows()) {
                     $output->writeln(
-                        '<warning>Symbolic link to shell activation script is not (yet) supported on windows.</warning>',
+                        '<error>Symbolic link to shell activation script is not (yet) supported on windows.</error>',
                         OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
                 } else {

@@ -102,11 +102,11 @@ EOT
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
-                '<warning>Skipping creation of symbolic links, as none is available.</warning>'
+                '<error>Skipping creation of symbolic links, as none is available.</error>'
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(
-                '<warning>Symbolic links are not (yet) supported on windows.</warning>',
+                '<error>Symbolic links are not (yet) supported on windows.</error>',
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {
@@ -127,11 +127,11 @@ EOT
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
-                '<warning>Skipping removal of symbolic links, as none is available.</warning>'
+                '<error>Skipping removal of symbolic links, as none is available.</error>'
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(
-                '<warning>Symbolic links are not (yet) supported on windows.</warning>',
+                '<error>Symbolic links are not (yet) supported on windows.</error>',
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
             );
         } else {

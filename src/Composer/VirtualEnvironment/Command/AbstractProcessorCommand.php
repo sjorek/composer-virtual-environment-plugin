@@ -110,7 +110,7 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
             }
         } else {
             $output->writeln(
-                '<warning>Failed to load configuration.</warning>',
+                '<error>Failed to load configuration.</error>',
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_NORMAL
             );
         }

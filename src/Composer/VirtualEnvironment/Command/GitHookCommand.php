@@ -173,7 +173,7 @@ EOT
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {
             $output->writeln(
-                '<warning>Skipping creation of git-hooks, as none is available.</warning>'
+                '<error>Skipping creation of git-hooks, as none is available.</error>'
             );
         } else {
             $baseDir = $config->get('base-dir', '');
@@ -204,7 +204,7 @@ EOT
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {
             $output->writeln(
-                '<warning>Skipping removal of git-hooks, as none is available.</warning>'
+                '<error>Skipping removal of git-hooks, as none is available.</error>'
             );
         } else {
             $baseDir = $config->get('base-dir', '');

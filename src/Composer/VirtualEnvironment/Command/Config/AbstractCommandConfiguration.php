@@ -198,7 +198,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
 
         $output->writeln(
             sprintf(
-                '<warning>Saving configuration "%s" failed.</warning>',
+                '<error>Saving configuration "%s" failed.</error>',
                 $recipe->file()
             )
         );
@@ -261,7 +261,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
                 if (isset($result[$expand])) {
                     $this->output->writeln(
                         sprintf(
-                            '<warning>Duplicate entry found while expanding configuration: %s vs %s</warning>',
+                            '<error>Duplicate entry found while expanding configuration: %s vs %s</error>',
                             $key,
                             $expand
                         )
