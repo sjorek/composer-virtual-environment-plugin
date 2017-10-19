@@ -23,25 +23,29 @@ php composer.phar require-dev sjorek/composer-virtual-environment-plugin
 
 ## Documentation
 
-```console
-$ php composer.phar help virtual-environment
+### Shell Activation Command
+
+```bash
+$ php composer.phar help venv:shell
 Usage:
-  virtual-environment [options]
-  virtualenvironment
-  venv
+  virtual-environment:shell [options] [--] [<shell>]...
+  venv:shell
+
+Arguments:
+  shell                          List of shell activators to add or remove.
 
 Options:
-      --name=NAME                Name of the virtual environment. [default: "vendor/package-name"]
-      --shell=SHELL              Set the list of shell activators to deploy. [default: ["detect"]] (multiple values allowed)
-      --php=PHP                  Add symlink to php.
-      --composer=COMPOSER        Add symlink to composer. [default: "composer.phar"]
-      --color-prompt             Enable the color prompt per default. Works currently only for "bash".
-      --update-local             Update the local virtual environment configuration recipe in "./composer.venv".
-      --update-global            Update the global virtual environment configuration recipe in "~/.composer/composer.venv".
-      --ignore-local             Ignore the local virtual environment configuration recipe in "./composer.venv".
-      --ignore-global            Ignore the global virtual environment configuration recipe in "~/.composer/composer.venv".
-      --remove                   Remove any deployed shell activators or symbolic links.
-  -f, --force                    Force overwriting existing environment scripts
+      --name=NAME                Name of the virtual environment. [default: "{$name}"]
+      --colors                   Enable the color prompt per default. Works currently only for "bash".
+      --no-colors                Disable the color prompt per default.
+  -a, --add                      Add to existing configuration.
+  -r, --remove                   Remove all configured items.
+  -s, --save                     Save configuration.
+  -c, --config=CONFIG            Use given configuration file.
+  -l, --local                    Use local configuration file "./composer-venv.json".
+  -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+      --lock                     Lock configuration in "./composer-venv.lock".
+  -f, --force                    Force overwriting existing git-hooks
   -h, --help                     Display this help message
   -q, --quiet                    Do not output any message
   -V, --version                  Display this application version
@@ -51,17 +55,16 @@ Options:
       --profile                  Display timing and memory usage information
       --no-plugins               Whether to disable plugins.
   -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
-  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output,
+                                 2 for more verbose output and 3 for debug
 
 Help:
-  The virtual-environment command creates files to activate
-  and deactivate the current bin directory in shell,
-  optionally placing symlinks to php- and composer-binaries
-  in the bin directory.
+  The virtual-environment:shell-activator command creates files
+  to activate and deactivate the current bin directory in shell.
   
   Usage:
   
-      php composer.phar venv
+      php composer.phar venv:shell
   
   After this you can source the activation-script
   corresponding to your shell.
@@ -84,144 +87,166 @@ Help:
 ```
 
 
-## Usage Scenarios
+### Symbolic Link Command
 
-### Example: multiple PHP versions for many composer packages
+```bash
+$ php composer.phar help venv:link
+Usage:
+  virtual-environment:link [options] [--] [<link>]...
+  venv:link
 
-Assuming the following:
+Arguments:
+  link                           List of symbolic links to add or remove.
 
-* you're developing a composer package:
-  * name: `vendor/first-example-package`
-  * requires `php` version 7.0
-* You're developing another composer package:
-  * name: `vendor/second-example-package`
-  * requires `php` version 7.2
-* you want to use the `composer-virtual-environment-plugin` in all of
-  your packages (in this case the two mentioned above) *without
-  cluttering the packages with files* and *without adding the plugin
-  to the package requirements*
-* in this example you're using `bash` as your favorite shell
-* you have `php` version 7.0 installed in `/path/to/bin/php70`
-* you have `php` version 7.2 installed in `/path/to/bin/php72`
-* you already installed/downloaded `composer.phar` somewhere in your
-  filesystem, let's say under `/path/to/composer.phar`
+Options:
+  -a, --add                      Add to existing configuration.
+  -r, --remove                   Remove all configured items.
+  -s, --save                     Save configuration.
+  -c, --config=CONFIG            Use given configuration file.
+  -l, --local                    Use local configuration file "./composer-venv.json".
+  -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+      --lock                     Lock configuration in "./composer-venv.lock".
+  -f, --force                    Force overwriting existing git-hooks
+  -h, --help                     Display this help message
+  -q, --quiet                    Do not output any message
+  -V, --version                  Display this application version
+      --ansi                     Force ANSI output
+      --no-ansi                  Disable ANSI output
+  -n, --no-interaction           Do not ask any interactive question
+      --profile                  Display timing and memory usage information
+      --no-plugins               Whether to disable plugins.
+  -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output,
+                                 2 for more verbose output and 3 for debug
 
-```console
-$ # install the plugin >>>globally<<< (in this case ${HOME}/.composer):
-$ /path/to/bin/php70 /path/to/composer.phar global require sjorek/composer-virtual-environment-plugin
-Changed current directory to /Users/sjorek/.composer
-Using version ^X.Y.Z for sjorek/composer-virtual-environment-plugin
-./composer.json has been updated
-Loading composer repositories with package information
-Updating dependencies (including require-dev)
-Package operations: 1 install, 0 updates, 0 removals
-  - Installing sjorek/composer-virtual-environment-plugin (X.Y.Z)
-Writing lock file
-Generating autoload files
+Help:
+  The virtual-environment:link command places symlinks
+  to php- and composer-binaries in the bin directory.
+  
+  Example:
+  
+      php composer.phar venv:link '{$bin-dir}/composer':'{$bin-dir-up}/composer.phar'
+  
+  After this you can use the linked binaries in composer's
+  run-script or in virtual-environment:shell.
+  
+  Attention: only link the composer like in the example above,
+  if your project does not require the composer/composer package.
+  
 ```
 
 
-#### vendor/first-example-package
+### Git-Hook Command
 
-```console
-$ # change directory to your first package:
-$ cd /path/to/vendor/first-example-package
+```bash
+$ php composer.phar help venv:git-hook 
+Usage:
+  virtual-environment:git-hook [options] [--] [<hook>]...
+  venv:git-hook
 
-$ # initial setup of the virtual composer shell environment (run this only once per package):
-$ /path/to/bin/php70 /path/to/composer.phar venv --php=/path/to/bin/php70 --shell=bash
-Installed virtual environment activation script: /path/to/vendor/first-example-package/vendor/bin/activate.bash
-Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/activate -> activate.bash
-Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/composer -> /path/to/composer.phar
-Installed virtual environment symlink: /path/to/vendor/first-example-package/vendor/bin/php -> /path/to/bin/php70
+Arguments:
+  hook                           List of git-hooks to add or remove.
 
-$ # after this you can activate the virtual composer shell environment:
-$ source vendor/bin/activate
+Options:
+      --script=SCRIPT            Use the given script as git-hook.
+      --shebang=SHEBANG          Use the given #!shebang for the given script.
+      --file=FILE                Use the content of the given file as git-hook.
+      --link=LINK                Install git-hook by creating a symbolic link to the given file.
+      --url=URL                  Download the git-hook from the given url.
+  -a, --add                      Add to existing configuration.
+  -r, --remove                   Remove all configured items.
+  -s, --save                     Save configuration.
+  -c, --config=CONFIG            Use given configuration file.
+  -l, --local                    Use local configuration file "./composer-venv.json".
+  -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+      --lock                     Lock configuration in "./composer-venv.lock".
+  -f, --force                    Force overwriting existing git-hooks
+  -h, --help                     Display this help message
+  -q, --quiet                    Do not output any message
+  -V, --version                  Display this application version
+      --ansi                     Force ANSI output
+      --no-ansi                  Disable ANSI output
+  -n, --no-interaction           Do not ask any interactive question
+      --profile                  Display timing and memory usage information
+      --no-plugins               Whether to disable plugins.
+  -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output,
+                                 2 for more verbose output and 3 for debug
 
-virtual composer shell environment
+Help:
+  The virtual-environment:git-hook command manages
+  git-hooks residing in the .git/hooks directory.
+  
+  Examples:
+  
+  Simple shell script using default shebang "#!/bin/sh"
+  
+      php composer.phar venv:git-hook pre-commit \
+          --script='composer run-script xyz'
+  
+  Shell script with a more complex shebang
+  
+      php composer.phar venv:git-hook pre-commit \
+          --shebang='/usr/bin/env bash' \
+          --script='echo "about to commit"'
+  
+  Simple PHP script
 
-    Name: vendor/first-example-package
-    Path: /path/to/vendor/first-example-package
-
-Run 'deactivate' to exit the environment and return to normal shell.
-
-$ # the directory '/path/to/vendor/first-example-package/vendor/bin' is 
-$ # now prepended to your PATH environment variable
-
-$ # now use any binary from package requirements located in 'vendor/bin':
-(vendor/first-example-package) $ php-cs-fixer fix # <-- just an example!
-
-...
-
-$ # you can use `composer` without specifying the path to php anymore:
-(vendor/first-example-package) $ composer --version
-Composer version 1.5.2 2017-09-11 16:59:25
-
-$ # and of course you can now also use `php` directly:
-(vendor/first-example-package) $ php --version
-PHP 7.0.24 (cli) (built: Sep 29 2017 00:27:16) ( NTS )
-Copyright (c) 1997-2017 The PHP Group
-Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
-    with Zend OPcache v7.0.24, Copyright (c) 1999-2017, by Zend Technologies
-    with Xdebug v2.5.5, Copyright (c) 2002-2017, by Derick Rethans
-
-$ # if you're done, run ...
-$ deactivate
-
-Left virtual composer shell environment.
-
-Good Bye!
-
-$ # ... and vendor/bin will be removed from your PATH
+      # notice the detection of the correct shebang
+      php composer.phar venv:git-hook pre-commit \
+          --script='<?php echo "about to commit";'
+  
+  Utilizing environment variable expansion
+  
+      php composer.phar venv:git-hook pre-commit \
+          --shebang=%SHELL% \
+          --script='echo "I'm using a %SHELL%!"'
+  
+  Utilizing configuration value expansion
+  
+      php composer.phar venv:git-hook pre-commit \
+          --shebang='{$bin-dir}/php' \
+          --script='<?php
+                  require "{$vendor-dir}/autoload.php";
+                  Namespace\Classname::staticMethod();'
+  
+  Import file from relative path
+  
+      php composer.phar venv:git-hook pre-commit \
+          --file=relative/path/to/pre-commit.hook
+  
+  Import file from absolute path
+  
+      php composer.phar venv:git-hook pre-commit \
+          --file=/absolute/path/to/pre-commit.hook
+  
+  Create symlink to file
+  
+      php composer.phar venv:git-hook pre-commit \
+          --link=../../path/to/pre-commit.hook
+  
+  Relative hook file URL
+  
+      php composer.phar venv:git-hook pre-commit \
+          --url=file://relative/path/to/pre-commit.hook
+  
+  Absolute hook file URL
+  
+      php composer.phar venv:git-hook pre-commit \
+          --url=file:///absolute/path/to/pre-commit.hook
+  
+  Download hook file from an URL
+  
+      php composer.phar venv:git-hook pre-commit \
+          --url=https://some.host/pre-commit.hook
+  
+  Using a built-in hook file URL
+  
+      php composer.phar venv:git-hook pre-commit \
+          --url=vfs://venv/git-hook/pre-commit.hook
+  
 ```
 
-
-#### vendor/second-example-package
-
-```console
-$ # now change directory to your second package:
-$ cd /path/to/vendor/second-example-package
-
-$ # initial setup of the virtual composer shell environment (run this only once per package):
-$ /path/to/bin/php72 /path/to/composer.phar venv --php=/path/to/bin/php72 --shell=bash
-Installed virtual environment activation script: /path/to/vendor/second-example-package/vendor/bin/activate.bash
-Installed virtual environment symlink: /path/to/vendor/second-example-package/vendor/bin/activate -> activate.bash
-Installed virtual environment symlink: /path/to/vendor/second-example-package/vendor/bin/composer -> /path/to/composer.phar
-Installed virtual environment symlink: /path/to/vendor/second-example-package/vendor/bin/php -> /path/to/bin/php70
-
-...
-
-$ # after this you can activate the virtual composer shell environment:
-$ source vendor/bin/activate
-
-virtual composer shell environment
-
-    Name: vendor/second-example-package
-    Path: /path/to/vendor/second-example-package
-
-Run 'deactivate' to exit the environment and return to normal shell.
-
-$ # the directory '/path/to/vendor/first-example-package/vendor/bin' is 
-$ # now prepended to your PATH environment variable
-
-$ # now use any binary from package requirements located in 'vendor/bin':
-(vendor/second-example-package) $ composer --version # <-- notice that we don't need to specify path to php anymore
-Composer version 1.5.2 2017-09-11 16:59:25
-
-(vendor/second-example-package) $ php --version # <-- notice that we don't need to specify path to php anymore
-PHP 7.2.0RC3 (cli) (built: Sep 28 2017 21:07:15) ( NTS )
-Copyright (c) 1997-2017 The PHP Group
-Zend Engine v3.2.0-dev, Copyright (c) 1998-2017 Zend Technologies
-    with Zend OPcache v7.2.0RC3, Copyright (c) 1999-2017, by Zend Technologies
-
-$ # if you're done, run ...
-(vendor/second-example-package) $ deactivate
-
-Left virtual composer shell environment.
-
-Good Bye!
-
-$ # ... and 'vendor/bin' will be removed from your PATH
-```
 
 ## Contributing
 

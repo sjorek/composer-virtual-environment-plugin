@@ -94,8 +94,8 @@ Shell script with a more complex shebang
 
 Simple PHP script
 
+    # notice the detection of the correct shebang!
     <info>php composer.phar venv:git-hook pre-commit \
-        --shebang='/usr/bin/env php' \
         --script='<?php echo "about to commit";'</info>
 
 Utilizing environment variable expansion
