@@ -11,11 +11,8 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
-use Composer\Config;
 use Composer\Util\Filesystem;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
-use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -71,49 +68,17 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
 
     /**
      * {@inheritDoc}
-     * @see AbstractCommandConfiguration::prepareLoad()
+     * @see AbstractCommandConfiguration::setup()
      */
-    protected function prepareLoad(FileConfigurationInterface $load = null, FileConfigurationInterface $save = null)
+    protected function setup()
     {
-//         $input = $this->input;
-//         if (!$input->getArgument('shell')) {
-//             $recipe = new LocalConfiguration($this->composer);
-//             if ($recipe->load()) {
-//                 $this->recipe = $recipe;
-//                 $this->set('load', true);
-//                 $this->set('save', false);
-//             } else {
-//                 $recipe = new GlobalConfiguration($this->composer);
-//                 if ($recipe->load()) {
-//                     $this->recipe = $recipe;
-//                     $this->set('load', true);
-//                     $this->set('save', false);
-//                 }
-//             }
-//         }
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see AbstractCommandConfiguration::finishLoad()
-     */
-    protected function finishLoad(FileConfigurationInterface $recipe)
-    {
+        $recipe = $this->recipe;
         $input = $this->input;
         $filesystem = new Filesystem();
 
         $this->set(
             'resource-dir',
             $filesystem->normalizePath(__DIR__ . '/../../../../../res')
-        );
-        $this->set(
-            'bin-dir',
-            $filesystem->normalizePath($this->composer->getConfig()->get('bin-dir'))
-        );
-        $bindDir = $this->set(
-            'bin-dir-relative',
-            $this->composer->getConfig()->get('bin-dir', Config::RELATIVE_PATHS)
         );
 
         $name = '{$name}';
@@ -128,8 +93,11 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         $candidates = array('detect'); // = explode(',', static::AVAILABLE_ACTIVATORS);
         if ($input->getArgument('shell')) {
             $candidates = $input->getArgument('shell');
+            if ($input->getOption('add')) {
+                $candidates = array_merge($recipe->get('shell', array()), $candidates);
+            }
         } elseif ($recipe->has('shell')) {
-            $candidates = $recipe->get('shell', $candidates);
+            $candidates = $recipe->get('shell');
         }
         $activators = $this->set('shell', self::validate($candidates));
 
@@ -145,9 +113,9 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
 
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
-            $symlinks = array($bindDir . '/activate' => 'activate.' . $activators[0]);
-            $this->set('link', $symlinks);
-            $this->set('link-expanded', $this->expandConfig($symlinks));
+            $symlinks = array('{$bin-dir}/activate' => 'activate.' . $activators[0]);
+            $this->set('shell-link', $symlinks);
+            $this->set('shell-link-expanded', $this->expandConfig($symlinks));
         }
 
         return true;
@@ -172,9 +140,8 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
      */
     protected function prepareLock(FileConfigurationInterface $recipe)
     {
-        $recipe->set('name', $this->get('name-expanded'));
-        $recipe->set('shell', $this->get('shell'));
-        $recipe->set('colors', $this->get('colors'));
+        $recipe->set('shell-link', $this->get('shell-link') ?: new \stdClass());
+        $recipe->set('shell-link-expanded', $this->get('shell-link-expanded') ?: new \stdClass());
 
         return $recipe;
     }

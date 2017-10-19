@@ -54,6 +54,12 @@ interface ConfigurationInterface
     public function import(ConfigurationInterface $config);
 
     /**
+     * @param  string                 $key
+     * @return ConfigurationInterface
+     */
+    public function merge(ConfigurationInterface $config);
+
+    /**
      * @return array
      */
     public function export();

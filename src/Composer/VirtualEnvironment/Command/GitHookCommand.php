@@ -16,6 +16,7 @@ use Composer\IO\IOInterface;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\GitHookConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor\GitHook;
+use Sjorek\Composer\VirtualEnvironment\Processor\GitHook\GitHookProcessorInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,30 +29,51 @@ class GitHookCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
-        $config = $this->getComposer()->getConfig();
-        $home = $config->get('home');
-
         $this
             ->setName('virtual-environment:git-hook')
             ->setAliases(array('venv:git-hook'))
             ->setDescription('Add or remove virtual environment git-hooks.')
-            ->setDefinition(array(
-                new InputArgument('hook', InputOption::VALUE_OPTIONAL, 'List of git-hooks to add or remove.'),
-                new InputOption('script', null, InputOption::VALUE_REQUIRED, 'Use the given script as git-hook.'),
-                new InputOption('shebang', null, InputOption::VALUE_REQUIRED, 'Use the given #!shebang for the given script.', '/bin/sh'),
-                new InputOption('file', null, InputOption::VALUE_REQUIRED, 'Use the content of the given file as git-hook.'),
-                new InputOption('link', null, InputOption::VALUE_REQUIRED, 'Install git-hook by creating a symbolic link to the given file.'),
-                new InputOption('url', null, InputOption::VALUE_REQUIRED, 'Download the git-hook from the given url.'),
-                new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
-                new InputOption('local', 'l', InputOption::VALUE_NONE, 'Use local configuration file "./composer-venv.json".'),
-                new InputOption('global', 'g', InputOption::VALUE_NONE, 'Use global configuration file "' . $home .'/composer-venv.json".'),
-                new InputOption('manifest', 'm', InputOption::VALUE_NONE, 'Use configuration from extra section of package manifest "./composer.json".'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save configuration.'),
-                new InputOption('remove', 'r', InputOption::VALUE_NONE, 'Remove given or all deployed git-hooks.'),
-                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force overwriting existing git-hooks'),
-                new InputOption('lock', null, InputOption::VALUE_NONE, 'Lock configuration in "./composer-venv.lock".'),
-                new InputOption('no-lock', null, InputOption::VALUE_NONE, 'Do not lock configuration in "./composer-venv.lock".'),
-            ))
+            ->setDefinition(
+                $this->addDefaultDefinition(
+                    array(
+                        new InputArgument(
+                            'hook',
+                            InputOption::VALUE_OPTIONAL,
+                            'List of git-hooks to add or remove.'
+                        ),
+                        new InputOption(
+                            'script',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Use the given script as git-hook.'
+                        ),
+                        new InputOption(
+                            'shebang',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Use the given #!shebang for the given script.'
+                        ),
+                        new InputOption(
+                            'file',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Use the content of the given file as git-hook.'
+                        ),
+                        new InputOption(
+                            'link',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Install git-hook by creating a symbolic link to the given file.'
+                        ),
+                        new InputOption(
+                            'url',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Download the git-hook from the given url.'
+                        ),
+                    )
+                )
+            )
             ->setHelp(
                 <<<'EOT'
 The <info>virtual-environment:git-hook</info> command manages
@@ -151,14 +173,13 @@ EOT
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {
             $output->writeln(
-                '<comment>Skipping creation of git-hooks, as none is available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping creation of git-hooks, as none is available.</warning>'
             );
         } else {
             $baseDir = $config->get('base-dir', '');
             $gitHookDir = $config->get('git-hook-dir', null);
-            foreach ($hooks as $name => $config) {
-                $processor = $this->getGitHookProcessor($name, $config, $baseDir, $gitHookDir);
+            foreach ($hooks as $name => $hook) {
+                $processor = $this->getGitHookProcessor($name, $hook, $baseDir, $gitHookDir);
                 if ($processor === null) {
                     $output->writeln(
                         sprintf(
@@ -172,8 +193,6 @@ EOT
                 $processor->deploy($output, $config->get('force'));
             }
         }
-        $config->save($config->get('force'));
-        $config->lock($config->get('force'));
     }
 
     /**
@@ -185,8 +204,7 @@ EOT
         $hooks = $config->get('git-hook-expanded');
         if (empty($hooks)) {
             $output->writeln(
-                '<comment>Skipping removal of git-hooks, as none is available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping removal of git-hooks, as none is available.</warning>'
             );
         } else {
             $baseDir = $config->get('base-dir', '');
@@ -209,11 +227,11 @@ EOT
     }
 
     /**
-     * @param  string                          $name
-     * @param  array                           $config
-     * @param  string                          $baseDir
-     * @param  string|null                     $gitHookDir
-     * @return GitHook\ProcessorInterface|null
+     * @param  string                         $name
+     * @param  array                          $config
+     * @param  string                         $baseDir
+     * @param  string|null                    $gitHookDir
+     * @return GitHookProcessorInterface|null
      */
     protected function getGitHookProcessor($name, array $config, $baseDir, $gitHookDir)
     {

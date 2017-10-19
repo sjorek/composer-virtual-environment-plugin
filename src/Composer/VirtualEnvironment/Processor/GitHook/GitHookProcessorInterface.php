@@ -11,12 +11,12 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Processor\GitHook;
 
-use Sjorek\Composer\VirtualEnvironment\Processor;
+use Sjorek\Composer\VirtualEnvironment\Processor\ProcessorInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-interface ProcessorInterface extends Processor\ProcessorInterface
+interface GitHookProcessorInterface extends ProcessorInterface
 {
     const GIT_HOOK_DIR = '.git/hooks';
 

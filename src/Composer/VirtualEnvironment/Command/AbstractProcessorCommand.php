@@ -15,6 +15,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -22,20 +23,96 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class AbstractProcessorCommand extends AbstractComposerCommand
 {
+    /**
+     * @param  array $definition
+     * @return array
+     */
+    protected function addDefaultDefinition(array $definition)
+    {
+        $home = $this->getComposer()->getConfig()->get('home');
+        array_push(
+            $definition,
+            new InputOption(
+                'add',
+                'a',
+                InputOption::VALUE_NONE,
+                'Add to existing configuration.'
+            ),
+            new InputOption(
+                'remove',
+                'r',
+                InputOption::VALUE_NONE,
+                'Remove all configured items.'
+            ),
+            new InputOption(
+                'save',
+                's',
+                InputOption::VALUE_NONE,
+                'Save configuration.'
+            ),
+            new InputOption(
+                'config',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Use given configuration file.'
+            ),
+            new InputOption(
+                'local',
+                'l',
+                InputOption::VALUE_NONE,
+                'Use local configuration file "./composer-venv.json".'
+            ),
+            new InputOption(
+                'global',
+                'g',
+                InputOption::VALUE_NONE,
+                'Use global configuration file "' . $home .'/composer-venv.json".'
+            ),
+            // new InputOption(
+            //     'manifest',
+            //     'm',
+            //     InputOption::VALUE_NONE,
+            //     'Use configuration from extra section of package manifest "./composer.json".'
+            // ),
+            new InputOption(
+                'lock',
+                null,
+                InputOption::VALUE_NONE,
+                'Lock configuration in "./composer-venv.lock".'
+            ),
+            new InputOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Force overwriting existing git-hooks'
+            )
+        );
+
+        return $definition;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = $this->getCommandConfiguration(
-            $input,
-            $output,
-            $this->getComposer(),
-            $this->getIO()
-        );
+        $config = $this->getCommandConfiguration($input, $output, $this->getComposer(), $this->getIO());
         if ($config->load()) {
             if ($config->get('remove')) {
+                $config->lock(true);
                 $this->rollback($config, $output);
             } else {
                 $this->deploy($config, $output);
+                if ($config->get('save')) {
+                    $config->save($config->get('force'));
+                }
+                if ($config->get('lock')) {
+                    $config->lock();
+                    $config->save($config->get('force'));
+                }
             }
+        } else {
+            $output->writeln(
+                '<warning>Failed to load configuration.</warning>',
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_NORMAL
+            );
         }
     }
 

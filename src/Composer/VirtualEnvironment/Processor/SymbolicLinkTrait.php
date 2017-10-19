@@ -47,7 +47,7 @@ trait SymbolicLinkTrait
         if ($source === $target) {
             $output->writeln(
                 sprintf(
-                    '<error>Skipped creation of %s, as source %s and target %s are the same.</error>',
+                    '<warning>Skipped creation of %s, as source %s and target %s are the same.</warning>',
                     static::PROCESSOR_NAME,
                     $this->source,
                     $this->target
@@ -201,7 +201,7 @@ trait SymbolicLinkTrait
 
         $output->writeln(
             sprintf(
-                '<comment>Skipped removing %s, as %s does not exist.</comment>',
+                '<warning>Skipped removing %s, as %s does not exist.</warning>',
                 static::PROCESSOR_NAME,
                 $this->source
             ),

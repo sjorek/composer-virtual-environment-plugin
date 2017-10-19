@@ -30,8 +30,8 @@ interface CommandConfigurationInterface extends ConfigurationInterface
     public function save($force = false);
 
     /**
-     * @param  bool $force
-     * @return bool
+     * @param $load
+     * @return void
      */
-    public function lock($force = false);
+    public function lock($load = false);
 }

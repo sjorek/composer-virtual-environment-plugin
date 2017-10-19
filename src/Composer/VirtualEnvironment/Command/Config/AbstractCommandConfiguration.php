@@ -22,6 +22,7 @@ use Sjorek\Composer\VirtualEnvironment\Config\FileConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\LockConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Json\JsonFile;
@@ -31,6 +32,8 @@ use Composer\Json\JsonFile;
  */
 abstract class AbstractCommandConfiguration extends AbstractConfiguration implements CommandConfigurationInterface
 {
+    const REGEXP_EXPANSION = '#\{\$([^\}]+)\}#u';
+
     /**
      * @var InputInterface
      */
@@ -114,10 +117,6 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             }
         }
 
-        if ($this->prepareLoad($load, $save) === false) {
-            return false;
-        }
-
         if ($load === null && $save === null) {
             $this->set('load', false);
             $this->set('save', false);
@@ -135,32 +134,44 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             $this->recipe = $load;
         }
 
-        $composerFile = Factory::getComposerFile();
-        $filesystem = new Filesystem();
-
-        $this->set('base-dir', $filesystem->normalizePath(realpath(realpath(dirname($composerFile)))));
-        $this->set('lock', $input->getOption('no-lock') ? false : ($input->getOption('lock') ?: true));
+        $this->set('lock', $input->getOption('lock') ? true : false);
         $this->set('force', $input->getOption('force'));
         $this->set('remove', $input->getOption('remove'));
 
-        return $this->finishLoad($load, $save);
+        $composerFile = Factory::getComposerFile();
+        $filesystem = new Filesystem();
+        $this->set(
+            'base-dir',
+            $filesystem->normalizePath(realpath(realpath(dirname($composerFile))))
+        );
+        $binDir = $this->set(
+            'bin-dir',
+            $this->composer->getConfig()->get('bin-dir', Config::RELATIVE_PATHS)
+        );
+        $this->set(
+            'bin-dir-up',
+            implode('/', array_map(function () {
+                return '..';
+            }, explode('/', $binDir)))
+        );
+        $vendorDir = $this->set(
+            'vendor-dir',
+            $this->composer->getConfig()->get('vendor-dir', Config::RELATIVE_PATHS)
+        );
+        $this->set(
+            'vendor-dir-up',
+            implode('/', array_map(function () {
+                return '..';
+            }, explode('/', $vendorDir)))
+        );
+
+        return $this->setup();
     }
 
     /**
-     * @param  FileConfigurationInterface|null $load
-     * @param  FileConfigurationInterface|null $save
      * @return bool
      */
-    abstract protected function prepareLoad(
-        FileConfigurationInterface $load = null,
-        FileConfigurationInterface $save = null
-    );
-
-    /**
-     * @param  FileConfigurationInterface $recipe
-     * @return bool
-     */
-    abstract protected function finishLoad(FileConfigurationInterface $recipe);
+    abstract protected function setup();
 
     /**
      * {@inheritDoc}
@@ -168,22 +179,31 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
      */
     public function save($force = false)
     {
-        if ($this->get('save')) {
-            $output = $this->output;
-            $recipe = $this->recipe;
-            if ($this->prepareSave($recipe)->save($force)) {
-                $output->writeln(
-                    '<comment>Saving configuration "' . $recipe->filename . '" succeeded.</comment>',
-                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
-                );
-            } else {
-                $output->writeln('<warning>Saving configuration "' . $recipe->filename . '" failed.</warning>');
+        $output = $this->output;
+        $recipe = $this->recipe;
+        if (!($recipe instanceof LockConfiguration)) {
+            $this->prepareSave($recipe);
+        }
+        if ($recipe->save($force)) {
+            $output->writeln(
+                sprintf(
+                    '<comment>Saving configuration "%s" succeeded.</comment>',
+                    $recipe->file()
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+            );
 
-                return false;
-            }
+            return true;
         }
 
-        return true;
+        $output->writeln(
+            sprintf(
+                '<warning>Saving configuration "%s" failed.</warning>',
+                $recipe->file()
+            )
+        );
+
+        return false;
     }
 
     /**
@@ -196,27 +216,15 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
      * {@inheritDoc}
      * @see FileConfigurationInterface::lock()
      */
-    public function lock($force = false)
+    public function lock($load = false)
     {
-        if ($this->get('lock')) {
-            $output = $this->output;
-            $filename = $this->recipe->file();
-            $extension = pathinfo($filename, PATHINFO_EXTENSION) ?: 'json';
-            $filename = dirname($filename) . DIRECTORY_SEPARATOR . basename($filename, '.' . $extension) . '.lock';
-            $recipe = new FileConfiguration($this->composer, $filename);
-            if ($this->prepareLock($recipe)->save($force)) {
-                $output->writeln(
-                    '<comment>Locking configuration "' . $recipe->filePath . '" succeeded.</comment>',
-                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
-                );
-            } else {
-                $output->writeln('<warning>Locking configuration "' . $recipe->filePath . '" failed.</warning>');
-
-                return false;
-            }
+        $lock = new LockConfiguration($this->composer, $this->recipe->file());
+        if ($lock->load() && $load) {
+            $this->merge($lock);
+        } else {
+            $lock = $this->prepareLock($lock)->merge($this);
         }
-
-        return true;
+        $this->recipe = $lock;
     }
 
     /**
@@ -291,10 +299,29 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
         if ($config === null) {
             $config = $this->composer->getConfig();
         }
+        $command = $this->export();
 
-        return preg_replace_callback('#\{\$(.+)\}#', function ($match) use ($config, $flags) {
-            return $config->has($match[1]) ? $config->get($match[1], $flags) : $match[0];
-        }, $value);
+        return preg_replace_callback(
+            static::REGEXP_EXPANSION,
+            function ($match) use ($command, $config, $flags) {
+                $path = str_getcsv($match[1], '.');
+                $value = $command;
+                foreach ($path as $key) {
+                    if (isset($value[$key])) {
+                        $value = $value[$key];
+                    } else {
+                        $value = null;
+                        break;
+                    }
+                }
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    return $config->has($match[1]) ? $config->get($match[1], $flags) : $match[0];
+                }
+            },
+            $value
+        );
     }
 
     /**
@@ -317,15 +344,24 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             } else {
                 return $value;
             }
-            $this->composer->getPackage()->getConfig();
         }
 
-        return preg_replace_callback('#\{\$(.+)\}#', function ($match) use ($manifest) {
-            if (isset($manifest[$match[1]]) && is_string($manifest[$match[1]])) {
-                return $manifest[$match[1]];
-            } else {
-                return $match[0];
-            }
-        }, $value);
+        return preg_replace_callback(
+            static::REGEXP_EXPANSION,
+            function ($match) use ($manifest) {
+                $path = str_getcsv($match[1], '.');
+                $value = $manifest;
+                foreach ($path as $key) {
+                    if (isset($value[$key])) {
+                        $value = $value[$key];
+                    } else {
+                        return $match[0];
+                    }
+                }
+
+                return is_string($value) ? $value : $match[0];
+            },
+            $value
+        );
     }
 }

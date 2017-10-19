@@ -121,14 +121,19 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     public function import(ConfigurationInterface $config)
     {
-        $blacklist = $this->blacklist;
-        $this->data = array_filter(
-            $config->export(),
-            function ($key) use ($blacklist) {
-                return !in_array($key, $blacklist, true);
-            },
-            ARRAY_FILTER_USE_KEY
-        );
+        $this->data = $this->filter($config->export());
+        $this->dirty = true;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface::import()
+     */
+    public function merge(ConfigurationInterface $config)
+    {
+        $this->data = array_merge($this->data, $this->filter($config->export()));
         $this->dirty = true;
 
         return $this;
@@ -141,5 +146,22 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function export()
     {
         return array_diff_key($this->data, array_flip($this->blacklist));
+    }
+
+    /**
+     * @param  array $data
+     * @return array
+     */
+    protected function filter(array $data)
+    {
+        $blacklist = $this->blacklist;
+
+        return array_filter(
+            $data,
+            function ($key) use ($blacklist) {
+                return !in_array($key, $blacklist, true);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

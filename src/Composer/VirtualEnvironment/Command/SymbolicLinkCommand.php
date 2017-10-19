@@ -29,9 +29,6 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
-        $config = $this->getComposer()->getConfig();
-        $home = $config->get('home');
-
         $composerPhar = null;
         if (
             isset($_SERVER['argv'][0]) &&
@@ -53,15 +50,17 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
             ->setName('virtual-environment:link')
             ->setAliases(array('venv:link'))
             ->setDescription('Add or remove virtual environment symbolic links.')
-            ->setDefinition(array(
-                new InputArgument('link', InputOption::VALUE_OPTIONAL, 'List of symbolic links to add or remove.'),
-                new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
-                new InputOption('local', 'l', InputOption::VALUE_NONE, 'Use local configuration file "./composer.venv".'),
-                new InputOption('global', 'g', InputOption::VALUE_NONE, 'Use global configuration file "' . $home .'/composer.venv".'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save configuration file.'),
-                new InputOption('remove', 'r', InputOption::VALUE_NONE, 'Remove any deployed symbolic links.'),
-                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force overwriting existing symbolic links'),
-            ))
+            ->setDefinition(
+                $this->addDefaultDefinition(
+                    array(
+                        new InputArgument(
+                            'link',
+                            InputOption::VALUE_OPTIONAL,
+                            'List of symbolic links to add or remove.'
+                        ),
+                    )
+                )
+            )
             ->setHelp(
                 <<<EOT
 The <info>virtual-environment:link</info> command places symlinks
@@ -103,8 +102,7 @@ EOT
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
-                '<comment>Skipping creation of symbolic links, as none is available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping creation of symbolic links, as none is available.</warning>'
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(
@@ -118,8 +116,6 @@ EOT
                 $processor->deploy($output, $config->get('force'));
             }
         }
-        $config->save($config->get('force'));
-        $config->lock($config->get('force'));
     }
 
     /**
@@ -131,8 +127,7 @@ EOT
         $symlinks = $config->get('link-expanded');
         if (empty($symlinks)) {
             $output->writeln(
-                '<comment>Skipping removal of symbolic links, as none is available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping removal of symbolic links, as none is available.</warning>'
             );
         } elseif (Platform::isWindows()) {
             $output->writeln(

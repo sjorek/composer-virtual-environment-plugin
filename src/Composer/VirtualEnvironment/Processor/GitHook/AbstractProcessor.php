@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-abstract class AbstractProcessor implements ProcessorInterface
+abstract class AbstractProcessor implements GitHookProcessorInterface
 {
     protected $name;
     protected $target;

@@ -29,24 +29,40 @@ class ShellActivatorCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
-        $home = $this->getComposer()->getConfig()->get('home');
-
         $this
             ->setName('virtual-environment:shell')
             ->setAliases(array('venv:shell'))
             ->setDescription('Add or remove virtual environment shell activation scripts.')
-            ->setDefinition(array(
-                new InputArgument('shell', InputOption::VALUE_OPTIONAL, 'List of shell activators to add or remove.'),
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the virtual environment.', '{$name}'),
-                new InputOption('colors', null, InputOption::VALUE_NONE, 'Enable the color prompt per default. Works currently only for "bash".'),
-                new InputOption('no-colors', null, InputOption::VALUE_NONE, 'Disable the color prompt per default.'),
-                new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use given configuration file.'),
-                new InputOption('local', 'l', InputOption::VALUE_NONE, 'Use local configuration file "./composer.venv".'),
-                new InputOption('global', 'g', InputOption::VALUE_NONE, 'Use global configuration file "' . $home .'/composer.venv".'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save configuration file.'),
-                new InputOption('remove', 'r', InputOption::VALUE_NONE, 'Remove any deployed shell activation scripts.'),
-                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force overwriting existing environment files and links'),
-            ))
+            ->setDefinition(
+                $this->addDefaultDefinition(
+                    array(
+                        new InputArgument(
+                            'shell',
+                            InputOption::VALUE_OPTIONAL,
+                            'List of shell activators to add or remove.'
+                        ),
+                        new InputOption(
+                            'name',
+                            null,
+                            InputOption::VALUE_REQUIRED,
+                            'Name of the virtual environment.',
+                            '{$name}'
+                        ),
+                        new InputOption(
+                            'colors',
+                            null,
+                            InputOption::VALUE_NONE,
+                            'Enable the color prompt per default. Works currently only for "bash".'
+                        ),
+                        new InputOption(
+                            'no-colors',
+                            null,
+                            InputOption::VALUE_NONE,
+                            'Disable the color prompt per default.'
+                        ),
+                    )
+                )
+            )
             ->setHelp(
                 <<<EOT
 The <info>virtual-environment:shell-activator</info> command creates files
@@ -116,14 +132,13 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<comment>Skipping creation of shell activators, none available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping creation of shell activators, none available.</warning>'
             );
         } else {
             $data = array(
                 '@NAME@' => $config->get('name-expanded'),
                 '@BASE_DIR@' => $config->get('base-dir'),
-                '@BIN_DIR@' => $config->get('bin-dir'),
+                '@BIN_DIR@' => $config->get('base-dir') . DIRECTORY_SEPARATOR . $config->get('bin-dir'),
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
             if (in_array('bash', $activators)) {
@@ -147,12 +162,12 @@ EOT
             $baseDir = $config->get('base-dir');
             foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
                 $source = $config->get('resource-dir') . '/' . $filename;
-                $target = $config->get('bin-dir-relative') . '/' . $filename;
+                $target = $config->get('bin-dir') . '/' . $filename;
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, $data);
                 $processor->deploy($output, $config->get('force'));
             }
-            if ($config->has('link-expanded')) {
-                $symlinks = $config->get('link-expanded');
+            if ($config->has('shell-link-expanded')) {
+                $symlinks = $config->get('shell-link-expanded');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping creation of symbolic link to shell activation script, as none is needed.</comment>',
@@ -171,9 +186,6 @@ EOT
                 }
             }
         }
-
-        $config->save($config->get('force'));
-        $config->lock($config->get('force'));
     }
 
     /**
@@ -185,19 +197,18 @@ EOT
         $activators = $config->get('shell');
         if (empty($activators)) {
             $output->writeln(
-                '<comment>Skipping removal of shell activation scripts, as none is available.</comment>',
-                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                '<warning>Skipping removal of shell activation scripts, as none is available.</warning>'
             );
         } else {
             $baseDir = $config->get('base-dir');
             foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
                 $source = $config->get('resource-dir') . '/' . $filename;
-                $target = $config->get('bin-dir-relative') . '/' . $filename;
+                $target = $config->get('bin-dir') . '/' . $filename;
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, array());
                 $processor->rollback($output);
             }
-            if ($config->has('link-expanded')) {
-                $symlinks = $config->get('link-expanded');
+            if ($config->has('shell-link-expanded')) {
+                $symlinks = $config->get('shell-link-expanded');
                 if (empty($symlinks)) {
                     $output->writeln(
                         '<comment>Skipping removal of symbolic link to shell activation script, as none is needed.</comment>',

@@ -12,8 +12,8 @@
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
-use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
+use Symfony\Component\Console\Output\OutputInterface;
+use Sjorek\Composer\VirtualEnvironment\Processor\GitHook\GitHookProcessorInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -22,38 +22,13 @@ class GitHookConfiguration extends AbstractCommandConfiguration
 {
     /**
      * {@inheritDoc}
-     * @see AbstractCommandConfiguration::prepareLoad()
+     * @see AbstractCommandConfiguration::setup()
      */
-    protected function prepareLoad(
-        FileConfigurationInterface $load = null,
-        FileConfigurationInterface $save = null
-    ) {
-//         $input = $this->input;
-//         if (!$input->getArgument('hook')) {
-//             $recipe = new LocalConfiguration($this->composer);
-//             if ($recipe->load()) {
-//                 $this->recipe = $recipe;
-//                 $this->set('load', true);
-//                 $this->set('save', false);
-//             } else {
-//                 $recipe = new GlobalConfiguration($this->composer);
-//                 if ($recipe->load()) {
-//                     $this->recipe = $recipe;
-//                     $this->set('load', true);
-//                     $this->set('save', false);
-//                 }
-//             }
-//         }
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see AbstractCommandConfiguration::finishLoad()
-     */
-    protected function finishLoad(FileConfigurationInterface $recipe)
+    protected function setup()
     {
+        $recipe = $this->recipe;
         $input = $this->input;
+        $output = $this->output;
         $config = array();
         if ($input->getOption('script')) {
             $config['script'] = $input->getOption('script');
@@ -67,28 +42,44 @@ class GitHookConfiguration extends AbstractCommandConfiguration
         } elseif ($input->getOption('url')) {
             $config['url'] = $input->getOption('url');
         }
-        $config_expanded = $this->expandConfig($config, false);
 
-        $hooks = $recipe->get('git-hook', array());
+        $hooks = array();
         $hooks_expanded = array();
         if ($input->getArgument('hook')) {
             foreach ($input->getArgument('hook') as $hook) {
                 $hooks[$hook] = $config;
-                $hooks_expanded[$hook] = $config_expanded;
             }
+            if ($input->getOption('add')) {
+                $hooks = array_merge($recipe->get('git-hook', array()), $hooks);
+            }
+        } elseif ($recipe->has('git-hook')) {
+            $hooks = $recipe->get('git-hook');
         }
-        if (empty($config)) {
-            foreach ($hooks as $hook => $config) {
-                if (!isset($hooks_expanded[$hook])) {
-                    $hooks_expanded[$hook] = $this->expandConfig($config, false);
-                }
+
+        foreach ($hooks as $hook => $config) {
+            if (!in_array($hook, GitHookProcessorInterface::GIT_HOOKS, true)) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Invalid git-hook given: %s</error>',
+                        $hook
+                    ),
+                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                );
+
+                return false;
             }
-        } else {
-            foreach (array_keys($hooks) as $hook) {
-                if (!isset($hooks_expanded[$hook])) {
-                    $hooks_expanded[$hook] = $config_expanded;
-                }
+            if (empty($config)) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Missing or invalid git-hook type configuration for hook %s.</error>',
+                        $hook
+                    ),
+                    OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                );
+
+                return false;
             }
+            $hooks_expanded[$hook] = $this->expandConfig($config, false);
         }
         $this->set('git-hook', $hooks);
         $this->set('git-hook-expanded', $hooks_expanded);
@@ -102,7 +93,7 @@ class GitHookConfiguration extends AbstractCommandConfiguration
      */
     protected function prepareSave(FileConfigurationInterface $recipe)
     {
-        $recipe->set('git-hook', $this->get('git-hook'));
+        $recipe->set('git-hook', $this->get('git-hook') ?: new \stdClass());
 
         return $recipe;
     }
@@ -113,7 +104,8 @@ class GitHookConfiguration extends AbstractCommandConfiguration
      */
     protected function prepareLock(FileConfigurationInterface $recipe)
     {
-        $recipe->set('git-hook', $this->get('git-hook-expanded'));
+        $recipe->set('git-hook', $this->get('git-hook') ?: new \stdClass());
+        $recipe->set('git-hook-expanded', $this->get('git-hook-expanded') ?: new \stdClass());
 
         return $recipe;
     }

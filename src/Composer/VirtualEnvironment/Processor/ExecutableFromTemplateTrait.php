@@ -226,11 +226,10 @@ trait ExecutableFromTemplateTrait
 
         $output->writeln(
             sprintf(
-                '<comment>Skipped removing the %s %s, as it does not exist.</comment>',
+                '<warning>Skipped removing the %s %s, as it does not exist.</warning>',
                 static::PROCESSOR_NAME,
                 $this->target
-            ),
-            OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+            )
         );
 
         return true;
