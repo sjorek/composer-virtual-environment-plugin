@@ -1,6 +1,6 @@
 {
 	"name" : "sjorek/composer-virtual-environment-plugin",
-	"description" : "A composer-plugin adding a command to activate/deactivate the current bin directory in shell, optionally placing a symlink to the composer- and php-binary.",
+	"description" : "A composer-plugin adding shell, symbolic link and git-hook related commands to composer.",
 	"homepage" : "https://sjorek.github.io/composer-virtual-environment-plugin/",
 	"license" : "BSD-3-Clause",
 	"authors" : [
