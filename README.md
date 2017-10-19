@@ -1,8 +1,10 @@
 # [“virtual-environment” command-plugin](https://sjorek.github.io/composer-virtual-environment-plugin/) for [composer](http://getcomposer.org)
 
-A [composer](http://getcomposer.org)-plugin adding a command to activate/deactivate the current
-bin-directory in shell, optionally creating symlinks to the composer-
-and php-binary in the bin-directory.
+A [composer](http://getcomposer.org)-plugin adding three commands to composer:
+
+1. `venv:shell` - activate/deactivate the current bin-directory in shell
+2. `venv:link` - create symlinks to arbitrary locations
+3. `venv:git-hook` - create git-hooks from various sources
 
 
 ## Installation
@@ -17,7 +19,7 @@ php composer.phar global require sjorek/composer-virtual-environment-plugin
 ### Method 2: as a package requirement
 
 ```bash
-php composer.phar require-dev sjorek/composer-virtual-environment-plugin
+php composer.phar require --dev sjorek/composer-virtual-environment-plugin
 ```
 
 
@@ -127,7 +129,7 @@ Help:
   
       php composer.phar venv:link '{$bin-dir}/composer':'{$bin-dir-up}/composer.phar'
   
-  After this you can use the linked binaries in composer's
+  After this you can use the linked binaries in composer
   run-script or in virtual-environment:shell.
   
   Attention: only link the composer like in the example above,
@@ -200,7 +202,7 @@ Help:
   
       php composer.phar venv:git-hook pre-commit \
           --shebang=%SHELL% \
-          --script='echo "I'm using a %SHELL%!"'
+          --script='echo "I am using a %SHELL%!"'
   
   Utilizing configuration value expansion
   

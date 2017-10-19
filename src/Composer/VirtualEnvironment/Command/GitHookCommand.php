@@ -102,7 +102,7 @@ Utilizing environment variable expansion
 
     <info>php composer.phar venv:git-hook pre-commit \
         --shebang=%SHELL% \
-        --script='echo "I'm using a %SHELL%!"'</info>
+        --script='echo "I am using a %SHELL%!"'</info>
 
 Utilizing configuration value expansion
 

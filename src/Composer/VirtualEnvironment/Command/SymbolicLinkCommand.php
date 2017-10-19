@@ -70,7 +70,7 @@ Example:
 
     <info>php composer.phar venv:link ${example}</info>
 
-After this you can use the linked binaries in composer's
+After this you can use the linked binaries in composer
 <info>run-script</info> or in <info>virtual-environment:shell</info>.
 
 Attention: only link the composer like in the example above,
