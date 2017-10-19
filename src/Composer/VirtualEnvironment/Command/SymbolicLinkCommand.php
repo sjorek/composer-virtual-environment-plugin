@@ -44,8 +44,8 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
         $example = implode(
             PATH_SEPARATOR,
             array(
-                '\'{$bin-dir}/composer\'',
-                $composerPhar ?: '../../composer.phar',
+                escapeshellarg('{$bin-dir}/composer'),
+                escapeshellarg($composerPhar ?: '../../composer.phar'),
             )
         );
 
