@@ -151,7 +151,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         $source = 'source/source.sh',
         $target = 'target/target.sh'
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         foreach (array($source, $target) as $file) {
@@ -254,7 +254,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         $directoryMode = null,
         $fileMode = null
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';

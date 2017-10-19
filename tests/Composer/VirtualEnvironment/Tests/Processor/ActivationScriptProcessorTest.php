@@ -136,7 +136,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         $fileMode = null,
         array $data = array()
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';
@@ -257,7 +257,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         $directoryMode = null,
         $fileMode = null
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';

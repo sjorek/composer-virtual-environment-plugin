@@ -151,7 +151,7 @@ class FileProcessorTest extends AbstractVfsStreamTestCase
         $hook = 'target/pre-commit',
         $target = 'source/source.sh'
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         foreach (array($target, $hook) as $file) {
@@ -283,7 +283,7 @@ class FileProcessorTest extends AbstractVfsStreamTestCase
         $fileMode = null,
         $hook = 'target/pre-commit'
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $target = 'source/source.sh';
