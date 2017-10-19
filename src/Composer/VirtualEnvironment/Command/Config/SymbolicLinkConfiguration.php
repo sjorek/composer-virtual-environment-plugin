@@ -11,7 +11,7 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
@@ -22,34 +22,36 @@ class SymbolicLinkConfiguration extends AbstractCommandConfiguration
 {
     /**
      * {@inheritDoc}
-     * @see AbstractCommandConfiguration::load()
+     * @see AbstractCommandConfiguration::prepareLoad()
      */
-    public function load()
+    protected function prepareLoad(FileConfigurationInterface $load = null, FileConfigurationInterface $save = null)
+    {
+//         $input = $this->input;
+//         if (!$input->getArgument('link')) {
+//             $recipe = new LocalConfiguration($this->composer);
+//             if ($recipe->load()) {
+//                 $this->recipe = $recipe;
+//                 $this->set('load', true);
+//                 $this->set('save', false);
+//             } else {
+//                 $recipe = new GlobalConfiguration($this->composer);
+//                 if ($recipe->load()) {
+//                     $this->recipe = $recipe;
+//                     $this->set('load', true);
+//                     $this->set('save', false);
+//                 }
+//             }
+//         }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::finishLoad()
+     */
+    protected function finishLoad(FileConfigurationInterface $recipe)
     {
         $input = $this->input;
-
-        if (!$input->getArgument('link')) {
-            $recipe = new LocalConfiguration($this->composer);
-            if ($recipe->load()) {
-                $this->recipe = $recipe;
-                $this->set('load', true);
-                $this->set('save', false);
-            } else {
-                $recipe = new GlobalConfiguration($this->composer);
-                if ($recipe->load()) {
-                    $this->recipe = $recipe;
-                    $this->set('load', true);
-                    $this->set('save', false);
-                }
-            }
-        }
-
-        if (!parent::load()) {
-            return false;
-        }
-
-        $recipe = $this->recipe;
-
         $symlinks = array();
         if ($input->getArgument('link')) {
             foreach ($input->getArgument('link') as $link) {
@@ -58,8 +60,8 @@ class SymbolicLinkConfiguration extends AbstractCommandConfiguration
                         sprintf(
                             '<error>Invalid link %s given. Link format is: path/to/link:path/to/target</error>',
                             $link
-                        )
-                    );
+                            )
+                        );
 
                     return false;
                 }
@@ -77,9 +79,17 @@ class SymbolicLinkConfiguration extends AbstractCommandConfiguration
 
     /**
      * {@inheritDoc}
+     * @see AbstractCommandConfiguration::load()
+     */
+    public function load()
+    {
+    }
+
+    /**
+     * {@inheritDoc}
      * @see AbstractCommandConfiguration::prepareSave()
      */
-    protected function prepareSave(ConfigurationInterface $recipe)
+    protected function prepareSave(FileConfigurationInterface $recipe)
     {
         $recipe->set('link', $this->get('link'));
 
@@ -87,10 +97,10 @@ class SymbolicLinkConfiguration extends AbstractCommandConfiguration
     }
 
     /**
-     * @param  ConfigurationInterface $recipe
-     * @return ConfigurationInterface
+     * @param  FileConfigurationInterface $recipe
+     * @return FileConfigurationInterface
      */
-    protected function prepareLock(ConfigurationInterface $recipe)
+    protected function prepareLock(FileConfigurationInterface $recipe)
     {
         $recipe->set('link', $this->get('link-expanded'));
 

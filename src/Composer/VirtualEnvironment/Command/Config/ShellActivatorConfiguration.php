@@ -13,7 +13,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Composer\Config;
 use Composer\Util\Filesystem;
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
@@ -69,32 +69,38 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         return $activators;
     }
 
-    public function load()
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::prepareLoad()
+     */
+    protected function prepareLoad(FileConfigurationInterface $load = null, FileConfigurationInterface $save = null)
+    {
+//         $input = $this->input;
+//         if (!$input->getArgument('shell')) {
+//             $recipe = new LocalConfiguration($this->composer);
+//             if ($recipe->load()) {
+//                 $this->recipe = $recipe;
+//                 $this->set('load', true);
+//                 $this->set('save', false);
+//             } else {
+//                 $recipe = new GlobalConfiguration($this->composer);
+//                 if ($recipe->load()) {
+//                     $this->recipe = $recipe;
+//                     $this->set('load', true);
+//                     $this->set('save', false);
+//                 }
+//             }
+//         }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::finishLoad()
+     */
+    protected function finishLoad(FileConfigurationInterface $recipe)
     {
         $input = $this->input;
-
-        if (!$input->getArgument('shell')) {
-            $recipe = new LocalConfiguration($this->composer);
-            if ($recipe->load()) {
-                $this->recipe = $recipe;
-                $this->set('load', true);
-                $this->set('save', false);
-            } else {
-                $recipe = new GlobalConfiguration($this->composer);
-                if ($recipe->load()) {
-                    $this->recipe = $recipe;
-                    $this->set('load', true);
-                    $this->set('save', false);
-                }
-            }
-        }
-
-        if (!parent::load()) {
-            return false;
-        }
-
-        $recipe = $this->recipe;
-
         $filesystem = new Filesystem();
 
         $this->set(
@@ -151,7 +157,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
      * {@inheritDoc}
      * @see AbstractCommandConfiguration::prepareSave()
      */
-    protected function prepareSave(ConfigurationInterface $recipe)
+    protected function prepareSave(FileConfigurationInterface $recipe)
     {
         $recipe->set('name', $this->get('name'));
         $recipe->set('shell', $this->get('shell'));
@@ -164,7 +170,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
      * {@inheritDoc}
      * @see AbstractCommandConfiguration::prepareLock()
      */
-    protected function prepareLock(ConfigurationInterface $recipe)
+    protected function prepareLock(FileConfigurationInterface $recipe)
     {
         $recipe->set('name', $this->get('name-expanded'));
         $recipe->set('shell', $this->get('shell'));

@@ -18,8 +18,8 @@ use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Sjorek\Composer\VirtualEnvironment\Config\AbstractConfiguration;
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +47,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
     protected $io;
 
     /**
-     * @var ConfigurationInterface
+     * @var FileConfigurationInterface
      */
     public $recipe;
 
@@ -114,6 +114,10 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             }
         }
 
+        if ($this->prepareLoad($load, $save) === false) {
+            return false;
+        }
+
         if ($load === null && $save === null) {
             $this->set('load', false);
             $this->set('save', false);
@@ -139,12 +143,28 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
         $this->set('force', $input->getOption('force'));
         $this->set('remove', $input->getOption('remove'));
 
-        return true;
+        return $this->finishLoad($load, $save);
     }
 
     /**
+     * @param  FileConfigurationInterface|null $load
+     * @param  FileConfigurationInterface|null $save
+     * @return bool
+     */
+    abstract protected function prepareLoad(
+        FileConfigurationInterface $load = null,
+        FileConfigurationInterface $save = null
+    );
+
+    /**
+     * @param  FileConfigurationInterface $recipe
+     * @return bool
+     */
+    abstract protected function finishLoad(FileConfigurationInterface $recipe);
+
+    /**
      * {@inheritDoc}
-     * @see ConfigurationInterface::save()
+     * @see FileConfigurationInterface::save()
      */
     public function save($force = false)
     {
@@ -167,20 +187,20 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
     }
 
     /**
-     * @param  ConfigurationInterface $recipe
-     * @return ConfigurationInterface
+     * @param  FileConfigurationInterface $recipe
+     * @return FileConfigurationInterface
      */
-    abstract protected function prepareSave(ConfigurationInterface $recipe);
+    abstract protected function prepareSave(FileConfigurationInterface $recipe);
 
     /**
      * {@inheritDoc}
-     * @see ConfigurationInterface::lock()
+     * @see FileConfigurationInterface::lock()
      */
     public function lock($force = false)
     {
         if ($this->get('lock')) {
             $output = $this->output;
-            $filename = $this->recipe->filename;
+            $filename = $this->recipe->file();
             $extension = pathinfo($filename, PATHINFO_EXTENSION) ?: 'json';
             $filename = dirname($filename) . DIRECTORY_SEPARATOR . basename($filename, '.' . $extension) . '.lock';
             $recipe = new FileConfiguration($this->composer, $filename);
@@ -200,10 +220,10 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
     }
 
     /**
-     * @param  ConfigurationInterface $recipe
-     * @return ConfigurationInterface
+     * @param  FileConfigurationInterface $recipe
+     * @return FileConfigurationInterface
      */
-    abstract protected function prepareLock(ConfigurationInterface $recipe);
+    abstract protected function prepareLock(FileConfigurationInterface $recipe);
 
     /**
      * @param  array $input

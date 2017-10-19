@@ -11,7 +11,7 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
-use Sjorek\Composer\VirtualEnvironment\Config\ConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\GlobalConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Config\LocalConfiguration;
 
@@ -22,34 +22,38 @@ class GitHookConfiguration extends AbstractCommandConfiguration
 {
     /**
      * {@inheritDoc}
-     * @see AbstractCommandConfiguration::load()
+     * @see AbstractCommandConfiguration::prepareLoad()
      */
-    public function load()
+    protected function prepareLoad(
+        FileConfigurationInterface $load = null,
+        FileConfigurationInterface $save = null
+    ) {
+//         $input = $this->input;
+//         if (!$input->getArgument('hook')) {
+//             $recipe = new LocalConfiguration($this->composer);
+//             if ($recipe->load()) {
+//                 $this->recipe = $recipe;
+//                 $this->set('load', true);
+//                 $this->set('save', false);
+//             } else {
+//                 $recipe = new GlobalConfiguration($this->composer);
+//                 if ($recipe->load()) {
+//                     $this->recipe = $recipe;
+//                     $this->set('load', true);
+//                     $this->set('save', false);
+//                 }
+//             }
+//         }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractCommandConfiguration::finishLoad()
+     */
+    protected function finishLoad(FileConfigurationInterface $recipe)
     {
         $input = $this->input;
-
-        if (!$input->getArgument('hook')) {
-            $recipe = new LocalConfiguration($this->composer);
-            if ($recipe->load()) {
-                $this->recipe = $recipe;
-                $this->set('load', true);
-                $this->set('save', false);
-            } else {
-                $recipe = new GlobalConfiguration($this->composer);
-                if ($recipe->load()) {
-                    $this->recipe = $recipe;
-                    $this->set('load', true);
-                    $this->set('save', false);
-                }
-            }
-        }
-
-        if (!parent::load()) {
-            return false;
-        }
-
-        $recipe = $this->recipe;
-
         $config = array();
         if ($input->getOption('script')) {
             $config['script'] = $input->getOption('script');
@@ -96,7 +100,7 @@ class GitHookConfiguration extends AbstractCommandConfiguration
      * {@inheritDoc}
      * @see AbstractCommandConfiguration::prepareSave()
      */
-    protected function prepareSave(ConfigurationInterface $recipe)
+    protected function prepareSave(FileConfigurationInterface $recipe)
     {
         $recipe->set('git-hook', $this->get('git-hook'));
 
@@ -107,7 +111,7 @@ class GitHookConfiguration extends AbstractCommandConfiguration
      * {@inheritDoc}
      * @see AbstractCommandConfiguration::prepareLock()
      */
-    protected function prepareLock(ConfigurationInterface $recipe)
+    protected function prepareLock(FileConfigurationInterface $recipe)
     {
         $recipe->set('git-hook', $this->get('git-hook-expanded'));
 
