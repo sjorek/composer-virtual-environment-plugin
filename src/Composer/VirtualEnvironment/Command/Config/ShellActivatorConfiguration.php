@@ -78,7 +78,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
 
         $this->set(
             'resource-dir',
-            $filesystem->normalizePath(__DIR__ . '/../../../../../res')
+            $filesystem->normalizePath(__DIR__ . '/../../../../../res/shell-activator')
         );
 
         $name = '{$name}';
