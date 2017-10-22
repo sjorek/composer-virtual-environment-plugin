@@ -51,7 +51,7 @@ if [ ! -z "${COMPOSER_VENV}" ] ; then
 
     # remove color helper
     unset -f _COMPOSER_VENV_getcolor
-    unset -f COMPOSER_VENV_COLORS
+    unset COMPOSER_VENV_COLORS
 
     return 
 fi
