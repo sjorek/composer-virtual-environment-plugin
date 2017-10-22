@@ -22,6 +22,10 @@ deactivate () {
         hash -r
     fi
 
+    if [ -d "${COMPOSER_VENV_DIR}/.composer-venv.d" ] ; then
+        source <( cat "${COMPOSER_VENV_DIR}/.composer-venv.d/*.zsh" 2>/dev/null ) deactivate
+    fi
+
     # reset old environment variables
     if [ -n "$_OLD_COMPOSER_VENV_PATH" ] ; then
         PATH="$_OLD_COMPOSER_VENV_PATH"
@@ -74,6 +78,10 @@ if [ -z "$COMPOSER_VENV_DISABLE_PROMPT" ] ; then
         PS1="(`basename \"${COMPOSER_VENV_DIR}\"`)$PS1"
     fi
     export PS1
+fi
+
+if [ -d "${COMPOSER_VENV_DIR}/.composer-venv.d" ] ; then
+    source <( cat "${COMPOSER_VENV_DIR}/.composer-venv.d/*.zsh" 2>/dev/null ) activate
 fi
 
 # This should detect zsh, which has a hash command that must
