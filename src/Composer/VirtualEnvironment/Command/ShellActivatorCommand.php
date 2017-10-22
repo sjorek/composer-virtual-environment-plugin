@@ -155,7 +155,7 @@ EOT
                     foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
                         $process->setCommandLine(
                             sprintf(
-                                '( echo %s | %s -ls )', //  ... 2>/dev/null', ?
+                                '( echo %s | %s -ls ) 2>/dev/null',
                                 escapeshellarg($command),
                                 $activator['shell'] // already escaped
                             )
