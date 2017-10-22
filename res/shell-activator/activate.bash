@@ -94,7 +94,6 @@ deactivate () {
         echo "Good Bye!"
         echo ""
     fi
-
 }
 
 # unset irrelevant variables
