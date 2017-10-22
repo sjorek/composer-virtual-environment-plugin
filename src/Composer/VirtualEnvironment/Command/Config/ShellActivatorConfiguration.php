@@ -135,17 +135,18 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         }
         $this->set('colors', $colors);
 
+        $symlink = null;
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
-            $symlinks = array('{$bin-dir}/activate' => reset($activators));
-            $this->set('shell-link', $symlinks);
-            $this->set('shell-link-expanded', $this->expandConfig($symlinks));
+            $symlink = reset($activators);
         } elseif (isset($activators['sh'])) {
-            $symlinks = array('{$bin-dir}/activate' => $activators['sh']);
+            $symlink = $activators['sh'];
+        }
+        if ($symlink !== null) {
+            $symlinks = array('{$bin-dir}/activate' => $symlink['filename']);
             $this->set('shell-link', $symlinks);
             $this->set('shell-link-expanded', $this->expandConfig($symlinks));
         }
-
         return true;
     }
 
