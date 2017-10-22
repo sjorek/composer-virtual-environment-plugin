@@ -1,5 +1,5 @@
-#!csh
-# This file must be used with "source bin/activate.csh" *from csh*.
+#!@SHEBANG@
+# This file must be used with "source @BIN_PATH@/activate.csh" *from csh*.
 # You cannot run it directly.
 # Created by Davide Di Blasi <davidedb@gmail.com>.
 # Ported to Python 3.3 venv by Andrew Svetlov <andrew.svetlov@gmail.com>

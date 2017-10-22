@@ -1,5 +1,5 @@
-#!fish
-# This file must be used with ". bin/activate.fish" *from fish* (http://fishshell.org)
+#!@SHEBANG@
+# This file must be used with ". @BIN_PATH@/activate.fish" *from fish* (http://fishshell.org)
 # you cannot run it directly
 
 if test -n "$COMPOSER_VENV"

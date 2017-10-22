@@ -129,40 +129,38 @@ EOT
      */
     protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
-        $activators = $config->get('shell');
+        $activators = $config->get('shell-expanded');
         if (empty($activators)) {
             $output->writeln(
                 '<error>Skipping creation of shell activators, none available.</error>'
             );
         } else {
-            $data = array(
+            $baseDir = $config->get('base-dir');
+            $binDir = $config->get('bin-dir');
+            $resourceDir = $config->get('resource-dir');
+            $dataTemplate = array(
                 '@NAME@' => $config->get('name-expanded'),
-                '@BASE_DIR@' => $config->get('base-dir'),
-                '@BIN_DIR@' => $config->get('base-dir') . DIRECTORY_SEPARATOR . $config->get('bin-dir'),
+                '@BASE_DIR@' => $baseDir,
+                '@BIN_DIR@' => $baseDir . DIRECTORY_SEPARATOR . $binDir,
+                '@BIN_PATH@' => $binDir,
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
-            if (in_array('bash', $activators)) {
-                $bash = 'bash';
-                if (isset($_SERVER['SHELL']) && basename($_SERVER['SHELL']) === 'bash') {
-                    $bash = $_SERVER['SHELL'];
-                } elseif (isset($_ENV['SHELL']) && basename($_ENV['SHELL']) === 'bash') {
-                    $bash = $_ENV['SHELL'];
+            foreach ($activators as $name => $activator) {
+                $data = array_merge($dataTemplate, array('@SHEBANG@' => $activator['shell']));
+                if ($name === 'bash') {
+                    // TODO check that $bash is really a bash? check version or issue a command only bash supports!
+                    foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
+                        $data[$key] = exec(
+                            sprintf(
+                                '( echo %s | %s -ls ) 2>/dev/null',
+                                escapeshellarg($command),
+                                $activator['shell'] // already escaped
+                            )
+                        );
+                    }
                 }
-                // TODO check that $bash is really a bash? check version or issue a command only bash supports!
-                foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
-                    $data[$key] = exec(
-                        sprintf(
-                            '( echo %s | %s -ls ) 2>/dev/null',
-                            escapeshellarg($command),
-                            escapeshellcmd($bash)
-                        )
-                    );
-                }
-            }
-            $baseDir = $config->get('base-dir');
-            foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
-                $source = $config->get('resource-dir') . '/' . $filename;
-                $target = $config->get('bin-dir') . '/' . $filename;
+                $source = $resourceDir . '/' . $activator['filename'];
+                $target = $binDir . '/' . $activator['filename'];
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, $data);
                 $processor->deploy($output, $config->get('force'));
             }
@@ -194,16 +192,18 @@ EOT
      */
     protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
-        $activators = $config->get('shell');
+        $activators = $config->get('shell-expanded');
         if (empty($activators)) {
             $output->writeln(
                 '<error>Skipping removal of shell activation scripts, as none is available.</error>'
             );
         } else {
             $baseDir = $config->get('base-dir');
-            foreach (ShellActivatorConfiguration::translate($activators) as $filename) {
-                $source = $config->get('resource-dir') . '/' . $filename;
-                $target = $config->get('bin-dir') . '/' . $filename;
+            $binDir = $config->get('bin-dir');
+            $resourceDir = $config->get('resource-dir');
+            foreach ($activators as $activator) {
+                $source = $resourceDir . DIRECTORY_SEPARATOR . $activator['filename'];
+                $target = $binDir . DIRECTORY_SEPARATOR . $activator['filename'];
                 $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, array());
                 $processor->rollback($output);
             }

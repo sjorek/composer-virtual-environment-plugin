@@ -1,5 +1,5 @@
-#!bash
-# This file must be used with "source bin/activate" *from bash*
+#!@SHEBANG@
+# This file must be used with "source @BIN_PATH@/activate.bash" *from bash*
 # you cannot run it directly
 
 if [ -z "${COMPOSER_VENV_COLORS}" ] ; then

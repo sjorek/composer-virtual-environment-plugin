@@ -1,5 +1,5 @@
-#!zsh
-# This file must be used with "source bin/activate" *from zsh*
+#!@SHEBANG@
+# This file must be used with "source @BIN_PATH@/activate.zsh" *from zsh*
 # you cannot run it directly
 
 if [ ! -z "${COMPOSER_VENV}" ] ; then

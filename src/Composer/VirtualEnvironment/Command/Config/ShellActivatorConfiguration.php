@@ -20,12 +20,14 @@ use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 class ShellActivatorConfiguration extends AbstractCommandConfiguration
 {
     const AVAILABLE_ACTIVATORS = 'bash,csh,fish,zsh';
+    const SHEBANG_SH = '/bin/sh';
+    const SHEBANG_ENV = '/usr/bin/env %s';
 
     /**
      * @param  array $candidates
      * @return array
      */
-    public static function validate(array $candidates)
+    public static function validateActivators(array $candidates)
     {
         $candidates = array_map('trim', array_map('strtolower', $candidates));
         $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
@@ -42,26 +44,47 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
      * @param  array $activators
      * @return array
      */
-    public static function translate(array $activators)
+    public static function expandActivators(array $activators)
     {
-        // Make the 'activate' shortcut available if needed
-        if (in_array('bash', $activators, true) && in_array('zsh', $activators, true)) {
-            $activators[] = 'activate';
-        }
 
-        // Remove duplicates introduced by user or shortcut addition from above
+        // Remove duplicates introduced by user
         $activators = array_unique($activators);
 
-        // sort them to get nice order
-        sort($activators);
+        // make array accessible by key
+        $activators = array_combine($activators, $activators);
 
-        // Create filenames
+        // Make the 'activate.sh' shortcut available if needed
+        if (isset($activators['bash']) && isset($activators['zsh']) && !isset($activators['sh'])) {
+            $activators['sh'] = 'sh';
+        }
+
+        $shebangSh = static::SHEBANG_SH;
+        $shebangEnv = static::SHEBANG_ENV;
+
+        // Create activator configuration
         $activators = array_map(
-            function ($activator) {
-                return $activator === 'activate' ? $activator : ('activate.' . $activator);
+            function ($activator) use ($shebangSh, $shebangEnv) {
+                $filename = 'activate.' . $activator;
+                if (isset($_SERVER['SHELL']) && basename($_SERVER['SHELL']) === $activator) {
+                    $shell = escapeshellcmd($_SERVER['SHELL']);
+                } elseif (isset($_ENV['SHELL']) && basename($_ENV['SHELL']) === $activator) {
+                    $shell = ecapeshellcmd($_ENV['SHELL']);
+                } elseif ($activator === 'sh') {
+                    $shell = escapeshellcmd($shebangSh);
+                } else {
+                    $shell = sprintf($shebangEnv, escapeshellcmd($activator));
+                }
+
+                return array(
+                    'filename' => $filename,
+                    'shell' => $shell,
+                );
             },
             $activators
         );
+
+        // sort them to get nice order
+        ksort($activators);
 
         return $activators;
     }
@@ -99,7 +122,8 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         } elseif ($recipe->has('shell')) {
             $candidates = $recipe->get('shell');
         }
-        $activators = $this->set('shell', self::validate($candidates));
+        $activators = $this->set('shell', self::validateActivators($candidates));
+        $activators = $this->set('shell-expanded', self::expandActivators($activators));
 
         $colors = true;
         if ($input->getOption('no-colors')) {
@@ -113,7 +137,11 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
 
         // If only has been given, we'll symlink to this activator
         if (count($activators) === 1) {
-            $symlinks = array('{$bin-dir}/activate' => 'activate.' . $activators[0]);
+            $symlinks = array('{$bin-dir}/activate' => reset($activators));
+            $this->set('shell-link', $symlinks);
+            $this->set('shell-link-expanded', $this->expandConfig($symlinks));
+        } elseif (isset($activators['sh'])) {
+            $symlinks = array('{$bin-dir}/activate' => $activators['sh']);
             $this->set('shell-link', $symlinks);
             $this->set('shell-link-expanded', $this->expandConfig($symlinks));
         }

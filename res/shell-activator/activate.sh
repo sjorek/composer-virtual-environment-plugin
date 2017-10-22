@@ -1,4 +1,5 @@
-# This file must be used with "source bin/activate" *from bash or zsh*
+#!@SHEBANG@
+# This file must be used with "source @BIN_PATH@/activate.sh" *from bash or zsh*
 # you cannot run it directly
 
 if [ -n "$BASH_VERSION" ] ; then

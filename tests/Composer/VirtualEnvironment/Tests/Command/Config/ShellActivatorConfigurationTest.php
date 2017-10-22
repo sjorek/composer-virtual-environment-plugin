@@ -21,7 +21,7 @@ use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguratio
  */
 class ShellActivatorConfigurationTest extends TestCase
 {
-    public function provideCheckValidateData()
+    public function provideCheckValidateActivatorsData()
     {
         return array(
             'empty candidates return empty activators' => array(
@@ -51,69 +51,136 @@ class ShellActivatorConfigurationTest extends TestCase
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::validate
-     * @dataProvider provideCheckValidateData
+     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::validateActivators
+     * @dataProvider provideCheckValidateActivatorsData
      *
      * @param array       $expected
      * @param array       $candidates
      * @param string|null $shell
-     * @see ShellActivatorConfiguration::validate()
+     * @see ShellActivatorConfiguration::validateActivators()
      */
-    public function checkValidate(array $expected, array $candidates, $shell = null)
+    public function checkValidateActivators(array $expected, array $candidates, $shell = null)
     {
-        if ($shell !== null) {
-            $_SERVER['SHELL'] = $shell;
-        }
-        $this->assertEquals($expected, ShellActivatorConfiguration::validate($candidates));
+        $_SERVER['SHELL'] = $shell ?: 'no-shell';
+        $_ENV['SHELL'] = $shell ?: 'no-shell';
+        $this->assertEquals($expected, ShellActivatorConfiguration::validateActivators($candidates));
     }
 
-    public function provideCheckTranslateData()
+    public function provideCheckExpandActivatorsData()
     {
         return array(
             'empty activators return empty activator scripts' => array(
-                array(), array(),
+                array(), array(), null,
             ),
             'one activator returns activator script' => array(
-                array('activate.bash'), array('bash'),
+                array(
+                    'bash' => array(
+                        'filename' => 'activate.bash',
+                        'shell' => '/custom/path/to/bash',
+                    ),
+                ),
+                array('bash'),
+                '/custom/path/to/bash',
             ),
             'two activators, but not bash or zsh, return two activator scripts' => array(
-                array('activate.csh', 'activate.fish'), array('csh', 'fish'),
+                array(
+                    'csh' => array(
+                        'filename' => 'activate.csh',
+                        'shell' => '/usr/bin/env csh',
+                    ),
+                    'fish' => array(
+                        'filename' => 'activate.fish',
+                        'shell' => '/usr/bin/env fish',
+                    ),
+                ),
+                array('csh', 'fish'),
             ),
             'two activators, with one of them being bash, return two activator scripts' => array(
-                array('activate.bash', 'activate.csh'), array('bash', 'csh'),
+                array(
+                    'bash' => array(
+                        'filename' => 'activate.bash',
+                        'shell' => '/usr/bin/env bash',
+                    ),
+                    'csh' => array(
+                        'filename' => 'activate.csh',
+                        'shell' => '/usr/bin/env csh',
+                    ),
+                ),
+                array('bash', 'csh'),
             ),
             'two activators, with one of them being zsh, return two activator scripts' => array(
-                array('activate.csh', 'activate.zsh'), array('csh', 'zsh'),
+                array(
+                    'csh' => array(
+                        'filename' => 'activate.csh',
+                        'shell' => '/usr/bin/env csh',
+                    ),
+                    'zsh' => array(
+                        'filename' => 'activate.zsh',
+                        'shell' => '/usr/bin/env zsh',
+                    ),
+                ),
+                array('csh', 'zsh'),
             ),
             'bash- and zsh-activator return three activator scripts' => array(
-                array('activate', 'activate.bash', 'activate.zsh'), array('bash', 'zsh'),
+                array(
+                    'bash' => array(
+                        'filename' => 'activate.bash',
+                        'shell' => '/usr/bin/env bash',
+                    ),
+                    'sh' => array(
+                        'filename' => 'activate.sh',
+                        'shell' => '/bin/sh',
+                    ),
+                    'zsh' => array(
+                        'filename' => 'activate.zsh',
+                        'shell' => '/usr/bin/env zsh',
+                    ),
+                ),
+                array('bash', 'zsh'),
             ),
             'all available return all available plus one' => array(
-                array_merge(
-                    array('activate'),
-                    array_map(
-                        function ($activator) {
-                            return 'activate.' . $activator;
-                        },
-                        explode(',', ShellActivatorConfiguration::AVAILABLE_ACTIVATORS)
-                    )
+                array(
+                    'bash' => array(
+                        'filename' => 'activate.bash',
+                        'shell' => '/usr/bin/env bash',
+                    ),
+                    'csh' => array(
+                        'filename' => 'activate.csh',
+                        'shell' => '/usr/bin/env csh',
+                    ),
+                    'fish' => array(
+                        'filename' => 'activate.fish',
+                        'shell' => '/usr/bin/env fish',
+                    ),
+                    'sh' => array(
+                        'filename' => 'activate.sh',
+                        'shell' => '/bin/sh',
+                    ),
+                    'zsh' => array(
+                        'filename' => 'activate.zsh',
+                        'shell' => '/usr/bin/env zsh',
+                    ),
                 ),
                 explode(',', ShellActivatorConfiguration::AVAILABLE_ACTIVATORS),
+                '/bin/sh',
             ),
         );
     }
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::translate
-     * @dataProvider provideCheckTranslateData
+     * @covers \Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration::expandActivators
+     * @dataProvider provideCheckExpandActivatorsData
      *
-     * @param array $expected
-     * @param array $candidates
-     * @see ShellActivatorConfiguration::translate()
+     * @param array       $expected
+     * @param array       $candidates
+     * @param string|null $shell
+     * @see ShellActivatorConfiguration::expandActivators()
      */
-    public function checkTranslate(array $expected, array $candidates)
+    public function checkExpandActivators(array $expected, array $candidates, $shell = null)
     {
-        $this->assertEquals($expected, ShellActivatorConfiguration::translate($candidates));
+        $_SERVER['SHELL'] = $shell ?: 'no-shell';
+        $_ENV['SHELL'] = $shell ?: 'no-shell';
+        $this->assertEquals($expected, ShellActivatorConfiguration::expandActivators($candidates));
     }
 }
