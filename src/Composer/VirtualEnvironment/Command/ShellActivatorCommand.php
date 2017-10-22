@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -125,6 +126,7 @@ EOT
 
     /**
      * {@inheritDoc}
+     * @throws \RuntimeException
      * @see AbstractProcessorCommand::deploy()
      */
     protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
@@ -149,14 +151,20 @@ EOT
                 $data = array_merge($dataTemplate, array('@SHEBANG@' => $activator['shell']));
                 if ($name === 'bash') {
                     // TODO check that $bash is really a bash? check version or issue a command only bash supports!
+                    $process = new Process(null);
                     foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
-                        $data[$key] = exec(
+                        $process->setCommandLine(
                             sprintf(
-                                '( echo %s | %s -ls ) 2>/dev/null',
+                                '( echo %s | %s -ls )', //  ... 2>/dev/null', ?
                                 escapeshellarg($command),
                                 $activator['shell'] // already escaped
                             )
                         );
+                        $process->run();
+                        if (!$process->isSuccessful()) {
+                            throw new \RuntimeException($process->getErrorOutput());
+                        }
+                        $data[$key] = trim($process->getOutput());
                     }
                 }
                 $source = $resourceDir . '/' . $activator['filename'];
