@@ -147,6 +147,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
             $this->set('shell-link', $symlinks);
             $this->set('shell-link-expanded', $this->expandConfig($symlinks));
         }
+
         return true;
     }
 
