@@ -13,16 +13,13 @@ namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 
 use Composer\Util\Filesystem;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
+use Sjorek\Composer\VirtualEnvironment\Config\ShellConstants;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellActivatorConfiguration extends AbstractCommandConfiguration
+class ShellActivatorConfiguration extends AbstractCommandConfiguration implements ShellConstants
 {
-    const AVAILABLE_ACTIVATORS = 'bash,csh,fish,zsh';
-    const SHEBANG_SH = '/bin/sh';
-    const SHEBANG_ENV = '/usr/bin/env %s';
-
     /**
      * @param  array $candidates
      * @return array
@@ -30,14 +27,13 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
     public static function validateActivators(array $candidates)
     {
         $candidates = array_map('trim', array_map('strtolower', $candidates));
-        $activators = array_map('trim', explode(',', strtolower(static::AVAILABLE_ACTIVATORS)) ?: array());
 
         if (in_array('detect', $candidates, true) && !empty($_SERVER['SHELL'])) {
             $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
         }
 
         // Get a list of valid $activators
-        return array_values(array_unique(array_intersect($candidates, $activators)));
+        return array_values(array_unique(array_intersect($candidates, static::SHELLS)));
     }
 
     /**
@@ -113,7 +109,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration
         $this->set('name', $name);
         $this->set('name-expanded', $this->parseConfig($this->parseManifest($name)));
 
-        $candidates = array('detect'); // = explode(',', static::AVAILABLE_ACTIVATORS);
+        $candidates = array('detect'); // = explode(',', static::SHELLS);
         if ($input->getArgument('shell')) {
             $candidates = $input->getArgument('shell');
             if ($input->getOption('add')) {

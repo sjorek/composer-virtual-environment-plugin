@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration;
 
 /**
- * ActivationScriptProcessor test case.
+ * ShellActivatorConfiguration test case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
@@ -43,8 +43,8 @@ class ShellActivatorConfigurationTest extends TestCase
                 array(), array('detect'), '/absolute/path/to/xxsh',
             ),
             'all available return all available' => array(
-                explode(',', ShellActivatorConfiguration::AVAILABLE_ACTIVATORS),
-                explode(',', ShellActivatorConfiguration::AVAILABLE_ACTIVATORS),
+                ShellActivatorConfiguration::SHELLS,
+                ShellActivatorConfiguration::SHELLS,
             ),
         );
     }
@@ -161,7 +161,7 @@ class ShellActivatorConfigurationTest extends TestCase
                         'shell' => '/usr/bin/env zsh',
                     ),
                 ),
-                explode(',', ShellActivatorConfiguration::AVAILABLE_ACTIVATORS),
+                ShellActivatorConfiguration::SHELLS,
                 '/bin/sh',
             ),
         );
