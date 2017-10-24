@@ -107,7 +107,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
             $name = $recipe->get('name', $name);
         }
         $this->set('name', $name);
-        $this->set('name-expanded', $this->parseConfig($this->parseManifest($name)));
+        $this->set('name-expanded', $this->parseExpansion($name));
 
         $candidates = array('detect'); // = explode(',', static::SHELLS);
         if ($input->getArgument('shell')) {

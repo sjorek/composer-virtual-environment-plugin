@@ -253,13 +253,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
         }
         foreach ($input as $key => $value) {
             if ($expandKey) {
-                $expand = Platform::expandPath(
-                    $this->parseConfig(
-                        Platform::expandPath($this->parseManifest(Platform::expandPath($key), $manifest)),
-                        Config::RELATIVE_PATHS,
-                        $config
-                    )
-                );
+                $expand = $this->parseExpansion($key, Config::RELATIVE_PATHS, $config, $manifest);
                 if (isset($result[$expand])) {
                     $this->output->writeln(
                         sprintf(
@@ -273,16 +267,35 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             } else {
                 $expand = $key;
             }
-            $result[$expand] = Platform::expandPath(
-                $this->parseConfig(
-                    Platform::expandPath($this->parseManifest(Platform::expandPath($value), $manifest)),
-                    Config::RELATIVE_PATHS,
-                    $config
-                )
-            );
+            $result[$expand] = $this->parseExpansion($value, Config::RELATIVE_PATHS, $config, $manifest);
         }
 
         return $result;
+    }
+
+    /**
+     * Replaces {$refs} and %ENV% inside a string
+     *
+     * @param  string     $value
+     * @param  int        $flags    Options (see class constants)
+     * @param  Config     $config
+     * @param  array|null $manifest
+     * @return string
+     */
+    protected function parseExpansion($value, $flags = 0, Config $config = null, array $manifest = null)
+    {
+        return Platform::expandPath(
+            $this->parseConfig(
+                Platform::expandPath(
+                    $this->parseManifest(
+                        Platform::expandPath($value),
+                        $manifest
+                    )
+                ),
+                $flags,
+                $config
+            )
+        );
     }
 
     /**
