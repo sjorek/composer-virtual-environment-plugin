@@ -165,6 +165,8 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             }, explode('/', $vendorDir)))
         );
 
+        $this->set('composer-venv-dir', '.composer-venv');
+
         return $this->setup();
     }
 
