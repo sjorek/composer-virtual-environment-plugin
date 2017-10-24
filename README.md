@@ -43,9 +43,9 @@ Options:
   -a, --add                      Add to existing configuration.
   -r, --remove                   Remove all configured items.
   -s, --save                     Save configuration.
-  -c, --config=CONFIG            Use given configuration file.
   -l, --local                    Use local configuration file "./composer-venv.json".
   -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+  -c, --config-file=CONFIG-FILE  Use given configuration file.
       --lock                     Lock configuration in "./composer-venv.lock".
   -f, --force                    Force overwriting existing git-hooks
   -h, --help                     Display this help message
@@ -61,7 +61,7 @@ Options:
                                  2 for more verbose output and 3 for debug
 
 Help:
-  The virtual-environment:shell-activator command creates files
+  The virtual-environment:shell command creates files
   to activate and deactivate the current bin directory in shell.
   
   Usage:
@@ -104,9 +104,9 @@ Options:
   -a, --add                      Add to existing configuration.
   -r, --remove                   Remove all configured items.
   -s, --save                     Save configuration.
-  -c, --config=CONFIG            Use given configuration file.
   -l, --local                    Use local configuration file "./composer-venv.json".
   -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+  -c, --config-file=CONFIG-FILE  Use given configuration file.
       --lock                     Lock configuration in "./composer-venv.lock".
   -f, --force                    Force overwriting existing git-hooks
   -h, --help                     Display this help message
@@ -158,9 +158,9 @@ Options:
   -a, --add                      Add to existing configuration.
   -r, --remove                   Remove all configured items.
   -s, --save                     Save configuration.
-  -c, --config=CONFIG            Use given configuration file.
   -l, --local                    Use local configuration file "./composer-venv.json".
   -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+  -c, --config-file=CONFIG-FILE  Use given configuration file.
       --lock                     Lock configuration in "./composer-venv.lock".
   -f, --force                    Force overwriting existing git-hooks
   -h, --help                     Display this help message

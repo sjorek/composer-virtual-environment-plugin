@@ -80,8 +80,8 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
     {
         $input = $this->input;
         $load = null;
-        if ($input->getOption('config')) {
-            $filename = $input->getOption('config');
+        if ($input->getOption('config-file')) {
+            $filename = $input->getOption('config-file');
             if ($filename === '-') {
                 $filename = 'php://stdin';
             }
@@ -102,8 +102,8 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
 
         $save = null;
         if ($input->getOption('save')) {
-            if ($input->getOption('config')) {
-                $filename = $input->getOption('config');
+            if ($input->getOption('config-file')) {
+                $filename = $input->getOption('config-file');
                 if ($filename === '-') {
                     $filename = 'php://output';
                 }

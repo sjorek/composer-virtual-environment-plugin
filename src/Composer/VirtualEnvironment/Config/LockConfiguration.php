@@ -24,7 +24,7 @@ class LockConfiguration extends FileConfiguration
     );
 
     protected $blacklist = array(
-        'info', 'add', 'remove', 'load', 'save', 'lock', 'force', 'global', 'local', 'config',
+        'info', 'add', 'remove', 'load', 'save', 'lock', 'force', 'global', 'local', 'config-file',
     );
 
     /**

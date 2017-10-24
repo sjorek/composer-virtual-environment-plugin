@@ -51,12 +51,6 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
                 'Save configuration.'
             ),
             new InputOption(
-                'config',
-                'c',
-                InputOption::VALUE_REQUIRED,
-                'Use given configuration file.'
-            ),
-            new InputOption(
                 'local',
                 'l',
                 InputOption::VALUE_NONE,
@@ -67,6 +61,12 @@ abstract class AbstractProcessorCommand extends AbstractComposerCommand
                 'g',
                 InputOption::VALUE_NONE,
                 'Use global configuration file "' . $home .'/composer-venv.json".'
+            ),
+            new InputOption(
+                'config-file',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Use given configuration file.'
             ),
             // new InputOption(
             //     'manifest',
