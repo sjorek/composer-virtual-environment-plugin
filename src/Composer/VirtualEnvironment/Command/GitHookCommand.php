@@ -178,13 +178,13 @@ EOT
         } else {
             $baseDir = $config->get('base-dir', '');
             $gitHookDir = $config->get('git-hook-dir', null);
-            foreach ($hooks as $name => $hook) {
-                $processor = $this->getGitHookProcessor($name, $hook, $baseDir, $gitHookDir);
+            foreach ($hooks as $hook => $hookConfig) {
+                $processor = $this->getGitHookProcessor($hook, $hookConfig, $baseDir, $gitHookDir);
                 if ($processor === null) {
                     $output->writeln(
                         sprintf(
                             '<error>Missing or invalid git-hook type for hook %s.</error>',
-                            $name
+                            $hook
                         ),
                         OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
@@ -209,13 +209,13 @@ EOT
         } else {
             $baseDir = $config->get('base-dir', '');
             $gitHookDir = $config->get('git-hook-dir', null);
-            foreach ($hooks as $name => $config) {
-                $processor = $this->getGitHookProcessor($name, $config, $baseDir, $gitHookDir);
+            foreach ($hooks as $hook => $hookConfig) {
+                $processor = $this->getGitHookProcessor($hook, $hookConfig, $baseDir, $gitHookDir);
                 if ($processor === null) {
                     $output->writeln(
                         sprintf(
                             '<error>Missing or invalid git-hook type for hook %s.</error>',
-                            $name
+                            $hook
                         ),
                         OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
                     );
@@ -227,24 +227,24 @@ EOT
     }
 
     /**
-     * @param  string                         $name
+     * @param  string                         $hook
      * @param  array                          $config
      * @param  string                         $baseDir
      * @param  string|null                    $gitHookDir
      * @return GitHookProcessorInterface|null
      */
-    protected function getGitHookProcessor($name, array $config, $baseDir, $gitHookDir)
+    protected function getGitHookProcessor($hook, array $config, $baseDir, $gitHookDir)
     {
         if (isset($config['script'])) {
             $shebang = isset($config['shebang']) ? $config['shebang'] : null;
 
-            return new GitHook\ScriptProcessor($name, $config['script'], $baseDir, $gitHookDir, $shebang);
+            return new GitHook\ScriptProcessor($hook, $config['script'], $baseDir, $gitHookDir, $shebang);
         } elseif (isset($config['file'])) {
-            return new GitHook\FileProcessor($name, $config['file'], $baseDir, $gitHookDir);
+            return new GitHook\FileProcessor($hook, $config['file'], $baseDir, $gitHookDir);
         } elseif (isset($config['link'])) {
-            return new GitHook\SymbolicLinkProcessor($name, $config['link'], $baseDir, $gitHookDir);
+            return new GitHook\SymbolicLinkProcessor($hook, $config['link'], $baseDir, $gitHookDir);
         } elseif (isset($config['url'])) {
-            return new GitHook\StreamProcessor($name, $config['url'], $baseDir, $gitHookDir);
+            return new GitHook\StreamProcessor($hook, $config['url'], $baseDir, $gitHookDir);
         } else {
             return null;
         }

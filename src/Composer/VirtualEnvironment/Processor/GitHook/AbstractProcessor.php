@@ -19,27 +19,26 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class AbstractProcessor implements GitHookProcessorInterface
 {
-    protected $name;
+    protected $hook;
     protected $target;
     protected $source;
     protected $baseDir;
     protected $gitHookDir;
-    protected $shebang;
     protected $filesystem;
 
     /**
-     * @param string $name
+     * @param string $hook
      * @param string $source
      * @param string $baseDir
      * @param string $gitHookDir
      * @param string $shebang
      */
-    public function __construct($name, $source, $baseDir, $gitHookDir = null)
+    public function __construct($hook, $source, $baseDir, $gitHookDir = null)
     {
-        $this->name = $name;
+        $this->hook = $hook;
         $this->baseDir = $baseDir;
         $this->gitHookDir = $gitHookDir ?: static::GIT_HOOK_DIR;
-        $this->target = $this->gitHookDir . '/' . $name;
+        $this->target = $this->gitHookDir . '/' . $hook;
         $this->source = $source;
         $this->filesystem = new Filesystem();
     }
@@ -51,11 +50,11 @@ abstract class AbstractProcessor implements GitHookProcessorInterface
      */
     public function deploy(OutputInterface $output, $force = false)
     {
-        if (!in_array($this->name, static::GIT_HOOKS, true)) {
+        if (!in_array($this->hook, static::GIT_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid git-hook %s given.</error>',
-                    $this->name
+                    $this->hook
                 )
             );
 
@@ -78,11 +77,11 @@ abstract class AbstractProcessor implements GitHookProcessorInterface
      */
     public function rollback(OutputInterface $output)
     {
-        if (!in_array($this->name, static::GIT_HOOKS, true)) {
+        if (!in_array($this->hook, static::GIT_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid git-hook %s given.</error>',
-                    $this->name
+                    $this->hook
                 )
             );
 

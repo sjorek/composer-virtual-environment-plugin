@@ -24,14 +24,14 @@ class StreamProcessor extends AbstractProcessor
     const PROCESSOR_NAME = 'git-hook stream';
 
     /**
-     * @param string $name
+     * @param string $hook
      * @param string $url
      * @param string $baseDir
      * @param string $gitHookDir
      */
-    public function __construct($name, $url, $baseDir, $gitHookDir = null)
+    public function __construct($hook, $url, $baseDir, $gitHookDir = null)
     {
-        parent::__construct($name, $url, $baseDir, $gitHookDir);
+        parent::__construct($hook, $url, $baseDir, $gitHookDir);
     }
 
     /**

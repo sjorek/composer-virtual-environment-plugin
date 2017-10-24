@@ -24,14 +24,14 @@ class FileProcessor extends AbstractProcessor
     const PROCESSOR_NAME = 'git-hook file';
 
     /**
-     * @param string $name
+     * @param string $hook
      * @param string $file
      * @param string $baseDir
      * @param string $gitHookDir
      */
-    public function __construct($name, $file, $baseDir, $gitHookDir = null)
+    public function __construct($hook, $file, $baseDir, $gitHookDir = null)
     {
-        parent::__construct($name, $file, $baseDir, $gitHookDir);
+        parent::__construct($hook, $file, $baseDir, $gitHookDir);
     }
 
     /**

@@ -24,14 +24,14 @@ class SymbolicLinkProcessor extends AbstractProcessor
     const PROCESSOR_NAME = 'git-hook symbolic link';
 
     /**
-     * @param string $name
+     * @param string $hook
      * @param string $target
      * @param string $baseDir
      * @param string $gitHookDir
      */
-    public function __construct($name, $target, $baseDir, $gitHookDir = null)
+    public function __construct($hook, $target, $baseDir, $gitHookDir = null)
     {
-        parent::__construct($name, $target, $baseDir, $gitHookDir);
+        parent::__construct($hook, $target, $baseDir, $gitHookDir);
         // Swap source and target for symlinks
         $target = $this->source;
         $this->source = $this->target;
