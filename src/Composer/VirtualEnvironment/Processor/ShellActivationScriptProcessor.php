@@ -17,7 +17,7 @@ use Composer\Util\Filesystem;
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ActivationScriptProcessor implements ProcessorInterface
+class ShellActivationScriptProcessor implements ProcessorInterface
 {
     use ExecutableFromTemplateTrait;
 

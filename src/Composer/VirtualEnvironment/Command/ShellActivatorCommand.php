@@ -66,8 +66,8 @@ class ShellActivatorCommand extends AbstractProcessorCommand
             )
             ->setHelp(
                 <<<EOT
-The <info>virtual-environment:shell-activator</info> command creates files
-to activate and deactivate the current bin directory in shell.
+The <info>virtual-environment:shell</info> command creates files to
+activate and deactivate the current bin directory in shell.
 
 Usage:
 
@@ -169,7 +169,7 @@ EOT
                 }
                 $source = $resourceDir . '/' . $activator['filename'];
                 $target = $binDir . '/' . $activator['filename'];
-                $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, $data);
+                $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, $data);
                 $processor->deploy($output, $config->get('force'));
             }
             if ($config->has('shell-link-expanded')) {
@@ -212,7 +212,7 @@ EOT
             foreach ($activators as $activator) {
                 $source = $resourceDir . DIRECTORY_SEPARATOR . $activator['filename'];
                 $target = $binDir . DIRECTORY_SEPARATOR . $activator['filename'];
-                $processor = new Processor\ActivationScriptProcessor($source, $target, $baseDir, array());
+                $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, array());
                 $processor->rollback($output);
             }
             if ($config->has('shell-link-expanded')) {

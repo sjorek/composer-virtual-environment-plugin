@@ -13,26 +13,26 @@ namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
-use Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor;
+use Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
- * ActivationScriptProcessor test case.
+ * ShellActivationScriptProcessor test case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
+class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
 {
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @see ActivationScriptProcessor::__construct()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::__construct
+     * @see ShellActivationScriptProcessor::__construct()
      */
     public function check__construct()
     {
         $this->assertInstanceOf(
-            ActivationScriptProcessor::class,
-            new ActivationScriptProcessor(null, null, null, array())
+            ShellActivationScriptProcessor::class,
+            new ShellActivationScriptProcessor(null, null, null, array())
         );
     }
 
@@ -109,11 +109,11 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::deploy()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::deploy()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::deployTemplate()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::fetchTemplate()
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::renderTemplate()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::renderTemplate()
      * @dataProvider provideCheckDeployData
      *
      * @param bool   $expectedResult
@@ -124,7 +124,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
      * @param int    $directoryMode
      * @param int    $fileMode
      * @param array  $data
-     * @see ActivationScriptProcessor::deploy()
+     * @see ShellActivationScriptProcessor::deploy()
      */
     public function checkDeploy(
         $expectedResult,
@@ -151,7 +151,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         }
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, $root->url(), $data);
+        $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), $data);
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;
@@ -236,8 +236,8 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
 
     /**
      * @test
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::__construct
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ActivationScriptProcessor::rollback()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::__construct
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
      * @dataProvider provideCheckRoolbackData
      *
@@ -247,7 +247,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
      * @param array  $structure
      * @param int    $directoryMode
      * @param int    $fileMode
-     * @see ActivationScriptProcessor::rollback()
+     * @see ShellActivationScriptProcessor::rollback()
      */
     public function checkRollback(
         $expectedResult,
@@ -272,7 +272,7 @@ class ActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         }
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
-        $processor = new ActivationScriptProcessor($source, $target, $root->url(), array());
+        $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), array());
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
         \Composer\Util\vfsFilesystem::$cwd = $root;
