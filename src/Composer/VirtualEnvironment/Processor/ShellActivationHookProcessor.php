@@ -158,9 +158,10 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
             array(
                 '# ' . sprintf(static::SCRIPT_COMMENT, $this->hook),
                 trim($content),
+                '',
             )
         );
 
-        return sprintf('#!%s%s%s%s', $shebang, PHP_EOL, $content, PHP_EOL);
+        return sprintf('#!%s%s%s', $shebang, PHP_EOL, $content);
     }
 }

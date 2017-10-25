@@ -96,6 +96,7 @@ class ScriptProcessor extends AbstractProcessor implements ShellConstants
                 array(
                     '# ' . sprintf(static::SCRIPT_COMMENT, $this->hook),
                     trim($content),
+                    '',
                 )
             );
         } else {
@@ -138,7 +139,7 @@ class ScriptProcessor extends AbstractProcessor implements ShellConstants
             }
         }
 
-        return sprintf('#!%s%s%s%s', $shebang, PHP_EOL, $content, PHP_EOL);
+        return sprintf('#!%s%s%s', $shebang, PHP_EOL, $content);
     }
 
     /**
