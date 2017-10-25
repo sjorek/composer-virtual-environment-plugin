@@ -28,8 +28,12 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
     {
         $candidates = array_map('trim', array_map('strtolower', $candidates));
 
-        if (in_array('detect', $candidates, true) && !empty($_SERVER['SHELL'])) {
-            $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
+        if (in_array('detect', $candidates, true)) {
+            if (!empty($_SERVER['SHELL'])) {
+                $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
+            } elseif (!empty($_ENV['SHELL'])) {
+                $candidates[] = strtolower(trim(basename($_ENV['SHELL'])));
+            }
         }
 
         // Get a list of valid $activators
