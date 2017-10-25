@@ -89,6 +89,62 @@ Help:
 ```
 
 
+### Shell Activation Hook Command
+
+```bash
+$ php composer.phar help venv:hook 
+Usage:
+  virtual-environment:hook [options] [--] [<hook>]...
+  venv:hook
+
+Arguments:
+  hook                           List of the shell activation script hooks.
+
+Options:
+      --name=NAME                The name of the shell activation script hook.
+      --priority=PRIORITY        The priority of the shell activation script hook.
+      --script=SCRIPT            The shell activation hook script.
+      --shell=SHELL              The name of or path to the shell. [default: "%SHELL%"]
+  -a, --add                      Add to existing configuration.
+  -r, --remove                   Remove all configured items.
+  -s, --save                     Save configuration.
+  -l, --local                    Use local configuration file "./composer-venv.json".
+  -g, --global                   Use global configuration file "~/.composer/composer-venv.json".
+  -c, --config-file=CONFIG-FILE  Use given configuration file.
+      --lock                     Lock configuration in "./composer-venv.lock".
+  -f, --force                    Force overwriting existing git-hooks
+  -h, --help                     Display this help message
+  -q, --quiet                    Do not output any message
+  -V, --version                  Display this application version
+      --ansi                     Force ANSI output
+      --no-ansi                  Disable ANSI output
+  -n, --no-interaction           Do not ask any interactive question
+      --profile                  Display timing and memory usage information
+      --no-plugins               Whether to disable plugins.
+  -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output,
+                                 2 for more verbose output and 3 for debug
+
+Help:
+  The virtual-environment:hook command creates files
+  triggered when the virtual environment shell is activated or deactivated.
+  
+  Examples:
+  
+  Simple shell script running in the detected shell only
+  
+      php composer.phar venv:hook post-activate \
+          --script='composer run-script xyz'
+  
+  Simple shell script running in all shells
+  
+      php composer.phar venv:hook post-activate \
+          --script='composer run-script xyz' \
+          --shell=sh
+  
+```
+
+
 ### Symbolic Link Command
 
 ```bash

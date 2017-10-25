@@ -75,22 +75,16 @@ triggered when the virtual environment shell is activated or deactivated.
 
 Examples:
 
-Simple shell script using the shell detection
+Simple shell script running in the detected shell only
 
     <info>php composer.phar venv:hook post-activate \
-        --name=composer-run-script-xyz \
         --script='composer run-script xyz'</info>
 
-    Hint: The deployed script will run in the detected shell only
-
-Simple shell script using the default shebang "#!/bin/sh"
+Simple shell script running in all shells
 
     <info>php composer.phar venv:hook post-activate \
-        --name=composer-run-script-xyz \
         --script='composer run-script xyz' \
         --shell=sh</info>
-
-    Hint: The deployed script will run in all supported shells
 
 EOT
             );
