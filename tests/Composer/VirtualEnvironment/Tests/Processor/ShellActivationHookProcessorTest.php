@@ -62,22 +62,22 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
             ),
             'target already exists' => array(
                 false,
-                'The shell-hook script vfs://test/target/00-test-post-activate.sh already exists.',
-                array('target' => array('00-test-post-activate.sh' => '')),
-                array('target' => array('00-test-post-activate.sh' => '')),
+                'The shell-hook script vfs://test/target/post-activate.d/00-test.sh already exists.',
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
             ),
             'target already exists, forced removal' => array(
                 true,
-                'Removed existing shell-hook script vfs://test/target/00-test-post-activate.sh.',
-                array('target' => array('00-test-post-activate.sh' => $hookContent)),
-                array('target' => array('00-test-post-activate.sh' => '')),
+                'Removed existing shell-hook script vfs://test/target/post-activate.d/00-test.sh.',
+                array('target' => array('post-activate.d' => array('00-test.sh' => $hookContent))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
                 true,
             ),
             'target already exists, forced removal fails due to lack of permissions' => array(
                 false,
-                '/^Failed to remove the existing shell-hook script vfs:\/\/test\/target\/00-test-post-activate.sh: Could not delete/',
-                array('target' => array('00-test-post-activate.sh' => '')),
-                array('target' => array('00-test-post-activate.sh' => '')),
+                '/^Failed to remove the existing shell-hook script vfs:\/\/test\/target\/post-activate\.d\/00-test\.sh: Could not delete/',
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
                 true,
                 0555,
             ),
@@ -94,7 +94,7 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
             ),
             'no permission to create target directory' => array(
                 false,
-                'Failed to create the shell-hook script target directory vfs://test/target: vfs://test/target does not exist and could not be created.',
+                'Failed to create the shell-hook script target directory vfs://test/target/post-activate.d: vfs://test/target/post-activate.d does not exist and could not be created.',
                 array(),
                 array(),
                 true,
@@ -102,21 +102,21 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
             ),
             'no permission to write target file' => array(
                 false,
-                'Failed to write the shell-hook script vfs://test/target/00-test-post-activate.sh.',
-                array('target' => array()),
-                array('target' => array()),
+                'Failed to write the shell-hook script vfs://test/target/post-activate.d/00-test.sh.',
+                array('target' => array('post-activate.d' => array())),
+                array('target' => array('post-activate.d' => array())),
                 true,
                 0555,
             ),
             'everything works as expected' => array(
                 true,
                 array(
-                    'Removed existing shell-hook script vfs://test/target/00-test-post-activate.sh.',
-                    'Installed shell-hook script vfs://test/target/00-test-post-activate.sh.',
+                    'Removed existing shell-hook script vfs://test/target/post-activate.d/00-test.sh.',
+                    'Installed shell-hook script vfs://test/target/post-activate.d/00-test.sh.',
                     '',
                 ),
-                array('target' => array('00-test-post-activate.sh' => $hookContent)),
-                array('target' => array('00-test-post-activate.sh' => 'Y')),
+                array('target' => array('post-activate.d' => array('00-test.sh' => $hookContent))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => 'Y'))),
                 true,
                 0755,
                 0644,
@@ -157,19 +157,20 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
         $shell = null
     ) {
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
+        $file = '00-test.sh';
+        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
-        if ($fileMode !== null && $root->hasChild($hook)) {
-            $root->getChild($hook)->chmod($fileMode);
+        if ($fileMode !== null && $root->hasChild($dir . '/' . $file)) {
+            $root->getChild($dir . '/' . $file)->chmod($fileMode);
         }
-        if ($directoryMode !== null && $root->hasChild(dirname($hook))) {
-            $root->getChild(dirname($hook))->chmod($directoryMode);
+        if ($directoryMode !== null && $root->hasChild($dir)) {
+            $root->getChild($dir)->chmod($directoryMode);
         }
         $hook = $root->url() . '/' . $hook;
         $processor = new ShellActivationHookProcessor(
             basename($hook),
-            'test',
-            0,
+            '00-test',
             $shell,
             $script,
             $root->url(),
@@ -230,38 +231,38 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
             ),
             'refuse removal of symlink' => array(
                 false,
-                'Refused to remove the shell-hook script vfs://test/target/00-test-post-activate.sh, as it is a symbolic link.',
-                array('target' => array('00-test-post-activate.sh' => 'symlink')),
-                array('target' => array('00-test-post-activate.sh' => 'symlink')),
+                'Refused to remove the shell-hook script vfs://test/target/post-activate.d/00-test.sh, as it is a symbolic link.',
+                array('target' => array('post-activate.d' => array('00-test.sh' => 'symlink'))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => 'symlink'))),
             ),
             'removal fails due to lack of permissions' => array(
                 false,
-                '/^Failed to remove the shell-hook script vfs:\/\/test\/target\/00-test-post-activate.sh: Could not delete/',
-                array('target' => array('00-test-post-activate.sh' => '')),
-                array('target' => array('00-test-post-activate.sh' => '')),
+                '/^Failed to remove the shell-hook script vfs:\/\/test\/target\/post-activate\.d\/00-test\.sh: Could not delete/',
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
                 0555,
             ),
             'refuse removal of dangling symlink' => array(
                 false,
-                'Refused to remove the shell-hook script vfs://test/target/00-test-post-activate.sh, as it is a dangling symbolic link.',
-                array('target' => array('00-test-post-activate.sh' => 'dangling symlink')),
-                array('target' => array('00-test-post-activate.sh' => 'dangling symlink')),
+                'Refused to remove the shell-hook script vfs://test/target/post-activate.d/00-test.sh, as it is a dangling symbolic link.',
+                array('target' => array('post-activate.d' => array('00-test.sh' => 'dangling symlink'))),
+                array('target' => array('post-activate.d' => array('00-test.sh' => 'dangling symlink'))),
                 0555,
             ),
             'skip removing missing file' => array(
                 true,
-                'Skipped removing the shell-hook script vfs://test/target/00-test-post-activate.sh, as it does not exist.',
-                array('target' => array()),
-                array('target' => array()),
+                'Skipped removing the shell-hook script vfs://test/target/post-activate.d/00-test.sh, as it does not exist.',
+                array('target' => array('post-activate.d' => array())),
+                array('target' => array('post-activate.d' => array())),
             ),
             'everything works as expected' => array(
                 true,
                 array(
-                    'Removed shell-hook script vfs://test/target/00-test-post-activate.sh.',
+                    'Removed shell-hook script vfs://test/target/post-activate.d/00-test.sh.',
                     '',
                 ),
-                array('target' => array()),
-                array('target' => array('00-test-post-activate.sh' => '')),
+                array('target' => array('post-activate.d' => array())),
+                array('target' => array('post-activate.d' => array('00-test.sh' => ''))),
             ),
         );
     }
@@ -292,19 +293,20 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
         $hook = 'target/post-activate'
     ) {
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
+        $file = '00-test.sh';
+        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
-        if ($fileMode !== null && $root->hasChild($hook)) {
-            $root->getChild($hook)->chmod($fileMode);
+        if ($fileMode !== null && $root->hasChild($dir . '/' . $file)) {
+            $root->getChild($dir . '/' . $file)->chmod($fileMode);
         }
-        if ($directoryMode !== null && $root->hasChild(dirname($hook))) {
-            $root->getChild(dirname($hook))->chmod($directoryMode);
+        if ($directoryMode !== null && $root->hasChild($dir)) {
+            $root->getChild($dir)->chmod($directoryMode);
         }
         $hook = $root->url() . '/' . $hook;
         $processor = new ShellActivationHookProcessor(
             basename($hook),
-            'test',
-            0,
+            '00-test',
             null,
             'test',
             $root->url(),

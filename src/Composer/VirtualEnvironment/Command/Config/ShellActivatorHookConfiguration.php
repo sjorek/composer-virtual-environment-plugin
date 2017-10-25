@@ -36,8 +36,6 @@ class ShellActivatorHookConfiguration extends AbstractCommandConfiguration
         }
         if ($input->getOption('priority')) {
             $config['priority'] = min(max(0, (int) $input->getOption('priority')), 99);
-        } else {
-            $config['priority'] = 0;
         }
         if ($input->getOption('shell')) {
             $config['shell'] = $input->getOption('shell');
@@ -53,14 +51,33 @@ class ShellActivatorHookConfiguration extends AbstractCommandConfiguration
                 if (!isset($hooks[$hook])) {
                     $hooks[$hook] = array();
                 }
-                $hooks[$hook][] = $config;
+                if (!isset($config['priority'])) {
+                    $config['priority'] = 0;
+                }
+                if (!isset($config['name'])) {
+                    $config['name'] = sha1(json_encode($config));
+                }
+                if (empty($config) || count($config) !== 4) {
+                    $output->writeln(
+                        sprintf(
+                            '<error>Missing or invalid shell-hook configuration for hook %s.</error>',
+                            $hook
+                            ),
+                        OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+                    );
+
+                    return false;
+                }
+                $name = sprintf('%02d-%s', $config['priority'], $config['name']);
+                unset($config['priority'], $config['name']);
+                $hooks[$hook][$name] = $config;
             }
         } elseif ($recipe->has('shell-hook')) {
             $hooks = $recipe->get('shell-hook');
         }
 
         foreach ($hooks as $hook => $hookConfigs) {
-            foreach ($hookConfigs as $config) {
+            foreach ($hookConfigs as $name => $config) {
                 if (!in_array($hook, ShellActivationHookProcessor::SHELL_HOOKS, true)) {
                     $output->writeln(
                         sprintf(
@@ -72,7 +89,7 @@ class ShellActivatorHookConfiguration extends AbstractCommandConfiguration
 
                     return false;
                 }
-                if (empty($config)) {
+                if (empty($config) || count($config) !== 2) {
                     $output->writeln(
                         sprintf(
                             '<error>Missing or invalid shell-hook configuration for hook %s.</error>',
@@ -86,7 +103,7 @@ class ShellActivatorHookConfiguration extends AbstractCommandConfiguration
                 if (!isset($hooks_expanded[$hook])) {
                     $hooks_expanded[$hook] = array();
                 }
-                $hooks_expanded[$hook][] = $this->expandConfig($config, false);
+                $hooks_expanded[$hook][$name] = $this->expandConfig($config, false);
             }
         }
         $this->set('shell-hook', $hooks);

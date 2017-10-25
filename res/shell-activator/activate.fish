@@ -16,7 +16,7 @@ else
     function deactivate  -d "Exit virtual environment and return to normal shell environment"
 
         if test "$argv[1]" != "nondestructive"
-            for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-pre-deactivate.sh" -or -name "*-pre-deactivate.fish" \) 2>/dev/null | sort )
+            for f in ( find "@SHELL_HOOK_DIR@/pre-deactivate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.fish" \) 2>/dev/null | sort )
                 source "$f"
             end
         end
@@ -40,22 +40,22 @@ else
             # Self destruct!
             functions -e deactivate
 
-            for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-post-deactivate.sh" -or -name "*-post-deactivate.fish" \) 2>/dev/null | sort )
-                source "$f"
-            end
-
             echo ""
             echo "Left virtual composer shell environment."
             echo ""
             echo "Good Bye!"
             echo ""
+
+            for f in ( find "@SHELL_HOOK_DIR@/post-deactivate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.fish" \) 2>/dev/null | sort )
+                source "$f"
+            end
         end
     end
 
     # unset irrelevant variables
     deactivate nondestructive
 
-    for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-pre-activate.sh" -or -name "*-pre-activate.fish" \) 2>/dev/null | sort )
+    for f in ( find "@SHELL_HOOK_DIR@/pre-activate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.fish" \) 2>/dev/null | sort )
         source "$f"
     end
 
@@ -108,7 +108,7 @@ else
     echo "Run 'deactivate' to exit the environment and return to normal shell."
     echo ""
 
-    for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-post-activate.sh" -or -name "*-post-activate.fish" \) 2>/dev/null | sort )
+    for f in ( find "@SHELL_HOOK_DIR@/post-activate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.fish" \) 2>/dev/null | sort )
         source "$f"
     end
 

@@ -24,7 +24,7 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
 
     const PROCESSOR_NAME = 'shell-hook script';
 
-    const SHELL_HOOK_DIR = '.composer-venv/shell-hook.d';
+    const SHELL_HOOK_DIR = '.composer-venv/hook';
 
     const SHELL_HOOKS = array(
         'post-activate',
@@ -37,7 +37,6 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
 
     protected $hook;
     protected $name;
-    protected $priority;
     protected $shell;
     protected $target;
     protected $script;
@@ -54,21 +53,19 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
      * @param string $baseDir
      * @param string $shellHookDir
      */
-    public function __construct($hook, $name, $priority, $shell, $script, $baseDir, $shellHookDir = null)
+    public function __construct($hook, $name, $shell, $script, $baseDir, $shellHookDir = null)
     {
         $this->hook = $hook;
         $this->name = $name;
-        $this->priority = (int) $priority;
         $this->shell = $shell ?: self::SHEBANG_SH;
         $this->script = $script;
         $this->baseDir = $baseDir;
         $this->shellHookDir = $shellHookDir ?: static::SHELL_HOOK_DIR;
         $this->target = sprintf(
-            '%s/%02d-%s-%s.%s',
+            '%s/%s.d/%s.%s',
             $this->shellHookDir,
-            $priority,
-            $name,
             $hook,
+            $name,
             basename($this->shell)
         );
         $this->filesystem = new Filesystem();

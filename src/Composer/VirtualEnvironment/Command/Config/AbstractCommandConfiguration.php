@@ -134,7 +134,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
             $this->recipe = $load;
         }
 
-        $this->set('lock', $input->getOption('lock') ? true : false);
+        $this->set('lock', $input->getOption('lock') ? !($this->recipe instanceof GlobalConfiguration) : false);
         $this->set('force', $input->getOption('force'));
         $this->set('remove', $input->getOption('remove'));
 
@@ -166,7 +166,7 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
         );
 
         $this->set('composer-venv-dir', '.composer-venv');
-        $this->set('shell-hook-dir', '{$composer-venv-dir}/shell-hook.d');
+        $this->set('shell-hook-dir', '{$composer-venv-dir}/hook');
         $this->set('shell-hook-dir-expanded', $this->parseExpansion($this->get('shell-hook-dir')));
 
         return $this->setup();

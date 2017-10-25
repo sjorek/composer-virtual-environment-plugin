@@ -16,8 +16,8 @@ fi
 
 deactivate () {
 
-    if [ -d "@SHELL_HOOK_DIR@" ] && [ ! "$1" = "nondestructive" ] ; then
-        source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-pre-deactivate.{sh,zsh} ) 2>/dev/null | sort | xargs cat )
+    if [ -d "@SHELL_HOOK_DIR@/pre-deactivate.d" ] && [ ! "$1" = "nondestructive" ] ; then
+        source <( find "@SHELL_HOOK_DIR@/pre-deactivate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.zsh" \) | sort | xargs cat )
     fi
 
     # reset old environment variables
@@ -47,8 +47,14 @@ deactivate () {
         # Self destruct!
         unset -f deactivate
 
-        if [ -d "@SHELL_HOOK_DIR@" ] ; then
-            source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-post-deactivate.{sh,zsh} ) 2>/dev/null | sort | xargs cat )
+        echo ""
+        echo "Left virtual composer shell environment."
+        echo ""
+        echo "Good Bye!"
+        echo ""
+
+        if [ -d "@SHELL_HOOK_DIR@/post-deactivate.d" ] ; then
+            source <( find "@SHELL_HOOK_DIR@/post-deactivate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.zsh" \) | sort | xargs cat )
 
             # This should detect zsh, which has a hash command that must
             # be called to get it to forget past commands.  Without forgetting
@@ -57,20 +63,14 @@ deactivate () {
                 hash -r
             fi
         fi
-
-        echo ""
-        echo "Left virtual composer shell environment."
-        echo ""
-        echo "Good Bye!"
-        echo ""
     fi
 }
 
 # unset irrelevant variables
 deactivate nondestructive
 
-if [ -d "@SHELL_HOOK_DIR@" ] ; then
-    source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-pre-activate.{sh,zsh} ) 2>/dev/null | sort | xargs cat )
+if [ -d "@SHELL_HOOK_DIR@/pre-activate.d" ] ; then
+    source <( find "@SHELL_HOOK_DIR@/pre-activate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.zsh" \) | sort | xargs cat )
 fi
 
 COMPOSER_VENV="@NAME@"
@@ -113,8 +113,8 @@ echo ""
 echo "Run 'deactivate' to exit the environment and return to normal shell."
 echo ""
 
-if [ -d "@SHELL_HOOK_DIR@" ] ; then
-    source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-post-activate.{sh,zsh} 2>/dev/null ) | sort | xargs cat )
+if [ -d "@SHELL_HOOK_DIR@/post-activate.d" ] ; then
+    source <( find "@SHELL_HOOK_DIR@/post-activate.d" -maxdepth 1 -type f \( -name "*.sh" -or -name "*.zsh" \) | sort | xargs cat )
 
     # This should detect zsh, which has a hash command that must
     # be called to get it to forget past commands.  Without forgetting

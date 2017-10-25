@@ -171,7 +171,7 @@ EOT
     protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('git-hook-expanded');
-        if (empty($hooks)) {
+        if (empty(array_filter($hooks))) {
             $output->writeln(
                 '<error>Skipping creation of git-hooks, as none is available.</error>'
             );
@@ -202,7 +202,7 @@ EOT
     protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('git-hook-expanded');
-        if (empty($hooks)) {
+        if (empty(array_filter($hooks))) {
             $output->writeln(
                 '<error>Skipping removal of git-hooks, as none is available.</error>'
             );

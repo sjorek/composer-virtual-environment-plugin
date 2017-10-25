@@ -29,8 +29,8 @@ class ShellActivatorHookCommand extends AbstractProcessorCommand
     protected function configure()
     {
         $this
-            ->setName('virtual-environment:shell-hook')
-            ->setAliases(array('venv:shell-hook'))
+            ->setName('virtual-environment:hook')
+            ->setAliases(array('venv:hook'))
             ->setDescription('Add or remove virtual environment shell activation hook scripts.')
             ->setDefinition(
                 $this->addDefaultDefinition(
@@ -70,14 +70,14 @@ class ShellActivatorHookCommand extends AbstractProcessorCommand
             )
             ->setHelp(
                 <<<EOT
-The <info>virtual-environment:shell-hook</info> command creates files
+The <info>virtual-environment:hook</info> command creates files
 triggered when the virtual environment shell is activated or deactivated.
 
 Examples:
 
 Simple shell script using the shell detection
 
-    <info>php composer.phar venv:shell-hook post-activate \
+    <info>php composer.phar venv:hook post-activate \
         --name=composer-run-script-xyz \
         --script='composer run-script xyz'</info>
 
@@ -85,7 +85,7 @@ Simple shell script using the shell detection
 
 Simple shell script using the default shebang "#!/bin/sh"
 
-    <info>php composer.phar venv:shell-hook post-activate \
+    <info>php composer.phar venv:hook post-activate \
         --name=composer-run-script-xyz \
         --script='composer run-script xyz' \
         --shell=sh</info>
@@ -117,7 +117,7 @@ EOT
     protected function deploy(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('shell-hook-expanded');
-        if (empty($hooks)) {
+        if (empty(array_filter($hooks))) {
             $output->writeln(
                 '<error>Skipping creation of shell activation hooks, none available.</error>'
             );
@@ -125,11 +125,10 @@ EOT
             $baseDir = $config->get('base-dir');
             $shellHookDir = $config->get('shell-hook-dir-expanded');
             foreach ($hooks as $hook => $hookConfigs) {
-                foreach ($hookConfigs as $hookConfig) {
+                foreach ($hookConfigs as $hookName => $hookConfig) {
                     $processor = new ShellActivationHookProcessor(
                         $hook,
-                        $hookConfig['name'],
-                        $hookConfig['priority'],
+                        $hookName,
                         $hookConfig['shell'],
                         $hookConfig['script'],
                         $baseDir,
@@ -148,7 +147,7 @@ EOT
     protected function rollback(CommandConfigurationInterface $config, OutputInterface $output)
     {
         $hooks = $config->get('shell-hook-expanded');
-        if (empty($hooks)) {
+        if (empty(array_filter($hooks))) {
             $output->writeln(
                 '<error>Skipping removal of shell activation hooks, as none is available.</error>'
             );
@@ -156,11 +155,10 @@ EOT
             $baseDir = $config->get('base-dir');
             $shellHookDir = $config->get('shell-hook-dir-expanded');
             foreach ($hooks as $hook => $hookConfigs) {
-                foreach ($hookConfigs as $hookConfig) {
+                foreach ($hookConfigs as $hookName => $hookConfig) {
                     $processor = new ShellActivationHookProcessor(
                         $hook,
-                        $hookConfig['name'],
-                        $hookConfig['priority'],
+                        $hookName,
                         $hookConfig['shell'],
                         $hookConfig['script'],
                         $baseDir,

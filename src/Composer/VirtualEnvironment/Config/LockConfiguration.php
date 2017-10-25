@@ -39,4 +39,31 @@ class LockConfiguration extends FileConfiguration
         }
         parent::__construct($composer, $file);
     }
+
+    /**
+     * @param  array $data
+     * @return array
+     */
+    protected function prepareSave(array $data)
+    {
+        if (isset($data['content-hash'])) {
+            unset($data['content-hash']);
+        }
+
+        return parent::prepareSave(array_merge(array('content-hash' => '@COMPOSERVER_VENV_LOCK_HASH@'), $data));
+    }
+
+    /**
+     * @param  array        $data
+     * @return string|false
+     */
+    protected function createJson(array $data)
+    {
+        $json = parent::createJson($data);
+        if ($json === false) {
+            return $json;
+        }
+
+        return str_replace('@COMPOSERVER_VENV_LOCK_HASH@', sha1($json), $json);
+    }
 }

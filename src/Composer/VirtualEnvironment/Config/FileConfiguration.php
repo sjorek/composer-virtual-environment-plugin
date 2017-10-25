@@ -92,8 +92,7 @@ class FileConfiguration extends AbstractConfiguration implements FileConfigurati
         if ($this->dirty || $force) {
             $data = $this->export();
             $this->sortArrayByKeyRecursive($data);
-            $data = array_merge(array('info' => static::INFO), $data);
-            $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES /* | JSON_FORCE_OBJECT */);
+            $json = $this->createJson($this->prepareSave($data));
             if ($json === false) {
                 return false;
             }
@@ -105,6 +104,24 @@ class FileConfiguration extends AbstractConfiguration implements FileConfigurati
         }
 
         return !$this->dirty;
+    }
+
+    /**
+     * @param  array $data
+     * @return array
+     */
+    protected function prepareSave(array $data)
+    {
+        return array_merge(array('info' => static::INFO), $data);
+    }
+
+    /**
+     * @param  array        $data
+     * @return string|false
+     */
+    protected function createJson(array $data)
+    {
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES /* | JSON_FORCE_OBJECT */);
     }
 
     /**

@@ -10,41 +10,44 @@ if ("$?COMPOSER_VENV") then
 endif
 
 alias deactivate '\
-if ( "\!:*" != "nondestructive" ) \
-    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-pre-deactivate.{csh,sh} /dev/nul[l] ) \
-        source "$composer_venv_hook_file" \
+if (! "$?nondestructive") then \
+    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@/pre-deactivate.d"/*.{csh,sh} /dev/nul[l] ) \
+       source "$composer_venv_hook_file" \
     end\
     unset composer_venv_hook_file \
 endif \
-if ( "$?_OLD_COMPOSER_VENV_PATH" != 0 ) \
+if ( "$?_OLD_COMPOSER_VENV_PATH" != 0 ) then \
     setenv PATH "$_OLD_COMPOSER_VENV_PATH" \
     unset _OLD_COMPOSER_VENV_PATH \
 endif \
 rehash \
-if ( "$?_OLD_COMPOSER_VENV_PROMPT" != 0 ) \
+if ( "$?_OLD_COMPOSER_VENV_PROMPT" != 0 ) then \
     set prompt="$_OLD_COMPOSER_VENV_PROMPT" \
     unset _OLD_COMPOSER_VENV_PROMPT \
 endif \
 unsetenv COMPOSER_VENV \
 unsetenv COMPOSER_VENV_DIR \
-if ( "\!:*" != "nondestructive" ) \
+if (! "$?nondestructive") then \
     unalias deactivate \
-    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-post-deactivate.{csh,sh} /dev/nul[l] ) \
-        source "$composer_venv_hook_file" \
-    end\
-    unset composer_venv_hook_file \
     echo "" \
     echo "Left virtual composer shell environment." \
     echo "" \
     echo "Good Bye!" \
     echo "" \
+    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@/post-deactivate.d"/*.{csh,sh} /dev/nul[l] ) \
+        source "$composer_venv_hook_file" \
+    end\
+    unset composer_venv_hook_file \
+    rehash \
 endif \
 '
 
 # Unset irrelevant variables.
-deactivate nondestructive
+set nondestructive=1
+deactivate
+unset nondestructive
 
-foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-pre-activate.{csh,sh} /dev/nul[l] )
+foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@/pre-activate.d"/*.{csh,sh} /dev/nul[l] )
     source "$composer_venv_hook_file"
 end
 unset composer_venv_hook_file
@@ -85,10 +88,12 @@ echo ""
 echo "Run 'deactivate' to exit the environment and return to normal shell."
 echo ""
 
-foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-post-activate.{csh,sh} /dev/nul[l] )
+foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@/post-activate.d"/*.{csh,sh} /dev/nul[l] )
     source "$composer_venv_hook_file"
 end
 unset composer_venv_hook_file
+
+rehash
 
 goto done
 
