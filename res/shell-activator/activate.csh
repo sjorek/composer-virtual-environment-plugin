@@ -9,10 +9,45 @@ if ("$?COMPOSER_VENV") then
     goto skip 
 endif
 
-alias deactivate 'test $?_OLD_COMPOSER_VENV_PATH != 0 && setenv PATH "$_OLD_COMPOSER_VENV_PATH" && unset _OLD_COMPOSER_VENV_PATH; rehash; test $?_OLD_COMPOSER_VENV_PROMPT != 0 && set prompt="$_OLD_COMPOSER_VENV_PROMPT" && unset _OLD_COMPOSER_VENV_PROMPT; unsetenv COMPOSER_VENV; unsetenv COMPOSER_VENV_DIR; test "\!:*" != "nondestructive" && unalias deactivate && echo "" && echo "Left virtual composer shell environment." && echo "" && echo "Good Bye!" && echo ""'
+alias deactivate '\
+if ( "\!:*" != "nondestructive" ) \
+    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-pre-deactivate.{csh,sh} /dev/nul[l] ) \
+        source "$composer_venv_hook_file" \
+    end\
+    unset composer_venv_hook_file \
+endif \
+if ( "$?_OLD_COMPOSER_VENV_PATH" != 0 ) \
+    setenv PATH "$_OLD_COMPOSER_VENV_PATH" \
+    unset _OLD_COMPOSER_VENV_PATH \
+endif \
+rehash \
+if ( "$?_OLD_COMPOSER_VENV_PROMPT" != 0 ) \
+    set prompt="$_OLD_COMPOSER_VENV_PROMPT" \
+    unset _OLD_COMPOSER_VENV_PROMPT \
+endif \
+unsetenv COMPOSER_VENV \
+unsetenv COMPOSER_VENV_DIR \
+if ( "\!:*" != "nondestructive" ) \
+    unalias deactivate \
+    foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-post-deactivate.{csh,sh} /dev/nul[l] ) \
+        source "$composer_venv_hook_file" \
+    end\
+    unset composer_venv_hook_file \
+    echo "" \
+    echo "Left virtual composer shell environment." \
+    echo "" \
+    echo "Good Bye!" \
+    echo "" \
+endif \
+'
 
 # Unset irrelevant variables.
 deactivate nondestructive
+
+foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-pre-activate.{csh,sh} /dev/nul[l] )
+    source "$composer_venv_hook_file"
+end
+unset composer_venv_hook_file
 
 setenv COMPOSER_VENV "@NAME@"
 setenv COMPOSER_VENV_DIR "@BASE_DIR@"
@@ -49,6 +84,12 @@ echo "    Path: $COMPOSER_VENV_DIR"
 echo ""
 echo "Run 'deactivate' to exit the environment and return to normal shell."
 echo ""
+
+foreach composer_venv_hook_file ( "@SHELL_HOOK_DIR@"/*-post-activate.{csh,sh} /dev/nul[l] )
+    source "$composer_venv_hook_file"
+end
+unset composer_venv_hook_file
+
 goto done
 
 

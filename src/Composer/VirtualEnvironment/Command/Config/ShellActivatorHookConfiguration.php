@@ -30,11 +30,6 @@ class ShellActivatorHookConfiguration extends AbstractCommandConfiguration
         $input = $this->input;
         $output = $this->output;
 
-        $this->set(
-            'shell-hook-dir-expanded',
-            $this->parseExpansion($this->set('shell-hook-dir', '{$composer-venv-dir}/shell-hook.d'))
-        );
-
         $config = array();
         if ($input->getOption('name')) {
             $config['name'] = $input->getOption('name');

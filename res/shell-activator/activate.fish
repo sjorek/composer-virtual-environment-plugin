@@ -14,7 +14,14 @@ if test -n "$COMPOSER_VENV"
 else
 
     function deactivate  -d "Exit virtual environment and return to normal shell environment"
-        # reset old environment variables
+
+        if test "$argv[1]" != "nondestructive"
+            for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-pre-deactivate.sh" -or -name "*-pre-deactivate.fish" \) 2>/dev/null | sort )
+                source "$f"
+            end
+        end
+
+                # reset old environment variables
         if test -n "$_OLD_COMPOSER_VENV_PATH"
             set -gx PATH $_OLD_COMPOSER_VENV_PATH
             set -e _OLD_COMPOSER_VENV_PATH
@@ -33,6 +40,10 @@ else
             # Self destruct!
             functions -e deactivate
 
+            for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-post-deactivate.sh" -or -name "*-post-deactivate.fish" \) 2>/dev/null | sort )
+                source "$f"
+            end
+
             echo ""
             echo "Left virtual composer shell environment."
             echo ""
@@ -43,6 +54,10 @@ else
 
     # unset irrelevant variables
     deactivate nondestructive
+
+    for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-pre-activate.sh" -or -name "*-pre-activate.fish" \) 2>/dev/null | sort )
+        source "$f"
+    end
 
     set -gx COMPOSER_VENV "@NAME@"
     set -gx COMPOSER_VENV_DIR "@BASE_DIR@"
@@ -92,4 +107,9 @@ else
     echo ""
     echo "Run 'deactivate' to exit the environment and return to normal shell."
     echo ""
+
+    for f in ( find "@SHELL_HOOK_DIR@" -maxdepth 1 -type f \( -name "*-post-activate.sh" -or -name "*-post-activate.fish" \) 2>/dev/null | sort )
+        source "$f"
+    end
+
 end

@@ -57,15 +57,9 @@ if [ ! -z "${COMPOSER_VENV}" ] ; then
 fi
 
 deactivate () {
-    # This should detect bash, which has a hash command that must
-    # be called to get it to forget past commands.  Without forgetting
-    # past commands the $PATH changes we made may not be respected
-    if [ -n "$BASH_VERSION" ] ; then
-        hash -r
-    fi
 
-    if [ -d "${COMPOSER_VENV_DIR}/.composer-venv.d" ] ; then
-        source <( cat "${COMPOSER_VENV_DIR}/.composer-venv.d/*.bash" 2>/dev/null ) deactivate
+    if [ -d "@SHELL_HOOK_DIR@" ] && [ ! "$1" = "nondestructive" ] ; then
+        source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-pre-deactivate.{sh,bash} ) 2>/dev/null | sort | xargs cat )
     fi
 
     # reset old environment variables
@@ -84,9 +78,28 @@ deactivate () {
     unset COMPOSER_VENV
     unset COMPOSER_VENV_DIR
     unset COMPOSER_VENV_COLORS
+
+    # This should detect bash, which has a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "$BASH_VERSION" ] ; then
+        hash -r
+    fi
+
     if [ ! "$1" = "nondestructive" ] ; then
         # Self destruct!
         unset -f deactivate
+
+        if [ -d "@SHELL_HOOK_DIR@" ] ; then
+            source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-post-deactivate.{sh,bash} ) 2>/dev/null | sort | xargs cat )
+
+            # This should detect bash, which has a hash command that must
+            # be called to get it to forget past commands.  Without forgetting
+            # past commands the $PATH changes we made may not be respected
+            if [ -n "$BASH_VERSION" ] ; then
+                hash -r
+            fi
+        fi
 
         echo ""
         echo "Left virtual composer shell environment."
@@ -98,6 +111,10 @@ deactivate () {
 
 # unset irrelevant variables
 deactivate nondestructive
+
+if [ -d "@SHELL_HOOK_DIR@" ] ; then
+    source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-pre-activate.{sh,bash} ) 2>/dev/null | sort | xargs cat )
+fi
 
 COMPOSER_VENV="@NAME@"
 export COMPOSER_VENV
@@ -123,10 +140,6 @@ if [ -z "$COMPOSER_VENV_DISABLE_PROMPT" ] ; then
     export PS1
 fi
 
-if [ -d "${COMPOSER_VENV_DIR}/.composer-venv.d" ] ; then
-    source <( cat "${COMPOSER_VENV_DIR}/.composer-venv.d/*.bash" 2>/dev/null ) activate
-fi
-
 # This should detect bash, which has a hash command that must
 # be called to get it to forget past commands.  Without forgetting
 # past commands the $PATH changes we made may not be respected
@@ -142,6 +155,17 @@ echo "    Path: $(_COMPOSER_VENV_getcolor 'bold')$(_COMPOSER_VENV_getcolor 'gree
 echo ""
 echo "Run '$(_COMPOSER_VENV_getcolor 'bold')$(_COMPOSER_VENV_getcolor 'yellow')deactivate$(_COMPOSER_VENV_getcolor 'normal')' to exit the environment and return to normal shell."
 echo ""
+
+if [ -d "@SHELL_HOOK_DIR@" ] ; then
+    source <( ( ls -1 "@SHELL_HOOK_DIR@"/*-post-activate.{sh,bash} 2>/dev/null ) | sort | xargs cat )
+
+    # This should detect bash, which has a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "$BASH_VERSION" ] ; then
+        hash -r
+    fi
+fi
 
 # remove color helper
 unset -f _COMPOSER_VENV_getcolor

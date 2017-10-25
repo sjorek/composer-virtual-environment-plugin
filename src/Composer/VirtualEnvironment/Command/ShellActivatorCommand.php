@@ -145,6 +145,7 @@ EOT
                 '@BASE_DIR@' => $baseDir,
                 '@BIN_DIR@' => $baseDir . DIRECTORY_SEPARATOR . $binDir,
                 '@BIN_PATH@' => $binDir,
+                '@SHELL_HOOK_DIR@' => $baseDir . DIRECTORY_SEPARATOR . $config->get('shell-hook-dir-expanded'),
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
             foreach ($activators as $name => $activator) {

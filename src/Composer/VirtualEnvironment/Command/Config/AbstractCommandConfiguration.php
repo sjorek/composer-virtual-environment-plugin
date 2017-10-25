@@ -166,6 +166,8 @@ abstract class AbstractCommandConfiguration extends AbstractConfiguration implem
         );
 
         $this->set('composer-venv-dir', '.composer-venv');
+        $this->set('shell-hook-dir', '{$composer-venv-dir}/shell-hook.d');
+        $this->set('shell-hook-dir-expanded', $this->parseExpansion($this->get('shell-hook-dir')));
 
         return $this->setup();
     }
