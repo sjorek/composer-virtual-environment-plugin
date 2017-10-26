@@ -349,4 +349,3 @@ repository, everything should work like a breeze.
 [![GitHub Watchers](https://img.shields.io/github/watchers/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://github.com/sjorek/composer-virtual-environment-plugin/watchers)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/sjorek/composer-virtual-environment-plugin.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fsjorek.github.io%2Fcomposer-virtual-environment-plugin%2F)
 
-
