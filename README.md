@@ -2,9 +2,10 @@
 
 A [composer](http://getcomposer.org)-plugin adding three commands to composer:
 
-1. `venv:shell` - activate/deactivate the current bin-directory in shell
-2. `venv:link` - create symlinks to arbitrary locations
-3. `venv:git-hook` - create git-hooks from various sources
+1. `venv:shell` - activate/deactivate the composer virtual environment in shell
+2. `venv:hook` - add/remove shell hooks, triggered on activating or deactivating the virtual environment
+3. `venv:link` - create symlinks to arbitrary locations
+4. `venv:git-hook` - create git-hooks from various sources
 
 
 ## Installation
