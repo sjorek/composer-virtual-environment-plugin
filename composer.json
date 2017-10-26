@@ -41,11 +41,17 @@
 		"class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
 	},
 	"scripts": {
-		"composer-virtual-environment-plugin:build": "composer composer-virtual-environment-plugin:cs-lint && composer composer-virtual-environment-plugin:test-all",
+		"composer-virtual-environment-plugin:build": [
+			"@composer-virtual-environment-plugin:cs-lint",
+			"@composer-virtual-environment-plugin:test-all"
+		],
 		"composer-virtual-environment-plugin:test": "phpunit -v --exclude-group=large",
 		"composer-virtual-environment-plugin:test-all": "phpunit -v",
 		"composer-virtual-environment-plugin:test-large": "phpunit -v --group=large",
-		"composer-virtual-environment-plugin:test-coverage": "( [ -d coverage ] && rm -r coverage ) && phpunit -v --coverage-html coverage",
+		"composer-virtual-environment-plugin:test-coverage": [
+			"[ -d coverage ] && rm -r coverage",
+			"phpunit -v --coverage-html coverage"
+		],
 		"composer-virtual-environment-plugin:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
 		"composer-virtual-environment-plugin:cs-fix": "php-cs-fixer fix -vv || true"
 	}
