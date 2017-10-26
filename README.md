@@ -1,4 +1,4 @@
-# [“virtual-environment” command-plugin](https://sjorek.github.io/composer-virtual-environment-plugin/) for [composer](http://getcomposer.org)
+# [“virtual-environment”](https://sjorek.github.io/composer-virtual-environment-plugin/) [composer-plugin](http://getcomposer.org)
 
 A [composer](http://getcomposer.org)-plugin adding three commands to composer:
 
