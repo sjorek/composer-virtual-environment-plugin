@@ -47,7 +47,7 @@
             "@composer-virtual-environment-plugin:test-coverage"
         ],
         "composer-virtual-environment-plugin:clean": [
-            "[ -d coverage ] && rm -r coverage"
+            "[ -d coverage ] && rm -r coverage || true"
         ],
         "composer-virtual-environment-plugin:test": "phpunit -v --exclude-group=large",
         "composer-virtual-environment-plugin:test-all": "phpunit -v",
