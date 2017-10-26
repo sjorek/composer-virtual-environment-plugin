@@ -14,7 +14,8 @@
         "environment",
         "shell",
         "php",
-        "composer"
+        "composer",
+        "composer-plugin"
     ],
     "autoload" : {
         "psr-4" : {
