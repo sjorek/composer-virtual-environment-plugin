@@ -1,58 +1,59 @@
 {
-	"name" : "sjorek/composer-virtual-environment-plugin",
-	"description" : "A composer-plugin adding shell, symbolic link and git-hook related commands to composer.",
-	"homepage" : "https://sjorek.github.io/composer-virtual-environment-plugin/",
-	"license" : "BSD-3-Clause",
-	"authors" : [
-		{
-			"name" : "Stephan Jorek",
-			"email" : "stephan.jorek@gmail.com"
-		}
-	],
-	"type" : "composer-plugin",
-	"keywords" : [
-		"environment",
-		"shell",
-		"php",
-		"composer"
-	],
-	"autoload" : {
-		"psr-4" : {
-			"Sjorek\\Composer\\VirtualEnvironment\\" : "src/Composer/VirtualEnvironment"
-		}
-	},
-	"autoload-dev" : {
-		"psr-4" : {
-			"Sjorek\\Composer\\VirtualEnvironment\\Tests\\" : "tests/Composer/VirtualEnvironment/Tests"
-		}
-	},
-	"require" : {
-		"php" : "^7.0",
-		"composer-plugin-api" : "^1.1"
-	},
-	"require-dev" : {
-		"composer/composer" : "^1.5",
-		"friendsofphp/php-cs-fixer" : "^2.7",
-		"phpunit/phpunit" : "^6.4",
-		"mikey179/vfsStream" : "^1.6",
-		"symfony/process": "^3.3"
-	},
-	"extra" : {
-		"class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
-	},
-	"scripts": {
-		"composer-virtual-environment-plugin:build": [
-			"@composer-virtual-environment-plugin:cs-lint",
-			"@composer-virtual-environment-plugin:test-all"
-		],
-		"composer-virtual-environment-plugin:test": "phpunit -v --exclude-group=large",
-		"composer-virtual-environment-plugin:test-all": "phpunit -v",
-		"composer-virtual-environment-plugin:test-large": "phpunit -v --group=large",
-		"composer-virtual-environment-plugin:test-coverage": [
-			"[ -d coverage ] && rm -r coverage",
-			"phpunit -v --coverage-html coverage"
-		],
-		"composer-virtual-environment-plugin:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
-		"composer-virtual-environment-plugin:cs-fix": "php-cs-fixer fix -vv || true"
-	}
+    "name" : "sjorek/composer-virtual-environment-plugin",
+    "description" : "A composer-plugin adding shell, symbolic link and git-hook related commands to composer.",
+    "homepage" : "https://sjorek.github.io/composer-virtual-environment-plugin/",
+    "license" : "BSD-3-Clause",
+    "authors" : [
+        {
+            "name" : "Stephan Jorek",
+            "email" : "stephan.jorek@gmail.com"
+        }
+    ],
+    "type" : "composer-plugin",
+    "keywords" : [
+        "environment",
+        "shell",
+        "php",
+        "composer"
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "Sjorek\\Composer\\VirtualEnvironment\\" : "src/Composer/VirtualEnvironment"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "Sjorek\\Composer\\VirtualEnvironment\\Tests\\" : "tests/Composer/VirtualEnvironment/Tests"
+        }
+    },
+    "require" : {
+        "php" : "^7.0",
+        "composer-plugin-api" : "^1.1"
+    },
+    "require-dev" : {
+        "composer/composer" : "^1.5",
+        "friendsofphp/php-cs-fixer" : "^2.7",
+        "phpunit/phpunit" : "^6.4",
+        "mikey179/vfsStream" : "^1.6",
+        "symfony/process": "^3.3"
+    },
+    "extra" : {
+        "class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
+    },
+    "scripts": {
+        "composer-virtual-environment-plugin:build": [
+            "@composer-virtual-environment-plugin:clean",
+            "@composer-virtual-environment-plugin:cs-lint",
+            "@composer-virtual-environment-plugin:test-coverage"
+        ],
+        "composer-virtual-environment-plugin:clean": [
+            "[ -d coverage ] && rm -r coverage"
+        ],
+        "composer-virtual-environment-plugin:test": "phpunit -v --exclude-group=large",
+        "composer-virtual-environment-plugin:test-all": "phpunit -v",
+        "composer-virtual-environment-plugin:test-large": "phpunit -v --group=large",
+        "composer-virtual-environment-plugin:test-coverage": "phpunit -v --coverage-html coverage",
+        "composer-virtual-environment-plugin:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
+        "composer-virtual-environment-plugin:cs-fix": "php-cs-fixer fix -vv || true"
+    }
 }
