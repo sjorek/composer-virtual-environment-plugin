@@ -9,27 +9,29 @@ export COMPOSER_VENV_COLORS
 
 if [ -n "${COMPOSER_VENV_COLORS}" ] && [ ! "${COMPOSER_VENV_COLORS}" = "0" ] ; then
     _COMPOSER_VENV_getcolor () {
-        local color ncolors bold underline standout normal black red green yellow blue magenta cyan white
+        if [ -n "${COMPOSER_VENV_COLORS}" ] && [ ! "${COMPOSER_VENV_COLORS}" = "0" ] ; then
+            local color ncolors bold underline standout normal black red green yellow blue magenta cyan white
 
-        color=$1
+            color=$1
 
-        # see if bash supports colors...
-        ncolors=@TPUT_COLORS@        # $(tput colors)
+            # see if bash supports colors...
+            ncolors=@TPUT_COLORS@        # $(tput colors)
 
-        if [ -n "$ncolors" ] && [ $ncolors -ge 8 ] ; then
-            bold="@TPUT_BOLD@"       # "$(tput bold)"
-            underline="@TPUT_SMUL@"  # "$(tput smul)"
-            standout="@TPUT_SMSO@"   # "$(tput smso)"
-            normal="@TPUT_SGR0@"     # "$(tput sgr0)"
-            black="@TPUT_SETAF_0@"   # "$(tput setaf 0)"
-            red="@TPUT_SETAF_1@"     # "$(tput setaf 1)"
-            green="@TPUT_SETAF_2@"   # "$(tput setaf 2)"
-            yellow="@TPUT_SETAF_3@"  # "$(tput setaf 3)"
-            blue="@TPUT_SETAF_4@"    # "$(tput setaf 4)"
-            magenta="@TPUT_SETAF_5@" # "$(tput setaf 5)"
-            cyan="@TPUT_SETAF_6@"    # "$(tput setaf 6)"
-            white="@TPUT_SETAF_7@"   # "$(tput setaf 7)"
-            echo ${!color}
+            if [ -n "$ncolors" ] && [ $ncolors -ge 8 ] ; then
+                bold="@TPUT_BOLD@"       # "$(tput bold)"
+                underline="@TPUT_SMUL@"  # "$(tput smul)"
+                standout="@TPUT_SMSO@"   # "$(tput smso)"
+                normal="@TPUT_SGR0@"     # "$(tput sgr0)"
+                black="@TPUT_SETAF_0@"   # "$(tput setaf 0)"
+                red="@TPUT_SETAF_1@"     # "$(tput setaf 1)"
+                green="@TPUT_SETAF_2@"   # "$(tput setaf 2)"
+                yellow="@TPUT_SETAF_3@"  # "$(tput setaf 3)"
+                blue="@TPUT_SETAF_4@"    # "$(tput setaf 4)"
+                magenta="@TPUT_SETAF_5@" # "$(tput setaf 5)"
+                cyan="@TPUT_SETAF_6@"    # "$(tput setaf 6)"
+                white="@TPUT_SETAF_7@"   # "$(tput setaf 7)"
+                echo ${!color}
+            fi
         fi
     }
 
