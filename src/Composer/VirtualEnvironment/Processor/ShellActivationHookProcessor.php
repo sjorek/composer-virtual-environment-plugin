@@ -129,27 +129,23 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
      */
     protected function renderTemplate($content, OutputInterface $output, $force = false)
     {
-        if ($this->filesystem->isAbsolutePath($this->shell)) {
-            $shebang = $this->shell;
-        } else {
-            $shebang = $this->shell === 'sh' ? self::SHEBANG_SH : sprintf(self::SHEBANG_ENV, $this->shell);
-        }
-        $shebang = explode(' ', $shebang);
+        $shebang = $this->shell === 'sh' ? self::SHEBANG_SH : $this->shell;
+        $shebang = explode(' ', $shebang, 2);
         if (!$this->filesystem->isAbsolutePath($shebang[0])) {
-            $shebang[0] = $this->baseDir . DIRECTORY_SEPARATOR . $shebang[0];
+            $shebang = explode(' ', sprintf(self::SHEBANG_ENV, implode(' ', $shebang)), 2);
         }
         $shebang[0] = $this->filesystem->normalizePath($shebang[0]);
         if (!(file_exists($shebang[0]) || is_link($shebang[0]))) {
             $output->writeln(
                 sprintf(
                     '<error>The shebang executable "%s" does not exist for shell-hook script: %s</error>',
-                    $this->shebang,
+                    $shebang[0],
                     $content
                 ),
                 OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_QUIET
             );
         }
-        $shebang = implode(' ', $shebang);
+        $shebang = trim(implode(' ', $shebang));
         $content = implode(
             PHP_EOL,
             array(

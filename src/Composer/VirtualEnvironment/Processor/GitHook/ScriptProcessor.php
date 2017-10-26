@@ -28,11 +28,11 @@ class ScriptProcessor extends AbstractProcessor implements ShellConstants
     protected $shebang;
 
     /**
-     * @param string      $hook
-     * @param string      $script
-     * @param string      $baseDir
-     * @param string      $gitHookDir
-     * @param string|bool $shebang
+     * @param string $hook
+     * @param string $script
+     * @param string $baseDir
+     * @param string $gitHookDir
+     * @param string $shebang
      */
     public function __construct($hook, $script, $baseDir, $gitHookDir = null, $shebang = null)
     {
@@ -74,9 +74,9 @@ class ScriptProcessor extends AbstractProcessor implements ShellConstants
      */
     protected function renderTemplate($content, OutputInterface $output, $force = false)
     {
-        $shebang = explode(' ', $this->shebang);
+        $shebang = explode(' ', $this->shebang, 2);
         if (!$this->filesystem->isAbsolutePath($shebang[0])) {
-            $shebang[0] = $this->baseDir . DIRECTORY_SEPARATOR . $shebang[0];
+            $shebang = explode(' ', sprintf(self::SHEBANG_ENV, implode(' ', $shebang)), 2);
         }
         $shebang[0] = $this->filesystem->normalizePath($shebang[0]);
         if (!(file_exists($shebang[0]) || is_link($shebang[0]))) {

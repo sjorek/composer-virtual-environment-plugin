@@ -36,11 +36,14 @@ class ShellActivatorConfigurationTest extends TestCase
             'candidate repetitions return unique activator' => array(
                 array('bash'), array('bash', 'BASH'),
             ),
-            'detection returns shell for supported shell' => array(
-                array('bash'), array('detect'), '/absolute/path/to/bash',
+            'detection returns shell for supported shell via _SERVER' => array(
+                array('bash'), array('detect'), '/absolute/path/to/bash', null,
+            ),
+            'detection returns shell for supported shell via _ENV' => array(
+                array('bash'), array('detect'), null, '/absolute/path/to/bash',
             ),
             'detection returns empty for unsupported shell' => array(
-                array(), array('detect'), '/absolute/path/to/xxsh',
+                array(), array('detect'),
             ),
             'all available return all available' => array(
                 ShellActivatorConfiguration::SHELLS,
@@ -56,13 +59,14 @@ class ShellActivatorConfigurationTest extends TestCase
      *
      * @param array       $expected
      * @param array       $candidates
-     * @param string|null $shell
+     * @param string|null $serverSh
+     * @param string|null $envSh
      * @see ShellActivatorConfiguration::validateActivators()
      */
-    public function checkValidateActivators(array $expected, array $candidates, $shell = null)
+    public function checkValidateActivators(array $expected, array $candidates, $serverSh = 'x', $envSh = 'x')
     {
-        $_SERVER['SHELL'] = $shell ?: 'no-shell';
-        $_ENV['SHELL'] = $shell ?: 'no-shell';
+        $_SERVER['SHELL'] = $serverSh;
+        $_ENV['SHELL'] = $envSh;
         $this->assertEquals($expected, ShellActivatorConfiguration::validateActivators($candidates));
     }
 
@@ -72,7 +76,7 @@ class ShellActivatorConfigurationTest extends TestCase
             'empty activators return empty activator scripts' => array(
                 array(), array(), null,
             ),
-            'one activator returns activator script' => array(
+            'one activator returns activator script for _SERVER' => array(
                 array(
                     'bash' => array(
                         'filename' => 'activate.bash',
@@ -80,6 +84,18 @@ class ShellActivatorConfigurationTest extends TestCase
                     ),
                 ),
                 array('bash'),
+                '/custom/path/to/bash',
+                null,
+            ),
+            'one activator returns activator script for _ENV' => array(
+                array(
+                    'bash' => array(
+                        'filename' => 'activate.bash',
+                        'shell' => '/custom/path/to/bash',
+                    ),
+                ),
+                array('bash'),
+                null,
                 '/custom/path/to/bash',
             ),
             'two activators, but not bash or zsh, return two activator scripts' => array(
@@ -177,10 +193,10 @@ class ShellActivatorConfigurationTest extends TestCase
      * @param string|null $shell
      * @see ShellActivatorConfiguration::expandActivators()
      */
-    public function checkExpandActivators(array $expected, array $candidates, $shell = null)
+    public function checkExpandActivators(array $expected, array $candidates, $serverSh = 'x', $envSh = 'x')
     {
-        $_SERVER['SHELL'] = $shell ?: 'no-shell';
-        $_ENV['SHELL'] = $shell ?: 'no-shell';
+        $_SERVER['SHELL'] = $serverSh;
+        $_ENV['SHELL'] = $envSh;
         $this->assertEquals($expected, ShellActivatorConfiguration::expandActivators($candidates));
     }
 }

@@ -68,7 +68,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
                 if (isset($_SERVER['SHELL']) && basename($_SERVER['SHELL']) === $activator) {
                     $shell = escapeshellcmd($_SERVER['SHELL']);
                 } elseif (isset($_ENV['SHELL']) && basename($_ENV['SHELL']) === $activator) {
-                    $shell = ecapeshellcmd($_ENV['SHELL']);
+                    $shell = escapeshellcmd($_ENV['SHELL']);
                 } elseif ($activator === 'sh') {
                     $shell = escapeshellcmd($shebangSh);
                 } else {

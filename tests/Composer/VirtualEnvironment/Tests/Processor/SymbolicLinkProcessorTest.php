@@ -107,16 +107,16 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
             'everything works as expected for relative symlink in same directory' => array(
                 true,
                 array(
-                    'Removed existing file for symbolic link vfs://test/source/source.sh.',
-                    'Installed symbolic link vfs://test/source/source.sh to target target.sh.',
+                    'Removed existing file for symbolic link source.sh.',
+                    'Installed symbolic link source.sh to target target.sh.',
                     '',
                 ),
-                array('source' => array('source.sh' => 'symlink target.sh', 'target.sh' => '')),
-                array('source' => array('source.sh' => '', 'target.sh' => '')),
+                array('source.sh' => 'symlink target.sh', 'target.sh' => ''),
+                array('source.sh' => '', 'target.sh' => ''),
                 true,
                 null,
                 null,
-                'source/source.sh',
+                'source.sh',
                 'target.sh',
             ),
         );
@@ -165,7 +165,9 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 $root->getChild(dirname($file))->chmod($directoryMode);
             }
         }
-        $source = $root->url() . '/' . $source;
+        if (strpos($source, '/') !== false) {
+            $source = $root->url() . '/' . $source;
+        }
         if (strpos($target, '/') !== false) {
             $target = $root->url() . '/' . $target;
         }
@@ -219,7 +221,19 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 array('source' => array('source.sh' => 'symlink')),
                 0555,
             ),
-            'everything works as expected' => array(
+            'everything works as expected for relative path' => array(
+                true,
+                array(
+                    'Removed symbolic link source.sh.',
+                    '',
+                ),
+                array(),
+                array('source.sh' => 'symlink'),
+                null,
+                null,
+                'source.sh',
+            ),
+            'everything works as expected for absolute path' => array(
                 true,
                 array(
                     'Removed symbolic link vfs://test/source/source.sh.',
@@ -252,14 +266,17 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         array $expectedFilesystem,
         array $filesystem = array(),
         $directoryMode = null,
-        $fileMode = null
+        $fileMode = null,
+        $source = 'source/source.sh'
     ) {
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         $root = vfsStream::setup('test', $directoryMode, $filesystem);
-        $source = 'source/source.sh';
         $target = 'target/target.sh';
         foreach (array($source, $target) as $file) {
+            if (strpos($file, '/') === false) {
+                continue;
+            }
             if ($fileMode !== null && $root->hasChild($file)) {
                 $root->getChild($file)->chmod($fileMode);
             }
@@ -267,7 +284,9 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
                 $root->getChild(dirname($file))->chmod($directoryMode);
             }
         }
-        $source = $root->url() . '/' . $source;
+        if (strpos($source, '/') !== false) {
+            $source = $root->url() . '/' . $source;
+        }
         $target = $root->url() . '/' . $target;
         $processor = new SymbolicLinkProcessor($source, $target, $root->url());
 
