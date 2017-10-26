@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Composer Virtual Environment Plugin.
+ * This file is part of the Composer Virtual Environment Plugin project.
  *
  * (c) Stephan Jorek <stephan.jorek@gmail.com>
  *
