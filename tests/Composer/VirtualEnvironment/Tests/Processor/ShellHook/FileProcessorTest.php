@@ -257,7 +257,6 @@ class FileProcessorTest extends AbstractProcessorTestCase
         $fileMode = null,
         $hook = 'target/post-activate'
     ) {
-
         $file = '00-test.sh';
         $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
         $root = $this->setupVirtualFilesystem(

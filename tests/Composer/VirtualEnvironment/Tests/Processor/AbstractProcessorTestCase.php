@@ -26,14 +26,14 @@ use org\bovigo\vfs\vfsStreamDirectory;
 class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
 {
     /**
-     * @param boolean            $expectedResult
+     * @param bool               $expectedResult
      * @param string             $expectedOutput
      * @param array              $expectedFilesystem
      * @param string             $target
      * @param vfsStreamDirectory $root
      * @param ProcessorInterface $processor
-     * @param boolean            $force
-     * @param integer|null       $targetPermission
+     * @param bool               $force
+     * @param int|null           $targetPermission
      */
     protected function assertDeployment(
         $expectedResult,
@@ -88,13 +88,13 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
     }
 
     /**
-     * @param boolean            $expectedResult
+     * @param bool               $expectedResult
      * @param string             $expectedOutput
      * @param array              $expectedFilesystem
      * @param string             $target
      * @param vfsStreamDirectory $root
      * @param ProcessorInterface $processor
-     * @param boolean            $force
+     * @param bool               $force
      */
     protected function assertRollback(
         $expectedResult,
@@ -141,10 +141,10 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
     }
 
     /**
-     * @param array        $filesystem
-     * @param array        $files
-     * @param integer|null $directoryPermissions
-     * @param integer|null $filePermissions
+     * @param  array                              $filesystem
+     * @param  array                              $files
+     * @param  int|null                           $directoryPermissions
+     * @param  int|null                           $filePermissions
      * @return \org\bovigo\vfs\vfsStreamDirectory
      */
     protected function setupVirtualFilesystem(
@@ -165,6 +165,7 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
                 $root->getChild(dirname($file))->chmod($directoryPermissions);
             }
         }
+
         return $root;
     }
 }
