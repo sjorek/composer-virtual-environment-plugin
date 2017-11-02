@@ -51,22 +51,22 @@
             "[ -d coverage ] && rm -r coverage || true"
         ],
         "composer-virtual-environment-plugin:test": [
-            "@composer exec phpunit -v --exclude-group=large"
+            "@composer exec -- phpunit -v --exclude-group=large"
          ],
         "composer-virtual-environment-plugin:test-all": [
-            "@composer exec phpunit -v"
+            "@composer exec -- phpunit -v"
         ],
         "composer-virtual-environment-plugin:test-large": [
-            "@composer exec phpunit -v --group=large"
+            "@composer exec -- phpunit -v --group=large"
         ],
         "composer-virtual-environment-plugin:test-coverage": [
-            "@composer exec phpunit -v --coverage-html coverage"
+            "@composer exec -- phpunit -v --coverage-html coverage"
         ],
         "composer-virtual-environment-plugin:cs-lint": [
-            "@composer exec php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
+            "@composer exec -- php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
         ],
         "composer-virtual-environment-plugin:cs-fix": [
-            "@composer exec php-cs-fixer fix -vv || true"
+            "@composer exec -- php-cs-fixer fix -vv || true"
         ],
         "composer-virtual-environment-plugin:download-scripts": [
             "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts"

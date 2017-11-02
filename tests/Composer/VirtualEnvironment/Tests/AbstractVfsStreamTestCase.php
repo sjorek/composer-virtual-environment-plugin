@@ -165,28 +165,13 @@ if (!function_exists(__NAMESPACE__ . '\\symlink')) {
     }
 }
 
-namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor;
-
-use PHPUnit\Framework\TestCase;
+namespace Sjorek\Composer\VirtualEnvironment\Tests;
 
 /**
  * Base test case class for testing with vfsStreams.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class AbstractVfsStreamTestCase extends TestCase
+class AbstractVfsStreamTestCase extends AbstractTestCase
 {
-    /**
-     * @param  mixed  $object
-     * @param  string $propertyName
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function setProtectedProperty($objectOrClass, $propertyName, $value)
-    {
-        $class = new \ReflectionClass(is_object($objectOrClass) ? get_class($objectOrClass) : $objectOrClass);
-        $property = $class->getProperty($propertyName);
-        $property->setAccessible(true);
-        $property->setValue(is_object($objectOrClass) ? $objectOrClass : null, $value);
-    }
 }

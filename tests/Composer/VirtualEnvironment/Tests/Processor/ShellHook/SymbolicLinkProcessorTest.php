@@ -13,7 +13,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor\ShellHook;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
-use Sjorek\Composer\VirtualEnvironment\Tests\Processor\AbstractVfsStreamTestCase;
+use Sjorek\Composer\VirtualEnvironment\Tests\AbstractVfsStreamTestCase;
 use Sjorek\Composer\VirtualEnvironment\Processor\ShellHook\SymbolicLinkProcessor;
 use Symfony\Component\Console\Output\BufferedOutput;
 

@@ -14,6 +14,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor;
+use Sjorek\Composer\VirtualEnvironment\Tests\AbstractVfsStreamTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
