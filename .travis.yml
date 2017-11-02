@@ -35,9 +35,9 @@ script:
     composer -v composer-virtual-environment-plugin:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v composer-virtual-environment-plugin:test-all;
+    composer -v composer-virtual-environment-plugin:test-all-coverage;
   else
-    composer -v composer-virtual-environment-plugin:test;
+    composer -v composer-virtual-environment-plugin:test-coverage;
   fi
 
 sudo: false

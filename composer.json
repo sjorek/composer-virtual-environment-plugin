@@ -45,7 +45,7 @@
         "composer-virtual-environment-plugin:build": [
             "@composer-virtual-environment-plugin:clean",
             "@composer-virtual-environment-plugin:cs-lint",
-            "@composer-virtual-environment-plugin:test-coverage"
+            "@composer-virtual-environment-plugin:coverage"
         ],
         "composer-virtual-environment-plugin:clean": [
             "[ -d coverage ] && rm -r coverage || true"
@@ -60,6 +60,12 @@
             "@composer -v exec -- phpunit -v --group=large"
         ],
         "composer-virtual-environment-plugin:test-coverage": [
+            "@composer -v exec -- phpunit -v --exclude-group=large --coverage-text"
+        ],
+        "composer-virtual-environment-plugin:test-all-coverage": [
+            "@composer -v exec -- phpunit -v --coverage-text"
+        ],
+        "composer-virtual-environment-plugin:coverage": [
             "@composer -v exec -- phpunit -v --coverage-html coverage"
         ],
         "composer-virtual-environment-plugin:cs-lint": [
