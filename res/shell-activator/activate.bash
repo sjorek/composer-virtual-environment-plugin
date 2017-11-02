@@ -72,7 +72,7 @@ _COMPOSER_VENV_hook () {
                 continue
             fi
             filename=$( basename "$filepath" )
-            echo "- shell-hook '$(_COMPOSER_VENV_style 'bold-yellow')${filename}$(_COMPOSER_VENV_style)': "
+            echo "- shell-hook '$(_COMPOSER_VENV_style 'bold-yellow')${filename}$(_COMPOSER_VENV_style)'"
             if ! source "$filepath" ; then
                 echo 'Failed to load shell-hook!' >&2
             fi

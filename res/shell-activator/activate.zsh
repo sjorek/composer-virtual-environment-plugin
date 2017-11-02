@@ -41,7 +41,7 @@ _COMPOSER_VENV_hook () {
             setopt +o nullglob
             setopt -o $( echo $oldopts )
             filename=$( basename "$filepath" )
-            echo "- shell-hook '${filename}': "
+            echo "- shell-hook '${filename}'"
             if ! source "$filepath" ; then
                 echo 'Failed to load shell-hook!' >&2
             fi
