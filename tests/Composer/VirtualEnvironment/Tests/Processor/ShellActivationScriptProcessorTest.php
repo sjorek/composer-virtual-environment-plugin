@@ -11,18 +11,14 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Tests\Processor;
 
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor;
-use Sjorek\Composer\VirtualEnvironment\Tests\AbstractVfsStreamTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * ShellActivationScriptProcessor test case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
+class ShellActivationScriptProcessorTest extends AbstractProcessorTestCase
 {
     /**
      * @test
@@ -137,61 +133,27 @@ class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         $fileMode = null,
         array $data = array()
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
-
-        $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';
         $target = 'target/target.sh';
-        foreach (array($source, $target) as $file) {
-            if ($fileMode !== null && $root->hasChild($file)) {
-                $root->getChild($file)->chmod($fileMode);
-            }
-            if ($directoryMode !== null && $root->hasChild(dirname($file))) {
-                $root->getChild(dirname($file))->chmod($directoryMode);
-            }
-        }
+        $root = $this->setupVirtualFilesystem(
+            $filesystem,
+            array($source, $target),
+            $directoryMode,
+            $fileMode
+        );
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
         $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), $data);
 
-        \Composer\Util\vfsFilesystem::$vfs = $root;
-        \Composer\Util\vfsFilesystem::$cwd = $root;
-        $this->setProtectedProperty($processor, 'filesystem', new \Composer\Util\vfsFilesystem());
-
-        $result = $processor->deploy($io, $force);
-        $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
-
-        $output = explode(PHP_EOL, $io->fetch());
-        if (is_array($expectedOutput)) {
-            $output = array_slice(
-                $output,
-                0,
-                count($expectedOutput) ?: 10
-            );
-            $this->assertEquals($expectedOutput, $output, 'Assert that output is equal.');
-        } else {
-            $output = array_shift($output);
-            if ($expectedOutput && $expectedOutput[0] === '/') {
-                $this->assertRegExp($expectedOutput, $output, 'Assert that output matches expectation.');
-            } else {
-                $this->assertSame($expectedOutput, $output, 'Assert that output is the same.');
-            }
-        }
-
-        $visitor = new vfsStreamStructureVisitor();
-        $filesystem = vfsStream::inspect($visitor)->getStructure();
-        $this->assertEquals(
+        $this->assertDeployment(
+            $expectedResult,
+            $expectedOutput,
             $expectedFilesystem,
-            $filesystem['test'],
-            'Assert that the filesystem structure is equal.'
+            $target,
+            $root,
+            $processor,
+            $force
         );
-
-        if ($root->hasChild($target)) {
-            $this->assertTrue(
-                $root->getChild($target)->getPermissions() === 0777,
-                'Assert that the target file is executable.'
-            );
-        }
     }
 
     public function provideCheckRollbackData()
@@ -258,53 +220,25 @@ class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         $directoryMode = null,
         $fileMode = null
     ) {
-        $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
-
-        $root = vfsStream::setup('test', $directoryMode, $filesystem);
         $source = 'source/source.sh';
         $target = 'target/target.sh';
-        foreach (array($source, $target) as $file) {
-            if ($fileMode !== null && $root->hasChild($file)) {
-                $root->getChild($file)->chmod($fileMode);
-            }
-            if ($directoryMode !== null && $root->hasChild(dirname($file))) {
-                $root->getChild(dirname($file))->chmod($directoryMode);
-            }
-        }
+        $root = $this->setupVirtualFilesystem(
+            $filesystem,
+            array($source, $target),
+            $directoryMode,
+            $fileMode
+        );
         $source = $root->url() . '/' . $source;
         $target = $root->url() . '/' . $target;
         $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), array());
 
-        \Composer\Util\vfsFilesystem::$vfs = $root;
-        \Composer\Util\vfsFilesystem::$cwd = $root;
-        $this->setProtectedProperty($processor, 'filesystem', new \Composer\Util\vfsFilesystem());
-
-        $result = $processor->rollback($io);
-        $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
-
-        $output = explode(PHP_EOL, $io->fetch());
-        if (is_array($expectedOutput)) {
-            $output = array_slice(
-                $output,
-                0,
-                count($expectedOutput) ?: 10
-            );
-            $this->assertEquals($expectedOutput, $output, 'Assert that output is equal.');
-        } else {
-            $output = array_shift($output);
-            if ($expectedOutput && $expectedOutput[0] === '/') {
-                $this->assertRegExp($expectedOutput, $output, 'Assert that output matches expectation.');
-            } else {
-                $this->assertSame($expectedOutput, $output, 'Assert that output is the same.');
-            }
-        }
-
-        $visitor = new vfsStreamStructureVisitor();
-        $filesystem = vfsStream::inspect($visitor)->getStructure();
-        $this->assertEquals(
+        $this->assertRollback(
+            $expectedResult,
+            $expectedOutput,
             $expectedFilesystem,
-            $filesystem['test'],
-            'Assert that the filesystem structure is equal.'
+            $target,
+            $root,
+            $processor
         );
     }
 }

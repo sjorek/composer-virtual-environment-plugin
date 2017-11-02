@@ -14,7 +14,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Tests;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Base test case class for testing with vfsStreams.
+ * Base test case class for all unit-tests.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
