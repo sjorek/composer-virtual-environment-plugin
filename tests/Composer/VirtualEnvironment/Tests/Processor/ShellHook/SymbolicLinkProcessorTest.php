@@ -237,7 +237,7 @@ class SymbolicLinkProcessorTest extends AbstractProcessorTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellHook\AbstractProcessor::__construct
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellHook\AbstractProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellHook\SymbolicLinkProcessor::rollbackHook()
-     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
+     * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::rollbackSymbolicLink()
      * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
