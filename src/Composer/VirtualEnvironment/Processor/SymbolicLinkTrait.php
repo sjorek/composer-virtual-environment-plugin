@@ -124,7 +124,6 @@ trait SymbolicLinkTrait
         // special treatment for relative symlinks in the same directory,
         // because composer's implementation uses a leading dot (./...)
         if (strpos($this->target, '/') === false && symlink($this->target, $source)) {
-
             Silencer::call('chmod', $source, 0777 & ~umask());
 
             $output->writeln(
@@ -139,7 +138,6 @@ trait SymbolicLinkTrait
 
             return true;
         } elseif (strpos($this->target, '/') !== false && $this->filesystem->relativeSymlink($target, $source)) {
-
             Silencer::call('chmod', $source, 0777 & ~umask());
 
             $output->writeln(
