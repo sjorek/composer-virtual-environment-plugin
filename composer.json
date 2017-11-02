@@ -57,11 +57,21 @@
         "composer-virtual-environment-plugin:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
         "composer-virtual-environment-plugin:cs-fix": "php-cs-fixer fix -vv || true",
         "composer-virtual-environment-plugin:download-scripts": "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts",
-        "composer-virtual-environment-plugin:deploy-venv": [
-            "composer venv:shell -v -f --lock",
-            "composer venv:hook -v -f --lock",
-            "composer venv:link -v -f --lock",
-            "composer venv:git-hook -v -f --lock"
+        "composer-virtual-environment-plugin:venv": [
+            "@composer-virtual-environment-plugin:venv-remove",
+            "@composer-virtual-environment-plugin:venv-deploy"
+        ],
+        "composer-virtual-environment-plugin:venv-deploy": [
+            "@composer venv:shell -v --lock",
+            "@composer venv:hook -v --lock",
+            "@composer venv:link -v --lock",
+            "@composer venv:git-hook -v --lock"
+        ],
+        "composer-virtual-environment-plugin:venv-remove": [
+            "@composer venv:shell -v --remove",
+            "@composer venv:hook -v --remove",
+            "@composer venv:link -v --remove",
+            "@composer venv:git-hook -v --remove"
         ]
     }
 }
