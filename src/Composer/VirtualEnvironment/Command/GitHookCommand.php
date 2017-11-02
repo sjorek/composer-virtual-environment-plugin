@@ -38,7 +38,7 @@ class GitHookCommand extends AbstractProcessorCommand
                     array(
                         new InputArgument(
                             'hook',
-                            InputOption::VALUE_OPTIONAL,
+                            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                             'List of git-hooks to add or remove.'
                         ),
                         new InputOption(

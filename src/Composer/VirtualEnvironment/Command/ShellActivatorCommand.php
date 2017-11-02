@@ -30,6 +30,10 @@ class ShellActivatorCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
+//         $shells = ShellActivatorConfiguration::SHELLS;
+//         if (!(($shell = getenv('SHELL')) && ($shell = basename($shell)) && in_array($shell, $shells))) {
+//             $shell = null;
+//         }
         $this
             ->setName('virtual-environment:shell')
             ->setAliases(array('venv:shell'))
@@ -39,7 +43,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
                     array(
                         new InputArgument(
                             'shell',
-                            InputOption::VALUE_OPTIONAL,
+                            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                             'List of shell activators to add or remove.'
                         ),
                         new InputOption(
@@ -61,6 +65,13 @@ class ShellActivatorCommand extends AbstractProcessorCommand
                             InputOption::VALUE_NONE,
                             'Disable the color prompt per default.'
                         ),
+//                         new InputOption(
+//                             'deploy-dir',
+//                             null,
+//                             InputOption::VALUE_REQUIRED,
+//                             'Deploy the given list of shells to given directory.',
+//                             '{$bin-dir}'
+//                         ),
                     )
                 )
             )

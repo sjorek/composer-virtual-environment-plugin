@@ -18,7 +18,6 @@ use Sjorek\Composer\VirtualEnvironment\Command\Config\SymbolicLinkConfiguration;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\CommandConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Processor;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -30,19 +29,23 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
     protected function configure()
     {
         $composerPhar = null;
-        if (
-            isset($_SERVER['argv'][0]) &&
-            realpath($_SERVER['argv'][0]) &&
-            substr(realpath($_SERVER['argv'][0]), -1 * strlen('/composer.phar')) === '/composer.phar'
-        ) {
-            $composerPhar = realpath($_SERVER['argv'][0]);
+        if (isset($_SERVER['argv'])) {
+            foreach($_SERVER['argv'] as $argument) {
+                $argument = realpath($argument);
+                if ($argument &&
+                    substr($argument, -1 * strlen('/composer.phar')) === '/composer.phar'
+                ) {
+                    $composerPhar = $argument;
+                    break;
+                }
+            }
         }
 
         $example = implode(
             PATH_SEPARATOR,
             array(
                 escapeshellarg('{$bin-dir}/composer'),
-                escapeshellarg($composerPhar ?: '../../composer.phar'),
+                escapeshellarg($composerPhar ?: '{$bin-dir-up}/composer.phar'),
             )
         );
 
@@ -55,7 +58,7 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
                     array(
                         new InputArgument(
                             'link',
-                            InputOption::VALUE_OPTIONAL,
+                            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                             'List of symbolic links to add or remove.'
                         ),
                     )
