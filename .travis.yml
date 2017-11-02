@@ -6,11 +6,13 @@ git:
 matrix:
   include:
     - php: 7.0
+      env: LINT=false
     - php: 7.1
       env: LINT=true
     - php: 7.2
+      env: LINT=false
     - php: nightly
-      env: NIGHTLY=true
+      env: NIGHTLY=true LINT=false
   allow_failures:
     - php: nightly
 
@@ -20,7 +22,9 @@ cache:
     - $HOME/.php-cs-fixer
 
 install:
-- phpenv config-rm xdebug.ini || true
+- if [[ $LINT = false ]]; then
+    phpenv config-rm xdebug.ini || true;
+  fi
 - travis_retry composer -v self-update
 - if [[ $NIGHTLY = true ]]; then
     composer -v remove --dev friendsofphp/php-cs-fixer;
@@ -34,10 +38,17 @@ script:
     composer -v validate;
     composer -v composer-virtual-environment-plugin:cs-lint;
   fi
-- if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+- if [[ $LINT = true ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v composer-virtual-environment-plugin:test-all-coverage;
-  else
+  fi
+- if [[ $LINT = true ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v composer-virtual-environment-plugin:test-coverage;
+  fi
+- if [[ $LINT = false ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+    composer -v composer-virtual-environment-plugin:test-all;
+  fi
+- if [[ $LINT = false ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+    composer -v composer-virtual-environment-plugin:test;
   fi
 
 sudo: false
