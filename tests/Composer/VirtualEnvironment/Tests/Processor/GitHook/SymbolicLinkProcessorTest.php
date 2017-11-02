@@ -219,7 +219,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         );
     }
 
-    public function provideCheckRoolbackData()
+    public function provideCheckRollbackData()
     {
         return array(
             'refuse to remove an invalid hook' => array(
@@ -262,7 +262,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\SymbolicLinkProcessor::rollbackHook()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::rollbackSymbolicLink()
-     * @dataProvider provideCheckRoolbackData
+     * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput

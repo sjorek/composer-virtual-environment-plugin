@@ -245,7 +245,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
         }
     }
 
-    public function provideCheckRoolbackData()
+    public function provideCheckRollbackData()
     {
         return array(
             'refuse to remove an invalid hook' => array(
@@ -302,7 +302,7 @@ class StreamProcessorTest extends AbstractVfsStreamTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\AbstractProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\GitHook\StreamProcessor::rollbackHook()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
-     * @dataProvider provideCheckRoolbackData
+     * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput

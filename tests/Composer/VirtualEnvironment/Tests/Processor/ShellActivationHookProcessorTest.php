@@ -235,7 +235,7 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
         }
     }
 
-    public function provideCheckRoolbackData()
+    public function provideCheckRollbackData()
     {
         return array(
             'refuse to remove an invalid hook' => array(
@@ -290,7 +290,7 @@ class ShellActivationHookProcessorTest extends AbstractVfsStreamTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationHookProcessor::__construct
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationHookProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
-     * @dataProvider provideCheckRoolbackData
+     * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput

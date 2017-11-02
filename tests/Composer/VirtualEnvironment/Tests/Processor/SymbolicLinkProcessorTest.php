@@ -206,7 +206,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
         );
     }
 
-    public function provideCheckRoolbackData()
+    public function provideCheckRollbackData()
     {
         return array(
             'skip removing non-existent symlink' => array(
@@ -250,7 +250,7 @@ class SymbolicLinkProcessorTest extends AbstractVfsStreamTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::__construct
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\SymbolicLinkTrait::rollbackSymbolicLink()
-     * @dataProvider provideCheckRoolbackData
+     * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput

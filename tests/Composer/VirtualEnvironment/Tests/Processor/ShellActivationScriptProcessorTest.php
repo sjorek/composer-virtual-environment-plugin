@@ -193,7 +193,7 @@ class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
         }
     }
 
-    public function provideCheckRoolbackData()
+    public function provideCheckRollbackData()
     {
         return array(
             'refuse removal of symlink' => array(
@@ -239,7 +239,7 @@ class ShellActivationScriptProcessorTest extends AbstractVfsStreamTestCase
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::__construct
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ShellActivationScriptProcessor::rollback()
      * @covers \Sjorek\Composer\VirtualEnvironment\Processor\ExecutableFromTemplateTrait::rollbackTemplate()
-     * @dataProvider provideCheckRoolbackData
+     * @dataProvider provideCheckRollbackData
      *
      * @param bool   $expectedResult
      * @param string $expectedOutput
