@@ -56,6 +56,12 @@
         "composer-virtual-environment-plugin:test-coverage": "phpunit -v --coverage-html coverage",
         "composer-virtual-environment-plugin:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
         "composer-virtual-environment-plugin:cs-fix": "php-cs-fixer fix -vv || true",
-        "composer-virtual-environment-plugin:download-scripts": "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts"
+        "composer-virtual-environment-plugin:download-scripts": "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts",
+        "composer-virtual-environment-plugin:deploy-venv": [
+            "composer venv:shell -v -f --lock",
+            "composer venv:hook -v -f --lock",
+            "composer venv:link -v -f --lock",
+            "composer venv:git-hook -v -f --lock"
+        ]
     }
 }
