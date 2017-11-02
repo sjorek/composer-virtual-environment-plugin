@@ -21,23 +21,23 @@ cache:
 
 install:
 - phpenv config-rm xdebug.ini || true
-- travis_retry composer self-update
+- travis_retry composer -v self-update
 - if [[ $NIGHTLY = true ]]; then
-    composer remove --dev friendsofphp/php-cs-fixer;
-    composer validate;
+    composer -v remove --dev friendsofphp/php-cs-fixer;
+    composer -v validate;
   fi
-- travis_retry composer install --no-interaction
-- travis_retry composer dump-autoload --optimize
+- travis_retry composer -v install --no-interaction
+- travis_retry composer -v dump-autoload --optimize
 
 script:
 - if [[ $LINT = true ]]; then
-    composer validate;
-    composer composer-virtual-environment-plugin:cs-lint;
+    composer -v validate;
+    composer -v composer-virtual-environment-plugin:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer composer-virtual-environment-plugin:test-all;
+    composer -v composer-virtual-environment-plugin:test-all;
   else
-    composer composer-virtual-environment-plugin:test;
+    composer -v composer-virtual-environment-plugin:test;
   fi
 
 sudo: false
