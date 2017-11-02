@@ -47,7 +47,6 @@ class ShellActivationHookProcessor implements ProcessorInterface, ShellConstants
     /**
      * @param string $hook
      * @param string $name
-     * @param int    $priority
      * @param string $shell
      * @param string $script
      * @param string $baseDir
