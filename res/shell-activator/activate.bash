@@ -66,8 +66,9 @@ _COMPOSER_VENV_hook () {
         echo "Processing virtual environment $(_COMPOSER_VENV_style 'bold-green')${hook}$(_COMPOSER_VENV_style) shell-hooks"
         echo ''
 
-        local IFS=$'\t\n'
+        local oldifs="${IFS}" IFS=$'\t\n'
         for filepath in "@SHELL_HOOK_DIR@/${hook}.d/"*.{sh,bash} ; do
+            IFS="${oldifs}"
             if [ ! -e "${filepath}" ] ; then
                 continue
             fi
@@ -76,7 +77,9 @@ _COMPOSER_VENV_hook () {
             if ! source "$filepath" ; then
                 echo 'Failed to load shell-hook!' >&2
             fi
+            oldifs="${IFS}"
         done
+        IFS="${oldifs}"
 
         if [ ! "$PATH" = "$oldpath" ] ; then
             _COMPOSER_VENV_rehash

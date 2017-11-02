@@ -26,7 +26,7 @@ _COMPOSER_VENV_rehash () {
 _COMPOSER_VENV_hook () {
     if [ -n "${1:-}" ] && [ -d "@SHELL_HOOK_DIR@/${1}.d" ] ; then
 
-        local hook oldpath oldopts filepath filename
+        local hook oldpath filepath filename
         hook="$1"
         oldpath="$PATH"
 
@@ -34,10 +34,10 @@ _COMPOSER_VENV_hook () {
         echo "Processing virtual environment ${hook} shell-hooks"
         echo ''
 
-        oldopts=$(setopt)
+        local oldopts=$(setopt) oldifs="${IFS}" IFS=$'\t\n'
         setopt -o nullglob
-        local IFS=$'\t\n'
         for filepath in "@SHELL_HOOK_DIR@/${hook}.d/"*.{sh,zsh} ; do
+            IFS="${oldifs}"
             setopt +o nullglob
             setopt -o $( echo $oldopts )
             filename=$( basename "$filepath" )
@@ -45,8 +45,10 @@ _COMPOSER_VENV_hook () {
             if ! source "$filepath" ; then
                 echo 'Failed to load shell-hook!' >&2
             fi
+            oldifs="${IFS}"
             oldopts=$(setopt)
         done
+        IFS="${oldifs}"
         setopt +o nullglob
         setopt -o $( echo $o )
 
