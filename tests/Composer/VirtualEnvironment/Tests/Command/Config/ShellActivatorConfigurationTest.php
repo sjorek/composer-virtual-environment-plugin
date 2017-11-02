@@ -11,15 +11,15 @@
 
 namespace Sjorek\Composer\VirtualEnvironment\Tests\Command\Config;
 
-use PHPUnit\Framework\TestCase;
 use Sjorek\Composer\VirtualEnvironment\Command\Config\ShellActivatorConfiguration;
+use Sjorek\Composer\VirtualEnvironment\Tests\AbstractTestCase;
 
 /**
  * ShellActivatorConfiguration test case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ShellActivatorConfigurationTest extends TestCase
+class ShellActivatorConfigurationTest extends AbstractTestCase
 {
     public function provideCheckValidateActivatorsData()
     {
