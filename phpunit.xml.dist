@@ -17,6 +17,8 @@
          stopOnIncomplete="false"
          stopOnSkipped="false"
          stopOnRisky="false"
+         failOnRisky="true"
+         failOnWarning="true"
          syntaxCheck="false"
          colors="auto"
          verbose="true">
