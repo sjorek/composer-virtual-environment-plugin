@@ -154,9 +154,9 @@ class FileProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $target = $root->url() . '/' . $target;
-        $hook = $root->url() . '/' . $hook;
-        $processor = new FileProcessor(basename($hook), $target, $root->url(), dirname($hook));
+        $targetVfs = $root->url() . '/' . $target;
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new FileProcessor(basename($hookVfs), $targetVfs, $root->url(), dirname($hookVfs));
 
         $this->assertDeployment(
             $expectedResult,
@@ -253,9 +253,9 @@ class FileProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        $target = $root->url() . '/' . $target;
-        $processor = new FileProcessor(basename($hook), $target, $root->url(), dirname($hook));
+        $hookVfs = $root->url() . '/' . $hook;
+        $targetVfs = $root->url() . '/' . $target;
+        $processor = new FileProcessor(basename($hookVfs), $targetVfs, $root->url(), dirname($hookVfs));
 
         $this->assertRollback(
             $expectedResult,

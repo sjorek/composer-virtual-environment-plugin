@@ -191,11 +191,9 @@ class StreamProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        if (strpos($target, '://') === false) {
-            $target = $root->url() . '/' . $target;
-        }
-        $processor = new StreamProcessor(basename($hook), $target, $root->url(), dirname($hook));
+        $targetVfs = strpos($target, '://') === false ? $root->url() . '/' . $target : $target;
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new StreamProcessor(basename($hookVfs), $targetVfs, $root->url(), dirname($hookVfs));
 
         $this->assertDeployment(
             $expectedResult,
@@ -292,9 +290,9 @@ class StreamProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        $target = $root->url() . '/' . $target;
-        $processor = new StreamProcessor(basename($hook), $target, $root->url(), dirname($hook));
+        $targetVfs = strpos($target, '://') === false ? $root->url() . '/' . $target : $target;
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new StreamProcessor(basename($hookVfs), $targetVfs, $root->url(), dirname($hookVfs));
 
         $this->assertRollback(
             $expectedResult,

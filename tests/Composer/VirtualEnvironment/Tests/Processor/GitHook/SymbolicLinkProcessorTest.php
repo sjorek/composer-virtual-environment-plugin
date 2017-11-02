@@ -169,11 +169,9 @@ class SymbolicLinkProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        if (strpos($source, '/') !== false) {
-            $source = $root->url() . '/' . $source;
-        }
-        $processor = new SymbolicLinkProcessor(basename($hook), $source, $root->url(), dirname($hook));
+        $sourceVfs = strpos($source, '/') === false ? $source : $root->url() . '/' . $source;
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new SymbolicLinkProcessor(basename($hookVfs), $sourceVfs, $root->url(), dirname($hookVfs));
 
         $this->assertDeployment(
             $expectedResult,
@@ -250,16 +248,16 @@ class SymbolicLinkProcessorTest extends AbstractProcessorTestCase
         $fileMode = null,
         $hook = 'target/pre-commit'
     ) {
-        $target = 'source/source.sh';
+        $source = 'source/source.sh';
         $root = $this->setupVirtualFilesystem(
             $filesystem,
-            array($hook, $target),
+            array($hook, $source),
             $directoryMode,
             $fileMode
         );
-        $target = $root->url() . '/' . $target;
-        $hook = $root->url() . '/' . $hook;
-        $processor = new SymbolicLinkProcessor(basename($hook), $target, $root->url(), dirname($hook));
+        $sourceVfs = $root->url() . '/' . $source;
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new SymbolicLinkProcessor(basename($hookVfs), $sourceVfs, $root->url(), dirname($hookVfs));
 
         $this->assertRollback(
             $expectedResult,

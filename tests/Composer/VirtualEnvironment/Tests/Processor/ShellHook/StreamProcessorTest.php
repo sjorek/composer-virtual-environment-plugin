@@ -187,32 +187,29 @@ class StreamProcessorTest extends AbstractProcessorTestCase
         $target = 'source/source.sh',
         $shell = null
     ) {
-        $file = '00-test.sh';
-        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
+        $file = sprintf('%s/%s.d/00-test.%s', dirname($hook), basename($hook), $shell ? basename($shell) : 'sh');
         $root = $this->setupVirtualFilesystem(
             $filesystem,
-            array($dir . '/' . $file, $target),
+            array($file, $target),
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        if (strpos($target, '://') === false) {
-            $target = $root->url() . '/' . $target;
-        }
+        $targetVfs = strpos($target, '://') === false ? $root->url() . '/' . $target : $target;
+        $hookVfs = $root->url() . '/' . $hook;
         $processor = new StreamProcessor(
-            basename($hook),
+            basename($hookVfs),
             '00-test',
             $shell,
-            $target,
+            $targetVfs,
             $root->url(),
-            dirname($hook)
+            dirname($hookVfs)
         );
 
         $this->assertDeployment(
             $expectedResult,
             $expectedOutput,
             $expectedFilesystem,
-            $root->url() . '/' . $dir . '/' . $file,
+            $file,
             $root,
             $processor,
             $force
@@ -285,6 +282,7 @@ class StreamProcessorTest extends AbstractProcessorTestCase
      * @param int    $directoryMode
      * @param int    $fileMode
      * @param string $hook
+     * @param string $shell
      * @see StreamProcessor::rollback()
      */
     public function checkRollback(
@@ -294,31 +292,31 @@ class StreamProcessorTest extends AbstractProcessorTestCase
         array $filesystem = array(),
         $directoryMode = null,
         $fileMode = null,
-        $hook = 'target/post-activate'
+        $hook = 'target/post-activate',
+        $shell = null
     ) {
-        $file = '00-test.sh';
-        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
+        $file = sprintf('%s/%s.d/00-test.%s', dirname($hook), basename($hook), $shell ? basename($shell) : 'sh');
         $root = $this->setupVirtualFilesystem(
             $filesystem,
-            array($dir . '/' . $file),
+            array($file),
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
+        $hookVfs = $root->url() . '/' . $hook;
         $processor = new StreamProcessor(
-            basename($hook),
+            basename($hookVfs),
             '00-test',
             null,
             'test',
             $root->url(),
-            dirname($hook)
+            dirname($hookVfs)
         );
 
         $this->assertRollback(
             $expectedResult,
             $expectedOutput,
             $expectedFilesystem,
-            $root->url() . '/' . $dir . '/' . $file,
+            $file,
             $root,
             $processor
         );

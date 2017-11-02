@@ -154,13 +154,9 @@ class SymbolicLinkProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        if (strpos($source, '/') !== false) {
-            $source = $root->url() . '/' . $source;
-        }
-        if (strpos($target, '/') !== false) {
-            $target = $root->url() . '/' . $target;
-        }
-        $processor = new SymbolicLinkProcessor($source, $target, $root->url());
+        $sourceVfs = strpos($source, '/') === false ? $source : $root->url() . '/' . $source;
+        $targetVfs = strpos($target, '/') === false ? $target : $root->url() . '/' . $target;
+        $processor = new SymbolicLinkProcessor($sourceVfs, $targetVfs, $root->url());
 
         $this->assertDeployment(
             $expectedResult,
@@ -244,17 +240,15 @@ class SymbolicLinkProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        if (strpos($source, '/') !== false) {
-            $source = $root->url() . '/' . $source;
-        }
-        $target = $root->url() . '/' . $target;
-        $processor = new SymbolicLinkProcessor($source, $target, $root->url());
+        $sourceVfs = strpos($source, '/') === false ? $source : $root->url() . '/' . $source;
+        $targetVfs = strpos($target, '/') === false ? $target : $root->url() . '/' . $target;
+        $processor = new SymbolicLinkProcessor($sourceVfs, $targetVfs, $root->url());
 
         $this->assertRollback(
             $expectedResult,
             $expectedOutput,
             $expectedFilesystem,
-            $target,
+            $source,
             $root,
             $processor
         );

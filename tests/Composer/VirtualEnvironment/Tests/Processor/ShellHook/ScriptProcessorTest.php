@@ -174,29 +174,28 @@ class ScriptProcessorTest extends AbstractProcessorTestCase
         $script = 'test',
         $shell = null
     ) {
-        $file = '00-test.sh';
-        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
+        $file = sprintf('%s/%s.d/00-test.%s', dirname($hook), basename($hook), $shell ? basename($shell) : 'sh');
         $root = $this->setupVirtualFilesystem(
             $filesystem,
-            array($dir . '/' . $file),
+            array($file),
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
+        $hookVfs = $root->url() . '/' . $hook;
         $processor = new ScriptProcessor(
-            basename($hook),
+            basename($hookVfs),
             '00-test',
             $shell,
             $script,
             $root->url(),
-            dirname($hook)
+            dirname($hookVfs)
         );
 
         $this->assertDeployment(
             $expectedResult,
             $expectedOutput,
             $expectedFilesystem,
-            $root->url() . '/' . $dir . '/' . $file,
+            $file,
             $root,
             $processor,
             $force
@@ -269,6 +268,7 @@ class ScriptProcessorTest extends AbstractProcessorTestCase
      * @param int    $directoryMode
      * @param int    $fileMode
      * @param string $hook
+     * @param string $shell
      * @see ScriptProcessor::rollback()
      */
     public function checkRollback(
@@ -278,31 +278,31 @@ class ScriptProcessorTest extends AbstractProcessorTestCase
         array $filesystem = array(),
         $directoryMode = null,
         $fileMode = null,
-        $hook = 'target/post-activate'
+        $hook = 'target/post-activate',
+        $shell = null
     ) {
-        $file = '00-test.sh';
-        $dir = sprintf('%s/%s.d', dirname($hook), basename($hook));
+        $file = sprintf('%s/%s.d/00-test.%s', dirname($hook), basename($hook), $shell ? basename($shell) : 'sh');
         $root = $this->setupVirtualFilesystem(
             $filesystem,
-            array($dir . '/' . $file),
+            array($file),
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
+        $hookVfs = $root->url() . '/' . $hook;
         $processor = new ScriptProcessor(
-            basename($hook),
+            basename($hookVfs),
             '00-test',
             null,
             'test',
             $root->url(),
-            dirname($hook)
+            dirname($hookVfs)
         );
 
         $this->assertRollback(
             $expectedResult,
             $expectedOutput,
             $expectedFilesystem,
-            $root->url() . '/' . $dir . '/' . $file,
+            $file,
             $root,
             $processor
         );

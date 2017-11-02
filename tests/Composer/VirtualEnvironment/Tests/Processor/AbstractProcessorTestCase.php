@@ -43,8 +43,11 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
         vfsStreamDirectory $root,
         ProcessorInterface $processor,
         $force = false,
-        $targetPermission = 0777
+        $targetPermission = null
     ) {
+        if ($targetPermission === null) {
+            $targetPermission = 0777 & ~umask();
+        }
         $io = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG, false);
 
         \Composer\Util\vfsFilesystem::$vfs = $root;
@@ -54,36 +57,22 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
         $result = $processor->deploy($io, $force);
         $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
 
-        $output = explode(PHP_EOL, $io->fetch());
-        if (is_array($expectedOutput)) {
-            $output = array_slice(
-                $output,
-                0,
-                count($expectedOutput) ?: 10
-            );
-            $this->assertEquals($expectedOutput, $output, 'Assert that output is equal.');
-        } else {
-            $output = array_shift($output);
-            if ($expectedOutput && $expectedOutput[0] === '/') {
-                $this->assertRegExp($expectedOutput, $output, 'Assert that output matches expectation.');
-            } else {
-                $this->assertSame($expectedOutput, $output, 'Assert that output is the same.');
-            }
-        }
+        $this->assertOutput($expectedOutput, $io);
 
-        $visitor = new vfsStreamStructureVisitor();
-        $filesystem = vfsStream::inspect($visitor)->getStructure();
-        $this->assertEquals(
-            $expectedFilesystem,
-            $filesystem['test'],
-            'Assert that the filesystem structure is equal.'
-        );
+        $this->assertVirtualFilesystem($expectedFilesystem);
 
-        if ($targetPermission !== null && $root->hasChild($target)) {
+        if ($result === true) {
             $this->assertTrue(
-                $root->getChild($target)->getPermissions() === $targetPermission,
-                sprintf('Assert that the target file has %04o permissions.', $targetPermission)
+                $root->hasChild($target),
+                'Assert that the target file exists.'
             );
+            if ($targetPermission !== null) {
+                $this->assertSame(
+                    sprintf('%04o', $targetPermission),
+                    sprintf('%04o', $root->getChild($target)->getPermissions()),
+                    sprintf('Assert that the target file has %04o permissions.', $targetPermission)
+                );
+            }
         }
     }
 
@@ -114,30 +103,50 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
         $result = $processor->rollback($io);
         $this->assertSame($expectedResult, $result, 'Assert that result is the same.');
 
+        $this->assertOutput($expectedOutput, $io);
+
+        $this->assertVirtualFilesystem($expectedFilesystem);
+
+        if ($result === true) {
+            $this->assertFalse(
+                $root->hasChild($target),
+                'Assert that the target file has been removed.'
+            );
+        }
+    }
+
+    /**
+     * @param mixed          $expected
+     * @param BufferedOutput $io
+     */
+    protected function assertOutput($expected, BufferedOutput $io)
+    {
         $output = explode(PHP_EOL, $io->fetch());
-        if (is_array($expectedOutput)) {
+        if (is_array($expected)) {
             $output = array_slice(
                 $output,
                 0,
-                count($expectedOutput) ?: 10
+                count($expected) ?: 10
             );
-            $this->assertEquals($expectedOutput, $output, 'Assert that output is equal.');
+            $this->assertEquals($expected, $output, 'Assert that output is equal.');
         } else {
             $output = array_shift($output);
-            if ($expectedOutput && $expectedOutput[0] === '/') {
-                $this->assertRegExp($expectedOutput, $output, 'Assert that output matches expectation.');
+            if ($expected && $expected[0] === '/') {
+                $this->assertRegExp($expected, $output, 'Assert that output matches expectation.');
             } else {
-                $this->assertSame($expectedOutput, $output, 'Assert that output is the same.');
+                $this->assertSame($expected, $output, 'Assert that output is the same.');
             }
         }
+    }
 
+    /**
+     * @param array $expected
+     */
+    protected function assertVirtualFilesystem(array $expected)
+    {
         $visitor = new vfsStreamStructureVisitor();
-        $filesystem = vfsStream::inspect($visitor)->getStructure();
-        $this->assertEquals(
-            $expectedFilesystem,
-            $filesystem['test'],
-            'Assert that the filesystem structure is equal.'
-        );
+        $actual = vfsStream::inspect($visitor)->getStructure();
+        $this->assertEquals($expected, $actual['test'], 'Assert that the filesystem structure is equal.');
     }
 
     /**
@@ -153,16 +162,17 @@ class AbstractProcessorTestCase extends AbstractVfsStreamTestCase
         $directoryPermissions = null,
         $filePermissions = null
     ) {
-        $root = vfsStream::setup('test', $directoryPermissions, $filesystem);
+        $defaultPermissions = 0777 & ~umask();
+        $root = vfsStream::setup('test', $directoryPermissions ?: $defaultPermissions, $filesystem);
         foreach ($files as $file) {
             if (strpos($file, '/') === false || strpos($file, '://') !== false) {
                 continue;
             }
-            if ($filePermissions !== null && $root->hasChild($file)) {
-                $root->getChild($file)->chmod($filePermissions);
+            if ($root->hasChild($file)) {
+                $root->getChild($file)->chmod($filePermissions ?: $defaultPermissions);
             }
-            if ($directoryPermissions !== null && $root->hasChild(dirname($file))) {
-                $root->getChild(dirname($file))->chmod($directoryPermissions);
+            if ($root->hasChild(dirname($file))) {
+                $root->getChild(dirname($file))->chmod($directoryPermissions ?: $defaultPermissions);
             }
         }
 

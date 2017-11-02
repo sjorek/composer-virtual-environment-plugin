@@ -12,6 +12,7 @@
 namespace Sjorek\Composer\VirtualEnvironment\Processor;
 
 use Composer\Util\Filesystem;
+use Composer\Util\Silencer;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -123,6 +124,9 @@ trait SymbolicLinkTrait
         // special treatment for relative symlinks in the same directory,
         // because composer's implementation uses a leading dot (./...)
         if (strpos($this->target, '/') === false && symlink($this->target, $source)) {
+
+            Silencer::call('chmod', $source, 0777 & ~umask());
+
             $output->writeln(
                 sprintf(
                     '<comment>Installed %s %s to target %s.</comment>',
@@ -135,6 +139,9 @@ trait SymbolicLinkTrait
 
             return true;
         } elseif (strpos($this->target, '/') !== false && $this->filesystem->relativeSymlink($target, $source)) {
+
+            Silencer::call('chmod', $source, 0777 & ~umask());
+
             $output->writeln(
                 sprintf(
                     '<comment>Installed %s %s to target %s.</comment>',

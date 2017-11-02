@@ -216,8 +216,8 @@ class ScriptProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        $processor = new ScriptProcessor(basename($hook), $script, $root->url(), dirname($hook), $shebang);
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new ScriptProcessor(basename($hookVfs), $script, $root->url(), dirname($hookVfs), $shebang);
 
         $this->assertDeployment(
             $expectedResult,
@@ -313,8 +313,8 @@ class ScriptProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $hook = $root->url() . '/' . $hook;
-        $processor = new ScriptProcessor(basename($hook), 'test', $root->url(), dirname($hook));
+        $hookVfs = $root->url() . '/' . $hook;
+        $processor = new ScriptProcessor(basename($hookVfs), 'test', $root->url(), dirname($hookVfs));
 
         $this->assertRollback(
             $expectedResult,

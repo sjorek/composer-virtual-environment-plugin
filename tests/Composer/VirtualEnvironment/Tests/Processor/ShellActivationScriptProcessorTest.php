@@ -141,9 +141,9 @@ class ShellActivationScriptProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $source = $root->url() . '/' . $source;
-        $target = $root->url() . '/' . $target;
-        $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), $data);
+        $sourceVfs = $root->url() . '/' . $source;
+        $targetVfs = $root->url() . '/' . $target;
+        $processor = new ShellActivationScriptProcessor($sourceVfs, $targetVfs, $root->url(), $data);
 
         $this->assertDeployment(
             $expectedResult,
@@ -228,9 +228,9 @@ class ShellActivationScriptProcessorTest extends AbstractProcessorTestCase
             $directoryMode,
             $fileMode
         );
-        $source = $root->url() . '/' . $source;
-        $target = $root->url() . '/' . $target;
-        $processor = new ShellActivationScriptProcessor($source, $target, $root->url(), array());
+        $sourceVfs = $root->url() . '/' . $source;
+        $targetVfs = $root->url() . '/' . $target;
+        $processor = new ShellActivationScriptProcessor($sourceVfs, $targetVfs, $root->url(), array());
 
         $this->assertRollback(
             $expectedResult,
