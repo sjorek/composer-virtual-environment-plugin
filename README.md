@@ -93,19 +93,22 @@ Help:
 ### Shell Activation Hook Command
 
 ```bash
-$ php composer.phar help venv:hook 
+$ php composer.phar help venv:shell-hook
 Usage:
-  virtual-environment:hook [options] [--] [<hook>]...
-  venv:hook
+  virtual-environment:shell-hook [options] [--] [<hook>]...
+  venv:shell-hook
 
 Arguments:
-  hook                           List of the shell activation script hooks.
+  hook                           List of shell-hooks to add or remove.
 
 Options:
-      --name=NAME                The name of the shell activation script hook.
-      --priority=PRIORITY        The priority of the shell activation script hook.
-      --script=SCRIPT            The shell activation hook script.
-      --shell=SHELL              The name of or path to the shell. [default: "%SHELL%"]
+      --name=NAME                The name of the shell-hook.
+      --priority=PRIORITY        The priority of the shell-hook.
+      --shell=SHELL              The name of or path to the shell.
+      --script=SCRIPT            Use the given script as shell-hook.
+      --file=FILE                Use the content of the given file as shell-hook.
+      --link=LINK                Install shell-hook by creating a symbolic link to the given file.
+      --url=URL                  Download the shell-hook from the given url.
   -a, --add                      Add to existing configuration.
   -r, --remove                   Remove all configured items.
   -s, --save                     Save configuration.
@@ -127,21 +130,67 @@ Options:
                                  2 for more verbose output and 3 for debug
 
 Help:
-  The virtual-environment:hook command creates files
-  triggered when the virtual environment shell is activated or deactivated.
+  The virtual-environment:shell-hook command manages
+  shell-hooks residing in the .composer-venv/shell directory.
   
   Examples:
   
   Simple shell script running in the detected shell only
   
-      php composer.phar venv:hook post-activate \
+      php composer.phar venv:shell-hook post-activate \
           --script='composer run-script xyz'
   
   Simple shell script running in all shells
   
-      php composer.phar venv:hook post-activate \
+      php composer.phar venv:shell-hook post-activate \
           --script='composer run-script xyz' \
           --shell=sh
+  
+  Utilizing environment variable expansion
+  
+      php composer.phar venv:shell-hook post-activate \
+          --script='echo "I am using a %SHELL%!"' \
+          --shell='%SHELL%'
+  
+  Utilizing configuration value expansion
+  
+      php composer.phar venv:shell-hook post-activate \
+          --script='{$bin-dir}/php -r \'require "{$vendor-dir}/autoload.php"; Namespace\\Classname::staticMethod();\''
+  
+  Import file from relative path
+  
+      php composer.phar venv:shell-hook post-activate \
+          --file=relative/path/to/post-activate.hook
+  
+  Import file from absolute path
+  
+      php composer.phar venv:shell-hook post-activate \
+          --file=/absolute/path/to/post-activate.hook
+  
+  Create symlink to file
+  
+      php composer.phar venv:shell-hook post-activate \
+          --link=../../path/to/post-activate.hook
+  
+  Relative hook file URL
+  
+      php composer.phar venv:shell-hook post-activate \
+          --url=file://relative/path/to/post-activate.hook
+  
+  Absolute hook file URL
+  
+      php composer.phar venv:shell-hook post-activate \
+          --url=file:///absolute/path/to/post-activate.hook
+  
+  Download hook file from an URL
+  
+      php composer.phar venv:shell-hook post-activate \
+          --url=https://some.host/post-activate.hook
+  
+  Using a built-in hook file URL
+  
+      php composer.phar venv:shell-hook post-activate \
+          --url=vfs://venv/shell-hook/post-activate.hook
   
 ```
 

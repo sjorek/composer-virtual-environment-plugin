@@ -18,8 +18,9 @@ use Composer\Plugin\Capable;
 use Composer\Plugin\Capability\CommandProvider;
 use Sjorek\Composer\VirtualEnvironment\Command\GitHookCommand;
 use Sjorek\Composer\VirtualEnvironment\Command\ShellActivatorCommand;
-use Sjorek\Composer\VirtualEnvironment\Command\SymbolicLinkCommand;
 use Sjorek\Composer\VirtualEnvironment\Command\ShellActivatorHookCommand;
+use Sjorek\Composer\VirtualEnvironment\Command\ShellHookCommand;
+use Sjorek\Composer\VirtualEnvironment\Command\SymbolicLinkCommand;
 
 /**
  * A plugin providing a command to activate/deactivate the current bin directory
@@ -83,8 +84,9 @@ class Plugin implements PluginInterface, Capable, CommandProvider
         return array(
             new ShellActivatorCommand(null, $this->composer, $this->io),
             new ShellActivatorHookCommand(null, $this->composer, $this->io),
-            new SymbolicLinkCommand(null, $this->composer, $this->io),
+            new ShellHookCommand(null, $this->composer, $this->io),
             new GitHookCommand(null, $this->composer, $this->io),
+            new SymbolicLinkCommand(null, $this->composer, $this->io),
         );
     }
 }
