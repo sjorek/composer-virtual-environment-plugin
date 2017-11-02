@@ -29,6 +29,8 @@ class GitHookCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
+        $gitHookDir = GitHookProcessorInterface::GIT_HOOK_DIR;
+
         $this
             ->setName('virtual-environment:git-hook')
             ->setAliases(array('venv:git-hook'))
@@ -75,9 +77,9 @@ class GitHookCommand extends AbstractProcessorCommand
                 )
             )
             ->setHelp(
-                <<<'EOT'
+                <<<EOT
 The <info>virtual-environment:git-hook</info> command manages
-git-hooks residing in the <info>.git/hooks</info> directory.
+git-hooks residing in the <info>${gitHookDir}</info> directory.
 
 Examples:
 
@@ -101,15 +103,15 @@ Simple PHP script
 Utilizing environment variable expansion
 
     <info>php composer.phar venv:git-hook pre-commit \
-        --shebang=%SHELL% \
+        --shebang='%SHELL%' \
         --script='echo "I am using a %SHELL%!"'</info>
 
 Utilizing configuration value expansion
 
     <info>php composer.phar venv:git-hook pre-commit \
-        --shebang='{$bin-dir}/php' \
+        --shebang='{\$bin-dir}/php' \
         --script='<?php
-                require "{$vendor-dir}/autoload.php";
+                require "{\$vendor-dir}/autoload.php";
                 Namespace\Classname::staticMethod();'</info>
 
 Import file from relative path
