@@ -30,7 +30,7 @@ class SymbolicLinkCommand extends AbstractProcessorCommand
     {
         $composerPhar = null;
         if (isset($_SERVER['argv'])) {
-            foreach($_SERVER['argv'] as $argument) {
+            foreach ($_SERVER['argv'] as $argument) {
                 $argument = realpath($argument);
                 if ($argument &&
                     substr($argument, -1 * strlen('/composer.phar')) === '/composer.phar'
