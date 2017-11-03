@@ -165,30 +165,26 @@ EOT
             $dataTemplate = array(
                 '@NAME@' => $config->get('name-expanded'),
                 '@BASE_DIR@' => $baseDir,
-                '@BIN_DIR@' => $baseDir . DIRECTORY_SEPARATOR . $binDir,
+                '@BIN_DIR@' => $baseDir . '/' . $binDir,
                 '@BIN_PATH@' => $binDir,
-                '@SHELL_HOOK_DIR@' => $baseDir . DIRECTORY_SEPARATOR . $config->get('shell-hook-dir-expanded'),
+                '@SHELL_HOOK_DIR@' => $baseDir . '/' . $config->get('shell-hook-dir-expanded'),
                 '@COLORS@' => $config->get('colors') ? '1' : '0',
             );
+            $windowsShells = explode(',', ShellActivatorConfiguration::SHELLS_NT);
             foreach ($activators as $name => $activator) {
                 $data = array_merge($dataTemplate, array('@SHEBANG@' => $activator['shell']));
                 if ($name === 'bash') {
-                    // TODO check that $bash is really a bash? check version or issue a command only bash supports!
-                    $process = new Process(null);
-                    foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
-                        $process->setCommandLine(
-                            sprintf(
-                                '( echo %s | %s -ls ) 2>/dev/null',
-                                escapeshellarg($command),
-                                $activator['shell'] // already escaped
-                            )
-                        );
-                        $process->run();
-                        if (!$process->isSuccessful()) {
-                            throw new \RuntimeException($process->getErrorOutput());
-                        }
-                        $data[$key] = trim($process->getOutput());
-                    }
+                    $this->fillBashTemplateData($data, $activator['shell']);
+                } elseif (in_array($name, $windowsShells, true)) {
+                    $this->convertWindowsDirectorySeparator(
+                        $data,
+                        array(
+                            '@BASE_DIR@',
+                            '@BIN_DIR@',
+                            '@BIN_PATH@',
+                            '@SHELL_HOOK_DIR@',
+                        )
+                    );
                 }
                 foreach($activator['filenames'] as $file) {
                     $source = $resourceDir . '/' . $file;
@@ -261,6 +257,42 @@ EOT
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @param array $data
+     * @param string $bash
+     * @throws \RuntimeException
+     */
+    protected function fillBashTemplateData(array & $data, $bash)
+    {
+        // TODO check that $bash is really a bash? check version or issue a command only bash supports?
+        $process = new Process(null);
+        foreach (self::BASH_TEMPLATE_COMMANDS as $key => $command) {
+            $process->setCommandLine(
+                sprintf(
+                    '( echo %s | %s -ls ) 2>/dev/null',
+                    escapeshellarg($command),
+                    $bash // already escaped
+                )
+            );
+            $process->run();
+            if (!$process->isSuccessful()) {
+                throw new \RuntimeException($process->getErrorOutput());
+            }
+            $data[$key] = trim($process->getOutput());
+        }
+    }
+
+    /**
+     * @param array $data
+     * @param array $keys
+     */
+    protected function convertWindowsDirectorySeparator(array & $data, array $keys)
+    {
+        foreach($keys as $key) {
+            $data[$key] = implode('\\', explode('/', $data[$key]));
         }
     }
 }

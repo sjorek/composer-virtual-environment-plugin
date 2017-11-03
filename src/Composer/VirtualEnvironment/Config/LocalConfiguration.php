@@ -31,6 +31,6 @@ class LocalConfiguration extends FileConfiguration
     {
         $recipe = Factory::getComposerFile();
         $fileName = basename($recipe, '.json') . '-venv.json';
-        parent::__construct($composer, dirname($recipe) . DIRECTORY_SEPARATOR . $fileName);
+        parent::__construct($composer, dirname($recipe) . '/' . $fileName);
     }
 }

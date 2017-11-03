@@ -35,7 +35,7 @@ class LockConfiguration extends FileConfiguration
     {
         if (strpos($file, 'php://') === false) {
             $extension = pathinfo($file, PATHINFO_EXTENSION) ?: 'json';
-            $file = dirname($file) . DIRECTORY_SEPARATOR . basename($file, '.' . $extension) . '.lock';
+            $file = dirname($file) . '/' . basename($file, '.' . $extension) . '.lock';
         }
         parent::__construct($composer, $file);
     }
