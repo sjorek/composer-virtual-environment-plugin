@@ -5,11 +5,11 @@ git:
 
 matrix:
   include:
-    - dist: precise
-      php: 5.3
-      env: LINT=false SKIP_LOCK=true
-    - php: 5.4
-      env: LINT=false SKIP_LOCK=true
+    #- dist: precise
+    #  php: 5.3
+    #  env: LINT=false SKIP_LOCK=true
+    #- php: 5.4
+    #  env: LINT=false SKIP_LOCK=true
     - php: 5.5
       env: LINT=false SKIP_LOCK=true
     - php: 5.6
