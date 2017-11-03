@@ -23,11 +23,7 @@ abstract class AbstractProcessor implements ShellHookProcessorInterface, ShellCo
     protected $hook;
     protected $name;
     protected $shell;
-    protected $target;
-    protected $source;
-    protected $baseDir;
     protected $shellHookDir;
-    protected $filesystem;
 
     /**
      * @param string $hook

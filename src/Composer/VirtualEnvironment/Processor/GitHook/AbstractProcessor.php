@@ -20,11 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractProcessor implements GitHookProcessorInterface
 {
     protected $hook;
-    protected $target;
-    protected $source;
-    protected $baseDir;
     protected $gitHookDir;
-    protected $filesystem;
 
     /**
      * @param string $hook
