@@ -88,7 +88,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
                 if ($activator === 'cmd') {
                     $filenames = array('activate.bat', 'deactivate.bat');
                     $shell = 'cmd.exe';
-                } elseif($activator === 'powershell') {
+                } elseif ($activator === 'powershell') {
                     $filenames = array('Activate.ps1');
                     $shell = 'powershell.exe';
                 } else {

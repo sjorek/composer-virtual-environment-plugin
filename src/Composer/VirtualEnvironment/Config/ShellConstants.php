@@ -20,5 +20,4 @@ interface ShellConstants
     const SHELLS_NT = 'cmd,powershell';
     const SHEBANG_SH = '/bin/sh';
     const SHEBANG_ENV = '/usr/bin/env %s';
-
 }

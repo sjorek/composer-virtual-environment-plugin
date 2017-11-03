@@ -37,6 +37,7 @@ class ShellActivatorConfigurationTest extends AbstractTestCase
                 'bash',
             )
         );
+
         return array(
             'empty candidates return empty array' => array(
                 array(), array(),
@@ -184,7 +185,7 @@ class ShellActivatorConfigurationTest extends AbstractTestCase
                         'shell' => '/usr/bin/env bash',
                     ),
                     'cmd' => array(
-                        'filenames' => array('activate.bat', 'deactivate.bat',),
+                        'filenames' => array('activate.bat', 'deactivate.bat'),
                         'shell' => 'cmd.exe',
                     ),
                     'csh' => array(

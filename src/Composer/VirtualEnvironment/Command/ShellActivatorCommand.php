@@ -186,7 +186,7 @@ EOT
                         )
                     );
                 }
-                foreach($activator['filenames'] as $file) {
+                foreach ($activator['filenames'] as $file) {
                     $source = $resourceDir . '/' . $file;
                     $target = $binDir . '/' . $file;
                     $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, $data);
@@ -231,7 +231,7 @@ EOT
             $binDir = $config->get('bin-dir');
             $resourceDir = $config->get('resource-dir');
             foreach ($activators as $activator) {
-                foreach($activator['filenames'] as $file) {
+                foreach ($activator['filenames'] as $file) {
                     $source = $resourceDir . '/' . $file;
                     $target = $binDir . '/' . $file;
                     $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, array());
@@ -261,8 +261,8 @@ EOT
     }
 
     /**
-     * @param array $data
-     * @param string $bash
+     * @param  array             $data
+     * @param  string            $bash
      * @throws \RuntimeException
      */
     protected function fillBashTemplateData(array & $data, $bash)
@@ -291,7 +291,7 @@ EOT
      */
     protected function convertWindowsDirectorySeparator(array & $data, array $keys)
     {
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             $data[$key] = implode('\\', explode('/', $data[$key]));
         }
     }
