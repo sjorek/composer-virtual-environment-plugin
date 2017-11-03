@@ -21,7 +21,7 @@ matrix:
     - php: 7.2
       env: LINT=false
     - php: nightly
-      env: NIGHTLY=true LINT=false
+      env: LINT=false
   fast_finish: true
   allow_failures:
     - php: nightly
@@ -39,7 +39,7 @@ install:
 - if [[ $SKIP_LOCK = true ]]; then
     rm -v composer.lock;
   fi
-- if [[ $NIGHTLY = true ]]; then
+- if [[ $LINT = false ]]; then
     composer -v remove --dev friendsofphp/php-cs-fixer;
     composer -v validate;
   fi
