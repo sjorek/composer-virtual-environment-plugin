@@ -14,6 +14,7 @@ namespace Sjorek\Composer\VirtualEnvironment\Command\Config;
 use Composer\Util\Filesystem;
 use Sjorek\Composer\VirtualEnvironment\Config\FileConfigurationInterface;
 use Sjorek\Composer\VirtualEnvironment\Config\ShellConstants;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -26,18 +27,39 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
      */
     public static function validateActivators(array $candidates)
     {
-        $candidates = array_map('trim', array_map('strtolower', $candidates));
+        $candidates = array_unique(
+            array_map(
+                'trim',
+                array_map(
+                    function ($candidate) {
+                        // Remove potential '.exe' suffix for windows users … :-P
+                        return basename(strtolower($candidate), '.exe');
+                    },
+                    $candidates
+                )
+            )
+        );
 
+        $amount = count($candidates);
         if (in_array('detect', $candidates, true)) {
-            if (!empty($_SERVER['SHELL'])) {
-                $candidates[] = strtolower(trim(basename($_SERVER['SHELL'])));
-            } elseif (!empty($_ENV['SHELL'])) {
-                $candidates[] = strtolower(trim(basename($_ENV['SHELL'])));
+            if (getenv('SHELL') !== false) {
+                // Remove potential '.exe' suffix for windows users … :-P
+                $candidates[] = strtolower(trim(basename(getenv('SHELL'), '.exe')));
+            } else {
+                $amount -= 1;
             }
         }
 
-        // Get a list of valid $activators
-        return array_values(array_unique(array_intersect($candidates, static::SHELLS)));
+        $available = array_merge(
+            explode(',', static::SHELLS_POSIX),
+            explode(',', static::SHELLS_NT)
+        );
+
+        // Get a list of valid candidates
+        $candidates = array_values(array_unique(array_intersect($candidates, $available)));
+
+        // Return false if invalid shells where given
+        return count($candidates) === $amount ? $candidates : false;
     }
 
     /**
@@ -46,7 +68,6 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
      */
     public static function expandActivators(array $activators)
     {
-
         // Remove duplicates introduced by user
         $activators = array_unique($activators);
 
@@ -64,19 +85,26 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
         // Create activator configuration
         $activators = array_map(
             function ($activator) use ($shebangSh, $shebangEnv) {
-                $filename = 'activate.' . $activator;
-                if (isset($_SERVER['SHELL']) && basename($_SERVER['SHELL']) === $activator) {
-                    $shell = escapeshellcmd($_SERVER['SHELL']);
-                } elseif (isset($_ENV['SHELL']) && basename($_ENV['SHELL']) === $activator) {
-                    $shell = escapeshellcmd($_ENV['SHELL']);
-                } elseif ($activator === 'sh') {
-                    $shell = escapeshellcmd($shebangSh);
+                if ($activator === 'cmd') {
+                    $filenames = array('activate.bat', 'deactivate.bat');
+                    $shell = 'cmd.exe';
+                } elseif($activator === 'powershell') {
+                    $filenames = array('Activate.ps1');
+                    $shell = 'powershell.exe';
                 } else {
-                    $shell = sprintf($shebangEnv, escapeshellcmd($activator));
+                    $filenames = array('activate.' . $activator);
+                    // Remove potential '.exe' suffix for windows users … :-P
+                    if (getenv('SHELL') !== false && basename(getenv('SHELL'), '.exe') === $activator) {
+                        $shell = escapeshellcmd(getenv('SHELL'));
+                    } elseif ($activator === 'sh') {
+                        $shell = escapeshellcmd($shebangSh);
+                    } else {
+                        $shell = sprintf($shebangEnv, escapeshellcmd($activator));
+                    }
                 }
 
                 return array(
-                    'filename' => $filename,
+                    'filenames' => $filenames,
                     'shell' => $shell,
                 );
             },
@@ -97,6 +125,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
     {
         $recipe = $this->recipe;
         $input = $this->input;
+        $output = $this->output;
         $filesystem = new Filesystem();
 
         $this->set(
@@ -113,7 +142,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
         $this->set('name', $name);
         $this->set('name-expanded', $this->parseExpansion($name));
 
-        $candidates = array('detect'); // = explode(',', static::SHELLS);
+        $candidates = array('detect'); // = explode(',', static::SHELLS_POSIX);
         if ($input->getArgument('shell')) {
             $candidates = $input->getArgument('shell');
             if ($input->getOption('add')) {
@@ -122,8 +151,23 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
         } elseif ($recipe->has('shell')) {
             $candidates = $recipe->get('shell');
         }
-        $activators = $this->set('shell', self::validateActivators($candidates));
-        $activators = $this->set('shell-expanded', self::expandActivators($activators));
+
+        $candidates = self::validateActivators($candidates);
+        if ($candidates === false) {
+            $output->writeln(
+                sprintf(
+                    '<error>Invalid shell given or detected. Supported shells are: %s (posix) and %s (nt)</error>',
+                    self::SHELLS_POSIX,
+                    self::SHELLS_NT
+                ),
+                OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_VERBOSE
+            );
+
+            return false;
+        } else {
+            $activators = $this->set('shell', $candidates);
+            $activators = $this->set('shell-expanded', self::expandActivators($activators));
+        }
 
         $colors = true;
         if ($input->getOption('no-colors')) {
@@ -136,9 +180,10 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
         $this->set('colors', $colors);
 
         $symlink = null;
-        // If only has been given, we'll symlink to this activator
-        if (count($activators) === 1) {
-            $symlink = reset($activators);
+        // If only one posix shell has been given, we'll symlink to this activator
+        $posix = array_intersect(array_keys($activators), explode(',', self::SHELLS_POSIX));
+        if (count($posix) === 1) {
+            $symlink = $activators[reset($posix)];
         } elseif (isset($activators['sh'])) {
             $symlink = $activators['sh'];
         }
@@ -170,6 +215,9 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
      */
     protected function prepareLock(FileConfigurationInterface $recipe)
     {
+        $recipe->set('name', $this->get('name'));
+        $recipe->set('shell', $this->get('shell'));
+        $recipe->set('colors', $this->get('colors'));
         $recipe->set('shell-link', $this->get('shell-link') ?: new \stdClass());
         $recipe->set('shell-link-expanded', $this->get('shell-link-expanded') ?: new \stdClass());
 

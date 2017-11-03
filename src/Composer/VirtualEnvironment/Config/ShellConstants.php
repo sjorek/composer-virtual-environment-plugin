@@ -16,7 +16,9 @@ namespace Sjorek\Composer\VirtualEnvironment\Config;
  */
 interface ShellConstants
 {
-    const SHELLS = array('bash', 'csh', 'fish', 'zsh');
+    const SHELLS_POSIX = 'bash,csh,fish,zsh';
+    const SHELLS_NT = 'cmd,powershell';
     const SHEBANG_SH = '/bin/sh';
     const SHEBANG_ENV = '/usr/bin/env %s';
+
 }

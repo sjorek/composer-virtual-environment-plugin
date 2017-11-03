@@ -30,7 +30,7 @@ class ShellActivatorCommand extends AbstractProcessorCommand
 {
     protected function configure()
     {
-//         $shells = ShellActivatorConfiguration::SHELLS;
+//         $shells = exlode(',', ShellActivatorConfiguration::SHELLS_POSIX);
 //         if (!(($shell = getenv('SHELL')) && ($shell = basename($shell)) && in_array($shell, $shells))) {
 //             $shell = null;
 //         }
@@ -87,20 +87,31 @@ Usage:
 After this you can source the activation-script
 corresponding to your shell.
 
-if only one shell-activator or bash and zsh have been deployed:
+Posix compatible shells:
+
+    If one posix shell-activator or
+    bash and zsh have been deployed:
     <info>source vendor/bin/activate</info>
 
-csh:
-    <info>source vendor/bin/activate.csh</info>
+    csh:
+        <info>source vendor/bin/activate.csh</info>
 
-fish:
-    <info>. vendor/bin/activate.fish</info>
+    fish:
+        <info>. vendor/bin/activate.fish</info>
 
-bash (alternative):
-    <info>source vendor/bin/activate.bash</info>
+    bash (alternative):
+        <info>source vendor/bin/activate.bash</info>
 
-zsh (alternative):
-    <info>source vendor/bin/activate.zsh</info>
+    zsh (alternative):
+        <info>source vendor/bin/activate.zsh</info>
+
+NT (Windows) compatible shells:
+
+    cmd[.exe] (batch):
+        <info>vendor\\bin\\activate.bat</info>
+
+    powershell[.exe]:
+        <info>vendor\\bin\\Activate.ps1</info>
 
 EOT
             );
@@ -179,10 +190,12 @@ EOT
                         $data[$key] = trim($process->getOutput());
                     }
                 }
-                $source = $resourceDir . '/' . $activator['filename'];
-                $target = $binDir . '/' . $activator['filename'];
-                $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, $data);
-                $processor->deploy($output, $config->get('force'));
+                foreach($activator['filenames'] as $file) {
+                    $source = $resourceDir . '/' . $file;
+                    $target = $binDir . '/' . $file;
+                    $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, $data);
+                    $processor->deploy($output, $config->get('force'));
+                }
             }
             if ($config->has('shell-link-expanded')) {
                 $symlinks = $config->get('shell-link-expanded');
@@ -222,10 +235,12 @@ EOT
             $binDir = $config->get('bin-dir');
             $resourceDir = $config->get('resource-dir');
             foreach ($activators as $activator) {
-                $source = $resourceDir . DIRECTORY_SEPARATOR . $activator['filename'];
-                $target = $binDir . DIRECTORY_SEPARATOR . $activator['filename'];
-                $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, array());
-                $processor->rollback($output);
+                foreach($activator['filenames'] as $file) {
+                    $source = $resourceDir . '/' . $file;
+                    $target = $binDir . '/' . $file;
+                    $processor = new Processor\ShellActivationScriptProcessor($source, $target, $baseDir, array());
+                    $processor->rollback($output);
+                }
             }
             if ($config->has('shell-link-expanded')) {
                 $symlinks = $config->get('shell-link-expanded');
