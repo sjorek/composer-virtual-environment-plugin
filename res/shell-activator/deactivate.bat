@@ -1,7 +1,11 @@
 @echo off
 
-if exists "@SHELL_HOOK_DIR@\pre-deactivate.bat" (
-    call "@SHELL_HOOK_DIR@\pre-deactivate.bat"
+
+if exists "@SHELL_HOOK_DIR@\pre-deactivate.d" (
+    for %%h in ("@SHELL_HOOK_DIR@\pre-deactivate.d\*.bat") do call "%%~fh"
+    if defined h (
+        set h=
+    )
 )
 
 if defined _OLD_COMPOSER_VENV_PROMPT (
@@ -23,8 +27,11 @@ echo ""
 echo "Good Bye!"
 echo ""
 
-if exists "@SHELL_HOOK_DIR@\post-deactivate.bat" (
-    call "@SHELL_HOOK_DIR@\post-deactivate.bat"
+if exists "@SHELL_HOOK_DIR@\post-deactivate.d" (
+    for %%h in ("@SHELL_HOOK_DIR@\post-deactivate.d\*.bat") do call "%%~fh"
+    if defined h (
+        set h=
+    )
 )
 
 :END

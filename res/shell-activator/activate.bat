@@ -14,8 +14,11 @@ if defined COMPOSER_VENV (
     goto END
 )
 
-if exists "@SHELL_HOOK_DIR@\pre-activate.bat" (
-    call "@SHELL_HOOK_DIR@\pre-activate.bat"
+if exists "@SHELL_HOOK_DIR@\pre-activate.d" (
+    for %%h in ("@SHELL_HOOK_DIR@\pre-activate.d\*.bat") do call "%%~fh"
+    if defined h (
+        set h=
+    )
 )
 
 set "COMPOSER_VENV=@NAME@"
@@ -46,8 +49,11 @@ echo ""
 echo "Run 'call @VENDOR_DIR@\deactivate.bat' to exit the environment."
 echo ""
 
-if exists "@SHELL_HOOK_DIR@\post-activate.bat" (
-    call "@SHELL_HOOK_DIR@\post-activate.bat"
+if exists "@SHELL_HOOK_DIR@\post-activate.d" (
+    for %%h in ("@SHELL_HOOK_DIR@\post-activate.d\*.bat") do call "%%~fh"
+    if defined h (
+        set h=
+    )
 )
 
 :END
