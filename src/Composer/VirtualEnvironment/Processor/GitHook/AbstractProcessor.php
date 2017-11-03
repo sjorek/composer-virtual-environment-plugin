@@ -46,7 +46,8 @@ abstract class AbstractProcessor implements GitHookProcessorInterface
      */
     public function deploy(OutputInterface $output, $force = false)
     {
-        if (!in_array($this->hook, static::GIT_HOOKS, true)) {
+        $GIT_HOOKS = explode(',', static::GIT_HOOKS);
+        if (!in_array($this->hook, $GIT_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid git-hook %s given.</error>',
@@ -73,7 +74,8 @@ abstract class AbstractProcessor implements GitHookProcessorInterface
      */
     public function rollback(OutputInterface $output)
     {
-        if (!in_array($this->hook, static::GIT_HOOKS, true)) {
+        $GIT_HOOKS = explode(',', static::GIT_HOOKS);
+        if (!in_array($this->hook, $GIT_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid git-hook %s given.</error>',

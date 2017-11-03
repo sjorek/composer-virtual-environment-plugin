@@ -19,11 +19,5 @@ use Sjorek\Composer\VirtualEnvironment\Processor\ProcessorInterface;
 interface ShellHookProcessorInterface extends ProcessorInterface
 {
     const SHELL_HOOK_DIR = '.composer-venv/shell';
-
-    const SHELL_HOOKS = array(
-        'post-activate',
-        'post-deactivate',
-        'pre-activate',
-        'pre-deactivate',
-    );
+    const SHELL_HOOKS = 'post-activate,post-deactivate,pre-activate,pre-deactivate';
 }

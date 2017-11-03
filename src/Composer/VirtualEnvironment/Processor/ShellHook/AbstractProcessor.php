@@ -58,7 +58,8 @@ abstract class AbstractProcessor implements ShellHookProcessorInterface, ShellCo
      */
     public function deploy(OutputInterface $output, $force = false)
     {
-        if (!in_array($this->hook, static::SHELL_HOOKS, true)) {
+        $SHELL_HOOKS = explode(',', static::SHELL_HOOKS);
+        if (!in_array($this->hook, $SHELL_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid shell-hook %s given.</error>',
@@ -85,7 +86,8 @@ abstract class AbstractProcessor implements ShellHookProcessorInterface, ShellCo
      */
     public function rollback(OutputInterface $output)
     {
-        if (!in_array($this->hook, static::SHELL_HOOKS, true)) {
+        $SHELL_HOOKS = explode(',', static::SHELL_HOOKS);
+        if (!in_array($this->hook, $SHELL_HOOKS, true)) {
             $output->writeln(
                 sprintf(
                     '<error>Invalid shell-hook %s given.</error>',

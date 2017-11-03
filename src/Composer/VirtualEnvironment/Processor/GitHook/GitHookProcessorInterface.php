@@ -19,25 +19,5 @@ use Sjorek\Composer\VirtualEnvironment\Processor\ProcessorInterface;
 interface GitHookProcessorInterface extends ProcessorInterface
 {
     const GIT_HOOK_DIR = '.git/hooks';
-
-    const GIT_HOOKS = array(
-        'applypatch-msg',
-        'commit-msg',
-        'post-applypatch',
-        'post-checkout',
-        'post-commit',
-        'post-merge',
-        'post-receive',
-        'post-rewrite',
-        'post-update',
-        'pre-applypatch',
-        'pre-auto-gc',
-        'pre-commit',
-        'pre-push',
-        'pre-rebase',
-        'pre-receive',
-        'prepare-commit-msg',
-        'push-to-checkout',
-        'update',
-    );
+    const GIT_HOOKS = 'applypatch-msg,commit-msg,post-applypatch,post-checkout,post-commit,post-merge,post-receive,post-rewrite,post-update,pre-applypatch,pre-auto-gc,pre-commit,pre-push,pre-rebase,pre-receive,prepare-commit-msg,push-to-checkout,update';
 }

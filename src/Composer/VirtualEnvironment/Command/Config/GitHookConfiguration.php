@@ -57,7 +57,8 @@ class GitHookConfiguration extends AbstractCommandConfiguration
         }
 
         foreach ($hooks as $hook => $config) {
-            if (!in_array($hook, GitHookProcessorInterface::GIT_HOOKS, true)) {
+            $GIT_HOOKS = explode(',', GitHookProcessorInterface::GIT_HOOKS);
+            if (!in_array($hook, $GIT_HOOKS, true)) {
                 $output->writeln(
                     sprintf(
                         '<error>Invalid git-hook given: %s</error>',

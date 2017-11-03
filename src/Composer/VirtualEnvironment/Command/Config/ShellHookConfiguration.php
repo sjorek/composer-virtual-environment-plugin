@@ -85,9 +85,10 @@ class ShellHookConfiguration extends AbstractCommandConfiguration
             $hooks = $recipe->get('shell-hook');
         }
 
+        $SHELL_HOOKS = explode(',', ShellHookProcessorInterface::SHELL_HOOKS);
         foreach ($hooks as $hook => $hookConfigs) {
             foreach ($hookConfigs as $name => $config) {
-                if (!in_array($hook, ShellHookProcessorInterface::SHELL_HOOKS, true)) {
+                if (!in_array($hook, $SHELL_HOOKS, true)) {
                     $output->writeln(
                         sprintf(
                             '<error>Invalid shell-hook given: %s</error>',
