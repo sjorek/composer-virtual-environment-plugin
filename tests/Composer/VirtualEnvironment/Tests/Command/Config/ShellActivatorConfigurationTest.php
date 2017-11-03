@@ -69,6 +69,9 @@ class ShellActivatorConfigurationTest extends AbstractTestCase
             'detection among others returns false for unsupported shell' => array(
                 false, array('bash', 'detect'),
             ),
+            'detection among others returns false if SHELL environment variable is not available' => array(
+                false, array('detect', 'bash'), null,
+            ),
             'all available return all available' => array(
                 $available, $available,
             ),

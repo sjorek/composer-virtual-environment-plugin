@@ -45,8 +45,6 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
             if (getenv('SHELL') !== false) {
                 // Remove potential '.exe' suffix for windows users … :-P
                 $candidates[] = strtolower(trim(basename(getenv('SHELL'), '.exe')));
-            } else {
-                $amount -= 1;
             }
         }
 
