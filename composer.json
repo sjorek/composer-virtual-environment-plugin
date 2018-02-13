@@ -79,6 +79,9 @@
         "composer-virtual-environment-plugin:security-check": [
             "@composer -v exec -- security-checker security:check --ansi"
         ],
+	"composer-virtual-environment-plugin:security-check-bugfix-for-travis": [
+            "@composer -v exec -- security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
+        ],
         "composer-virtual-environment-plugin:download-scripts": [
             "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts"
         ],
