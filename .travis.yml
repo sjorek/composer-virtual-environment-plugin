@@ -6,13 +6,13 @@ git:
 matrix:
   include:
     - php: 7.0
-      env: LINT=false
+      env: LINT=false CHECK_SECURITY=false
     - php: 7.1
-      env: LINT=true
+      env: LINT=true CHECK_SECURITY=true
     - php: 7.2
-      env: LINT=false
+      env: LINT=false CHECK_SECURITY=false
     - php: nightly
-      env: NIGHTLY=true LINT=false
+      env: NIGHTLY=true LINT=false CHECK_SECURITY=false
   allow_failures:
     - php: nightly
 
@@ -49,6 +49,9 @@ script:
   fi
 - if [[ $LINT = false ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v composer-virtual-environment-plugin:test;
+  fi
+- if [[ $CHECK_SECUIRITY = true ]]; then
+    composer -v composer-virtual-environment-plugin:security-check;
   fi
 
 sudo: false
