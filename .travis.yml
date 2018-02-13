@@ -50,7 +50,7 @@ script:
 - if [[ $LINT = false ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v composer-virtual-environment-plugin:test;
   fi
-- if [[ $CHECK_SECUIRITY = true ]]; then
+- if [[ $CHECK_SECURITY = true ]]; then
     composer -v composer-virtual-environment-plugin:security-check;
   fi
 
