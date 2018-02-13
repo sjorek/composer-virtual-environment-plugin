@@ -32,10 +32,11 @@
         "composer-plugin-api" : "^1.1"
     },
     "require-dev" : {
-        "composer/composer" : "^1.5",
-        "friendsofphp/php-cs-fixer" : "^2.7",
-        "phpunit/phpunit" : "^6.4",
-        "mikey179/vfsStream" : "^1.6",
+        "composer/composer": "^1.5",
+        "friendsofphp/php-cs-fixer": "^2.7",
+        "mikey179/vfsStream": "^1.6",
+        "phpunit/phpunit": "^6.4",
+        "sensiolabs/security-checker": "^4.1",
         "symfony/process": "^3.3"
     },
     "extra" : {
@@ -44,6 +45,7 @@
     "scripts": {
         "composer-virtual-environment-plugin:build": [
             "@composer-virtual-environment-plugin:clean",
+            "@composer-virtual-environment-plugin:security-check",
             "@composer-virtual-environment-plugin:cs-lint",
             "@composer-virtual-environment-plugin:coverage"
         ],
@@ -73,6 +75,9 @@
         ],
         "composer-virtual-environment-plugin:cs-fix": [
             "@composer -v exec -- php-cs-fixer fix -vv || true"
+        ],
+        "composer-virtual-environment-plugin:security-check": [
+            "@composer -v exec -- security-checker security:check --ansi"
         ],
         "composer-virtual-environment-plugin:download-scripts": [
             "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts"
