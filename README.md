@@ -373,7 +373,6 @@ repository, everything should work like a breeze.
 ### Status
 
 [![Build Status](https://img.shields.io/travis/sjorek/composer-virtual-environment-plugin.svg)](https://travis-ci.org/sjorek/composer-virtual-environment-plugin)
-[![Dependency Status](https://img.shields.io/gemnasium/sjorek/composer-virtual-environment-plugin.svg)](https://gemnasium.com/github.com/sjorek/composer-virtual-environment-plugin)
 
 
 ### GitHub
