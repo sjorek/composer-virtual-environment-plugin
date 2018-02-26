@@ -36,22 +36,22 @@ install:
 script:
 - if [[ $LINT = true ]]; then
     composer -v validate;
-    composer -v composer-virtual-environment-plugin:cs-lint;
+    composer -v run:cs-lint;
   fi
 - if [[ $LINT = true ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v composer-virtual-environment-plugin:test-all-coverage;
+    composer -v run:test-all-coverage;
   fi
 - if [[ $LINT = true ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v composer-virtual-environment-plugin:test-coverage;
+    composer -v run:test-coverage;
   fi
 - if [[ $LINT = false ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v composer-virtual-environment-plugin:test-all;
+    composer -v run:test-all;
   fi
 - if [[ $LINT = false ]] && [[ ! $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v composer-virtual-environment-plugin:test;
+    composer -v run:test;
   fi
 - if [[ $CHECK_SECURITY = true ]]; then
-    composer -v composer-virtual-environment-plugin:security-check-bugfix-for-travis;
+    composer -v run:security-check-bugfix-for-travis;
   fi
 
 sudo: false

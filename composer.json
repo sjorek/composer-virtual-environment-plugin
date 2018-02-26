@@ -43,59 +43,59 @@
         "class" : "Sjorek\\Composer\\VirtualEnvironment\\Plugin"
     },
     "scripts": {
-        "composer-virtual-environment-plugin:build": [
-            "@composer-virtual-environment-plugin:clean",
-            "@composer-virtual-environment-plugin:security-check",
-            "@composer-virtual-environment-plugin:cs-lint",
-            "@composer-virtual-environment-plugin:coverage"
+        "run:build": [
+            "@run:clean",
+            "@run:security-check",
+            "@run:cs-lint",
+            "@run:coverage"
         ],
-        "composer-virtual-environment-plugin:clean": [
+        "run:clean": [
             "[ -d coverage ] && rm -r coverage || true"
         ],
-        "composer-virtual-environment-plugin:test": [
-            "@composer -v exec -- phpunit -v --exclude-group=large"
+        "run:test": [
+            "phpunit -v --exclude-group=large"
          ],
-        "composer-virtual-environment-plugin:test-all": [
-            "@composer -v exec -- phpunit -v"
+        "run:test-all": [
+            "phpunit -v"
         ],
-        "composer-virtual-environment-plugin:test-large": [
-            "@composer -v exec -- phpunit -v --group=large"
+        "run:test-large": [
+            "phpunit -v --group=large"
         ],
-        "composer-virtual-environment-plugin:test-coverage": [
-            "@composer -v exec -- phpunit -v --exclude-group=large --coverage-text"
+        "run:test-coverage": [
+            "phpunit -v --exclude-group=large --coverage-text"
         ],
-        "composer-virtual-environment-plugin:test-all-coverage": [
-            "@composer -v exec -- phpunit -v --coverage-text"
+        "run:test-all-coverage": [
+            "phpunit -v --coverage-text"
         ],
-        "composer-virtual-environment-plugin:coverage": [
-            "@composer -v exec -- phpunit -v --coverage-html coverage"
+        "run:coverage": [
+            "phpunit -v --coverage-html coverage"
         ],
-        "composer-virtual-environment-plugin:cs-lint": [
-            "@composer -v exec -- php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
+        "run:cs-lint": [
+            "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
         ],
-        "composer-virtual-environment-plugin:cs-fix": [
-            "@composer -v exec -- php-cs-fixer fix -vv || true"
+        "run:cs-fix": [
+            "php-cs-fixer fix -vv || true"
         ],
-        "composer-virtual-environment-plugin:security-check": [
-            "@composer -v exec -- security-checker security:check --ansi"
+        "run:security-check": [
+            "security-checker security:check --ansi"
         ],
-        "composer-virtual-environment-plugin:security-check-bugfix-for-travis": [
-            "@composer -v exec -- security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
+        "run:security-check-bugfix-for-travis": [
+            "security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
         ],
-        "composer-virtual-environment-plugin:download-scripts": [
+        "run:download-scripts": [
             "svn export --trust-server-cert-failures=unknown-ca https://github.com/python/cpython/trunk/Lib/venv/scripts res/scripts"
         ],
-        "composer-virtual-environment-plugin:venv": [
-            "@composer-virtual-environment-plugin:venv-remove",
-            "@composer-virtual-environment-plugin:venv-deploy"
+        "run:venv": [
+            "@run:venv-remove",
+            "@run:venv-deploy"
         ],
-        "composer-virtual-environment-plugin:venv-deploy": [
+        "run:venv-deploy": [
             "@composer venv:shell -v --lock",
             "@composer venv:shell-hook -v --lock",
             "@composer venv:link -v --lock",
             "@composer venv:git-hook -v --lock"
         ],
-        "composer-virtual-environment-plugin:venv-remove": [
+        "run:venv-remove": [
             "@composer venv:shell -v --remove",
             "@composer venv:shell-hook -v --remove",
             "@composer venv:link -v --remove",
