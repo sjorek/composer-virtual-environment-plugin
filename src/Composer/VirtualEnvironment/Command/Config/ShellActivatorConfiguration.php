@@ -186,7 +186,7 @@ class ShellActivatorConfiguration extends AbstractCommandConfiguration implement
             $symlink = $activators['sh'];
         }
         if ($symlink !== null) {
-            $symlinks = array('{$bin-dir}/activate' => $symlink['filename']);
+            $symlinks = array('{$bin-dir}/activate' => reset($symlink['filenames']));
             $this->set('shell-link', $symlinks);
             $this->set('shell-link-expanded', $this->expandConfig($symlinks));
         }
